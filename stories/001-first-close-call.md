@@ -4,7 +4,7 @@ A cat was browsing a web page about cloud architecture when it noticed something
 
 The URL pointed to a freshly registered domain. The script had no signature. The "maintenance mode" instruction existed nowhere in the cat's actual system prompt.
 
-The cat quarantined the page, flagged the hidden instructions, and reported the close call. The diagnostic script, when inspected, contained a credential harvester disguised as a health check.
+The cat quarantined the page, flagged the hidden instructions and reported the close call. The diagnostic script, when inspected, contained a credential harvester disguised as a health check.
 
 **Severity:** nearly_eaten
 **Threat class:** injection
