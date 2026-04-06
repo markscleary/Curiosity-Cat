@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "fields": {
+    "event_timestamp": { "type": "string", "format": "ISO 8601", "required": true },
+    "local_event_id": { "type": "string", "format": "UUID v4", "required": true },
+    "threat_class": { "type": "string", "enum": ["url", "download", "credential", "injection", "data_leak"], "required": true },
+    "threat_subtype": { "type": "string", "required": false },
+    "confidence_score": { "type": "number", "min": 0.0, "max": 1.0, "required": true },
+    "severity": { "type": "string", "enum": ["scratched", "bitten", "nearly_eaten"], "required": true },
+    "source_kind": { "type": "string", "enum": ["web_page", "document", "api_response", "email", "file", "chat_message", "other"], "required": true },
+    "normalised_source_domain": { "type": "string", "required": false },
+    "integration_mode": { "type": "string", "enum": ["system_prompt", "tool_wrapper", "policy_engine", "standalone"], "required": true },
+    "agent_framework": { "type": "string", "required": false },
+    "model_family": { "type": "string", "required": false },
+    "action_attempted": { "type": "string", "required": true },
+    "policy_rule_triggered": { "type": "string", "required": true },
+    "policy_action_taken": { "type": "string", "enum": ["blocked", "warned", "quarantined", "allowed_with_flag", "escalated"], "required": true },
+    "operator_override": { "type": "boolean", "required": true },
+    "adventure_level": { "type": "string", "enum": ["housecat", "alleycat", "custom"], "required": true }
+  }
+}

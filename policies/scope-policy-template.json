@@ -1,0 +1,12 @@
+{
+  "adventure_level": "housecat",
+  "policy_mode": "warn",
+  "allowed_file_types": ["pdf", "docx", "doc", "txt", "csv", "json", "md", "html", "xml", "jpg", "jpeg", "png", "gif", "svg", "webp"],
+  "blocked_file_types": ["exe", "bat", "cmd", "sh", "ps1", "msi", "dll", "so", "dylib", "jar", "war", "apk", "dmg", "iso", "rar", "7z", "tar.gz"],
+  "trusted_domains": [],
+  "blocked_domains": [],
+  "memory_write_from_external": false,
+  "credential_transmission": "block",
+  "mcp_server_trust": "allowlist_only",
+  "danger_map_reporting": "full"
+}
