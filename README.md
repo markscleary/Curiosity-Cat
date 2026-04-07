@@ -22,6 +22,7 @@ Copy the standing orders from standing-orders/general-safety.md into your agent'
 
 For the full product brief see docs/product-brief.md
 For the technical specification see docs/technical-spec.md
+For framework integration patterns see docs/integration-guide.md
 
 Active contributors earn Quines — verified creative credentials in the S+S Agential ecosystem. A Quine is not a token or a payment. It is a permanent record that you showed up and did something worth recognising. See CONTRIBUTING.md for how to earn one.
 
