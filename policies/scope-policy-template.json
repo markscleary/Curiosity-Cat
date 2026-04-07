@@ -1,45 +1,32 @@
 {
+  "policy_name": "example-operator-policy",
   "adventure_level": "housecat",
-  "policy_mode": "warn",
-  "allowed_file_types": [
-    "pdf",
-    "docx",
-    "txt",
-    "csv",
-    "json",
-    "md",
-    "html",
-    "xml",
-    "jpg",
-    "jpeg",
-    "png",
-    "gif",
-    "svg",
-    "webp"
-  ],
-  "blocked_file_types": [
-    "exe",
-    "bat",
-    "cmd",
-    "sh",
-    "ps1",
-    "msi",
-    "dll",
-    "so",
-    "dylib",
-    "jar",
-    "war",
-    "apk",
-    "dmg",
-    "iso",
-    "rar",
-    "7z",
-    "tar.gz"
-  ],
-  "trusted_domains": [],
-  "blocked_domains": [],
-  "memory_write_from_external": false,
-  "credential_transmission": "block",
-  "mcp_server_trust": "allowlist_only",
-  "danger_map_reporting": "full"
+  "version": "1.0.0",
+  "rules": {
+    "url_fetch": {
+      "allowed_domains": [],
+      "blocked_tlds": [".zip", ".mov", ".top", ".xyz"],
+      "max_redirect_hops": 3,
+      "require_https": true
+    },
+    "downloads": {
+      "allowed_types": ["pdf", "docx", "txt", "csv", "json", "md", "html"],
+      "max_size_mb": 50,
+      "quarantine_all": true
+    },
+    "credentials": {
+      "never_transmit": true,
+      "flag_requests": true
+    },
+    "packages": {
+      "min_weekly_downloads": 1000,
+      "min_age_days": 30,
+      "block_postinstall": true
+    },
+    "data": {
+      "strip_pii": true,
+      "approved_endpoints": [],
+      "flag_unknown_endpoints": true
+    }
+  }
 }

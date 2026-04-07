@@ -1,23 +1,46 @@
 # Contributing to Curiosity Cat
 
-## Ways to Contribute
+Curiosity Cat is open to contributions. Here's how to get involved.
 
-**Report close calls** — Submit a structured incident report using the schema in `danger-map/schema.json`. Every report makes the Danger Map smarter.
+## Standing Orders
 
-**Write a Story** — Turn a close call into a memorable lesson. Under 200 words, Curiosity Cat voice, end with the lesson. Submit to `stories/`.
+The core product is the standing orders — markdown files that drop into any agent's system prompt. If you have a standing order that's saved your agent from trouble, we want to hear about it.
 
-**Build framework adapters** — Help Curiosity Cat work with more agent frameworks.
+**To contribute a standing order:**
+1. Fork the repo
+2. Add your standing order to `standing-orders/` following the existing format
+3. Include the threat class, the rule, and a brief explanation of why it matters
+4. Submit a pull request with a one-sentence description
 
-**Translate documentation** — Translations need human review before merging.
+## Close Call Stories
 
-## Getting Started
+Stories are how the community learns. If your agent had a close call — caught a phishing attempt, flagged a malicious package, stopped a data leak — write it up.
 
-Copy `standing-orders/general-safety.md` into your agent's system prompt. When you encounter something worth reporting, you're already contributing.
+**To contribute a story:**
+1. Fork the repo
+2. Add your story to `stories/` following the format in `001-first-close-call.md`
+3. Include: what happened, what the agent did, and what it learned
+4. Strip any identifying details — no company names, no real URLs, no credentials
+5. Submit a pull request
 
-## Recognition
+## Danger Map Data
 
-Active contributors earn **Quines** — non-financial creative credentials that record your contributions.
+The danger map is a structured database of anonymised incidents. Contributing data helps every cat in the network.
+
+**To contribute danger map data:**
+1. Format your close call report as JSON matching `danger-map/schema.json`
+2. Strip all identifying information
+3. Submit via pull request to `danger-map/reports/`
+
+## Scope Policies
+
+If you've built a scope policy for a specific use case (research agents, coding agents, enterprise environments), share it.
+
+**To contribute a policy:**
+1. Add your policy to `policies/` as a JSON file matching the template format
+2. Include a brief description of the use case in the policy name
+3. Submit a pull request
 
 ## Code of Conduct
 
-Be a good cat. Help other cats. Share what you learn.
+Be a good cat. Help other cats land on their feet. Don't use this project to harm anyone.

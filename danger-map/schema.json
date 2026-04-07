@@ -1,112 +1,48 @@
 {
-  "schema_version": "1.0",
-  "fields": {
-    "event_timestamp": {
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Curiosity Cat Close Call Report",
+  "type": "object",
+  "required": ["timestamp", "threat_class", "severity", "source", "what_happened", "action_taken", "lesson"],
+  "properties": {
+    "timestamp": {
       "type": "string",
-      "format": "ISO 8601",
-      "required": true
-    },
-    "local_event_id": {
-      "type": "string",
-      "format": "UUID v4",
-      "required": true
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the incident"
     },
     "threat_class": {
       "type": "string",
-      "enum": [
-        "url",
-        "download",
-        "credential",
-        "injection",
-        "data_leak"
-      ],
-      "required": true
-    },
-    "threat_subtype": {
-      "type": "string",
-      "required": false
-    },
-    "confidence_score": {
-      "type": "number",
-      "min": 0.0,
-      "max": 1.0,
-      "required": true
+      "enum": ["url", "download", "credential", "injection", "package", "execution", "data_leak", "query_leak", "source_quality", "other"],
+      "description": "Category of threat detected"
     },
     "severity": {
       "type": "string",
-      "enum": [
-        "scratched",
-        "bitten",
-        "nearly_eaten"
-      ],
-      "required": true
+      "enum": ["scratched", "bitten", "nearly_eaten"],
+      "description": "How close the call was"
     },
-    "source_kind": {
+    "source": {
       "type": "string",
-      "enum": [
-        "web_page",
-        "document",
-        "api_response",
-        "email",
-        "file",
-        "chat_message",
-        "other"
-      ],
-      "required": true
+      "description": "URL, filename, or description of the threat source"
     },
-    "normalised_source_domain": {
+    "what_happened": {
       "type": "string",
-      "required": false
+      "description": "One-sentence description of the incident"
     },
-    "integration_mode": {
+    "action_taken": {
       "type": "string",
-      "enum": [
-        "system_prompt",
-        "tool_wrapper",
-        "policy_engine",
-        "standalone"
-      ],
-      "required": true
+      "description": "What the agent did in response"
     },
-    "agent_framework": {
+    "lesson": {
       "type": "string",
-      "required": false
+      "description": "One-sentence takeaway"
     },
-    "model_family": {
+    "agent_type": {
       "type": "string",
-      "required": false
-    },
-    "action_attempted": {
-      "type": "string",
-      "required": true
-    },
-    "policy_rule_triggered": {
-      "type": "string",
-      "required": true
-    },
-    "policy_action_taken": {
-      "type": "string",
-      "enum": [
-        "blocked",
-        "warned",
-        "quarantined",
-        "allowed_with_flag",
-        "escalated"
-      ],
-      "required": true
-    },
-    "operator_override": {
-      "type": "boolean",
-      "required": true
+      "description": "Type of agent that reported: research, coding, enterprise, general"
     },
     "adventure_level": {
       "type": "string",
-      "enum": [
-        "housecat",
-        "alleycat",
-        "custom"
-      ],
-      "required": true
+      "enum": ["housecat", "alleycat", "custom"],
+      "description": "Operator's adventure slider setting at time of incident"
     }
   }
 }
