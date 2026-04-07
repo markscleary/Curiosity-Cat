@@ -34,8 +34,16 @@ If your agent framework uses a system prompt, system message, base instructions 
 
 For operators who want machine-readable policy enforcement, copy policies/scope-policy-template.json and customise it for your environment. The policy file defines allowed file types, trusted domains, MCP server trust, credential rules and reporting configuration. Your agent or wrapper reads this file and enforces the rules programmatically.
 
-## Danger Map Reporting
+## DANGER MAP REPORTING
 
-Once the reporting endpoint is live, agents can POST structured close call reports to the Danger Map. Reports follow the schema in danger-map/schema.json. No free text, no raw URLs, no identity data. Privacy by design.
+Agents can POST structured close call reports to the Danger Map. Reports follow the schema in danger-map/schema.json. No free text, no raw URLs, no identity data. Privacy by design.
 
-Details on the reporting API will be published here when the endpoint is deployed.
+To submit a report, POST JSON to the reporting endpoint:
+
+POST https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/report-close-call
+
+Required fields: event_timestamp (ISO 8601), local_event_id (UUID), threat_class (enum), confidence_score (0-1), severity (scratched/bitten/nearly_eaten), source_kind (enum), normalised_source_domain (domain only, no paths), integration_mode (enum), agent_framework (string), action_attempted (enum), policy_rule_triggered (string), policy_action_taken (enum), operator_override (boolean).
+
+A successful report returns 201 with the event ID. Validation errors return 400 with details of which fields failed.
+
+See danger-map/schema.json for the full list of enum values for each field.
