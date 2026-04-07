@@ -1,34 +1,38 @@
-# Curiosity Cat
+Curiosity Cat
 
-Curiosity Cat is a safety framework for AI agents that explores the world alongside them — not by locking doors, but by teaching cats to land on their feet. Cats explore. Cats survive. This is the only security tool that lets you choose to be braver.
+A safety framework for AI agents that explore the internet.
 
-## The Adventure Slider
+Cats explore. Cats get into things they shouldn't. Cats survive.
 
-Every operator sets their own risk tolerance. **Housecat** mode is cautious — quarantine everything, block unknowns, ask before acting. **Alleycat** mode is bold — wider trust, faster action, learning from close calls. Or set your own custom level. The slider is the product.
+Curiosity Cat is a portable safety framework for anyone running AI agents. It helps agents browse the web, download files and connect to external tools — without being left defenceless. It is not a firewall. It is not a sandbox. It is the practical middle ground between locking agents down and letting them roam free.
 
-## Three Layers
+The only security tool that lets you choose to be braver. A single slider — the adventure level — runs from Housecat (maximum protection) to Alley Cat (maximum exploration). You choose your risk level. The system adapts.
 
-**Safety Net** — Copy-paste standing orders that drop into any agent's system prompt. Zero dependencies, works with any framework. Check URLs, quarantine downloads, flag hidden instructions, never transmit credentials. The MVP is a markdown file.
+Three layers:
 
-**Danger Map** — A shared, anonymised database of real incidents. Every close call reported by every cat makes every other cat smarter. Structured data, no free text, privacy by design. The network effect is the moat.
+The Safety Net — local policy enforcement, file quarantine, domain trust controls and standing orders you can copy-paste into any agent's system prompt. Works with any framework. Zero dependencies for the basic install.
 
-**Stories** — Short, memorable accounts of what went wrong and what the cat learned. Written in Curiosity Cat's voice. Designed to be read, shared and remembered — because the best security training is a good story.
+The Danger Map — crowdsourced threat intelligence. When your cat gets scratched, every other cat learns from it. Anonymised, structured, weighted by trust and recency. The more cats exploring, the safer every cat becomes.
 
-## Quick Start
+The Stories — real close calls turned into short, memorable tales. Published weekly in English, Arabic and Mandarin Chinese. Security lessons people actually remember. Because CVE numbers don't change behaviour. Stories do.
 
-Copy the contents of [`standing-orders/general-safety.md`](standing-orders/general-safety.md) into your agent's system prompt. Done.
+Quick start:
 
-That's the install. No packages, no dependencies, no configuration. Your agent now checks URLs, quarantines downloads, flags hidden instructions and reports close calls.
+Copy the standing orders from standing-orders/general-safety.md into your agent's system prompt. That is the minimum install. No package manager required. Works with Claude Code, Nanobot, AutoGPT, CrewAI, LangChain or any custom setup.
 
-For role-specific standing orders, see [`research-agent.md`](standing-orders/research-agent.md), [`coding-agent.md`](standing-orders/coding-agent.md), and [`enterprise-analyst.md`](standing-orders/enterprise-analyst.md).
+For the full product brief see docs/product-brief.md
+For the technical specification see docs/technical-spec.md
 
-## Documentation
+Active contributors earn Quines — verified creative credentials in the S+S Agential ecosystem. A Quine is not a token or a payment. It is a permanent record that you showed up and did something worth recognising. See CONTRIBUTING.md for how to earn one.
 
-- [Product Brief](docs/product-brief.md) — what Curiosity Cat is and where it's going
-- [Technical Spec](docs/technical-spec.md) — architecture, schemas, integration patterns
+------------------------------------
 
-## About
+Built by Short+Sweet AI Lab.
 
-Curiosity Cat is a [Short+Sweet International](https://shortandsweet.org) product.
+Who we are. Since 2002 from our starting point in Sydney, Australia Short+Sweet has been presenting short form Theatre, Music, Dance & Film Festivals. The world is changing more rapidly than ever before and for 'artists' of all kinds AI is both a threat and an amazing opportunity. We're bringing everything we've learned about creating 'safe spaces' to tell stories - working with 100,000 artists, 15,000 new works, 50 cities, 14 countries in a dozen languages.
 
-© 2026 Mark Cleary, Short+Sweet. All rights reserved.
+Our Vision is to make the world, a more creative place. Core belief: Human stories make us who we are. Everyone can be an artist. No barriers, except your own imagination. Explore, Discover, Create.
+
+shortandsweet.org | curiosity@shortandsweet.org
+
+Copyright 2026 Mark Cleary, Short+Sweet. All rights reserved.
