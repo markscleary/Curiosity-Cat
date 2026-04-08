@@ -1,0 +1,7 @@
+MEDIA_LIST_SS_EXECUTABLE.md
+.DS_Store
+*.log
+node_modules/
+.env
+.env.local
+quarantine/

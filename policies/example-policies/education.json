@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "policy_name": "education",
+  "extends": "default",
+  "adventure_level": "housecat",
+  "policy_mode": "warn",
+  "notes": "Education environments involve minors and student data. FERPA and equivalent protections apply. Student names, grades, behavioural records and family information must never appear in external queries or reports.",
+  "file_handling": {
+    "allowed_types": ["pdf", "docx", "txt", "md", "csv", "json", "html", "jpg", "png"],
+    "blocked_types": ["exe", "bat", "sh", "cmd", "ps1", "msi", "dmg", "app", "jar", "zip", "tar", "gz", "7z", "rar"],
+    "quarantine_path": "./curiosity-cat/quarantine/",
+    "auto_quarantine": true
+  },
+  "domain_trust": {
+    "trusted_domains": [],
+    "blocked_domains": [],
+    "trust_mode": "flag_unknown"
+  },
+  "credentials": {
+    "transmission_policy": "block",
+    "allowed_credential_targets": []
+  },
+  "data_containment": {
+    "block_student_identifiers": true,
+    "block_grades_and_records": true,
+    "sanitise_external_queries": true
+  },
+  "reporting": {
+    "danger_map_enabled": true,
+    "reporting_mode": "full",
+    "local_log_path": "./curiosity-cat/logs/",
+    "audit_required": true
+  }
+}
