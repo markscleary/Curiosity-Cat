@@ -6,11 +6,20 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/markscleary/Curiosity-Cat"
+    "url": "git+https://github.com/markscleary/Curiosity-Cat.git"
   },
-  "keywords": ["ai", "agent", "safety", "security", "prompt-injection", "mcp", "llm", "standing-orders"],
+  "keywords": [
+    "ai",
+    "agent",
+    "safety",
+    "security",
+    "prompt-injection",
+    "mcp",
+    "llm",
+    "standing-orders"
+  ],
   "bin": {
-    "curiosity-cat": "./bin/curiosity-cat.js"
+    "curiosity-cat": "bin/curiosity-cat.js"
   },
   "files": [
     "bin/",
