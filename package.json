@@ -1,0 +1,23 @@
+{
+  "name": "curiosity-cat",
+  "version": "0.1.0",
+  "description": "AI agent safety framework — standing orders, danger maps, and stories that teach cats to land on their feet",
+  "author": "Mark Cleary, Short+Sweet International",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markscleary/Curiosity-Cat"
+  },
+  "keywords": ["ai", "agent", "safety", "security", "prompt-injection", "mcp", "llm", "standing-orders"],
+  "bin": {
+    "curiosity-cat": "./bin/curiosity-cat.js"
+  },
+  "files": [
+    "bin/",
+    "standing-orders/",
+    "policies/",
+    "danger-map/",
+    "README.md",
+    "LICENSE"
+  ]
+}
