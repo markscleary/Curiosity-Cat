@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "curiosity-cat"
+version = "0.1.0"
+description = "AI agent safety framework — standing orders, danger maps, and stories that teach cats to land on their feet"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Mark Cleary", email = "curiosity@shortandsweet.org"}]
+keywords = ["ai", "agent", "safety", "security", "prompt-injection", "mcp", "llm"]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries",
+]
+
+[project.scripts]
+curiosity-cat = "curiosity_cat.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/markscleary/Curiosity-Cat"
+Repository = "https://github.com/markscleary/Curiosity-Cat"
+Issues = "https://github.com/markscleary/Curiosity-Cat/issues"
+
+[tool.setuptools.package-data]
+curiosity_cat = ["data/standing-orders/*.md", "data/policies/*.json", "data/policies/example-policies/*.json", "data/stories/*.md", "data/danger-map/*.json"]

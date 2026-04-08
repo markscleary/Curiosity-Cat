@@ -6,3 +6,9 @@ node_modules/
 .env.local
 quarantine/
 supabase/config.json
+
+# Python build artifacts
+dist/
+build/
+*.egg-info/
+__pycache__/

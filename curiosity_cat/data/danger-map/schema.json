@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Curiosity Cat Close Call Report",
+  "type": "object",
+  "required": ["timestamp", "threat_class", "severity", "source", "what_happened", "action_taken", "lesson"],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the incident"
+    },
+    "threat_class": {
+      "type": "string",
+      "enum": ["url", "download", "credential", "injection", "package", "execution", "data_leak", "query_leak", "source_quality", "other"],
+      "description": "Category of threat detected"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["scratched", "bitten", "nearly_eaten"],
+      "description": "How close the call was"
+    },
+    "source": {
+      "type": "string",
+      "description": "URL, filename, or description of the threat source"
+    },
+    "what_happened": {
+      "type": "string",
+      "description": "One-sentence description of the incident"
+    },
+    "action_taken": {
+      "type": "string",
+      "description": "What the agent did in response"
+    },
+    "lesson": {
+      "type": "string",
+      "description": "One-sentence takeaway"
+    },
+    "agent_type": {
+      "type": "string",
+      "description": "Type of agent that reported: research, coding, enterprise, general"
+    },
+    "adventure_level": {
+      "type": "string",
+      "enum": ["housecat", "alleycat", "custom"],
+      "description": "Operator's adventure slider setting at time of incident"
+    }
+  }
+}

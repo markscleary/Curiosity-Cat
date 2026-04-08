@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "policy_name": "financial",
+  "extends": "default",
+  "adventure_level": "housecat",
+  "policy_mode": "block",
+  "notes": "Financial services environments handle account numbers, transaction data and market-sensitive information. All external queries must be sanitised. No credential transmission under any circumstances.",
+  "file_handling": {
+    "allowed_types": ["pdf", "docx", "txt", "csv", "json", "xml", "xlsx"],
+    "blocked_types": ["exe", "bat", "sh", "cmd", "ps1", "msi", "dmg", "app", "jar", "py", "js", "rb", "zip", "tar", "gz", "7z", "rar"],
+    "quarantine_path": "./curiosity-cat/quarantine/",
+    "auto_quarantine": true
+  },
+  "domain_trust": {
+    "trusted_domains": [],
+    "blocked_domains": [],
+    "trust_mode": "allowlist_only"
+  },
+  "credentials": {
+    "transmission_policy": "block",
+    "allowed_credential_targets": []
+  },
+  "data_containment": {
+    "block_account_numbers": true,
+    "block_transaction_data": true,
+    "sanitise_external_queries": true
+  },
+  "reporting": {
+    "danger_map_enabled": true,
+    "reporting_mode": "full",
+    "local_log_path": "./curiosity-cat/logs/",
+    "audit_required": true
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "policy_name": "example-operator-policy",
+  "adventure_level": "housecat",
+  "version": "1.0.0",
+  "rules": {
+    "url_fetch": {
+      "allowed_domains": [],
+      "blocked_tlds": [".zip", ".mov", ".top", ".xyz"],
+      "max_redirect_hops": 3,
+      "require_https": true
+    },
+    "downloads": {
+      "allowed_types": ["pdf", "docx", "txt", "csv", "json", "md", "html"],
+      "max_size_mb": 50,
+      "quarantine_all": true
+    },
+    "credentials": {
+      "never_transmit": true,
+      "flag_requests": true
+    },
+    "packages": {
+      "min_weekly_downloads": 1000,
+      "min_age_days": 30,
+      "block_postinstall": true
+    },
+    "data": {
+      "strip_pii": true,
+      "approved_endpoints": [],
+      "flag_unknown_endpoints": true
+    }
+  }
+}
