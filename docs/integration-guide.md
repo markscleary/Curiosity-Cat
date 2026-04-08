@@ -36,14 +36,26 @@ For operators who want machine-readable policy enforcement, copy policies/scope-
 
 ## DANGER MAP REPORTING
 
-Agents can POST structured close call reports to the Danger Map. Reports follow the schema in danger-map/schema.json. No free text, no raw URLs, no identity data. Privacy by design.
+Agents can report close calls and query the shared threat database via the Danger Map API. Full API documentation is in docs/api.md.
 
-To submit a report, POST JSON to the reporting endpoint:
+**Base URL:** `https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map`
 
-POST https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/report-close-call
+### Submit a close call
 
-Required fields: event_timestamp (ISO 8601), local_event_id (UUID), threat_class (enum), confidence_score (0-1), severity (scratched/bitten/nearly_eaten), source_kind (enum), normalised_source_domain (domain only, no paths), integration_mode (enum), agent_framework (string), action_attempted (enum), policy_rule_triggered (string), policy_action_taken (enum), operator_override (boolean).
+POST to the report endpoint:
 
-A successful report returns 201 with the event ID. Validation errors return 400 with details of which fields failed.
+```
+POST https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map/report
+```
 
-See danger-map/schema.json for the full list of enum values for each field.
+Required fields: timestamp (ISO 8601), threat_class (url|download|credential|injection|package|execution|data_leak|query_leak|source_quality|other), severity (scratched|bitten|nearly_eaten), source, what_happened, action_taken, lesson.
+
+Optional fields: agent_type, adventure_level, submitted_by, framework, region.
+
+A successful report returns 201. Validation errors return 400 with field details.
+
+### Query the map
+
+- `GET /danger-map` — close call counts grouped by threat class, severity, and week
+- `GET /danger-map/recent` — recent close calls, newest first (optional `limit` param, default 20)
+- `GET /danger-map/stats` — aggregate statistics by threat class and severity
