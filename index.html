@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Curiosity Cat — Safety framework for AI agents</title>
-  <meta name="description" content="The safety framework for AI agents that explore the internet. Configurable, open-source, and built around how agents actually work." />
+  <meta name="description" content="A cat falls flat, the rest learn the trick. The safety framework for AI agents that explore the internet." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -635,7 +635,7 @@
       <li><a href="#adventure">How It Works</a></li>
       <li><a href="#layers">Layers</a></li>
       <li><a href="#quickstart">Quick Start</a></li>
-      <li><a href="#stories">Stories</a></li>
+      <li><a href="#stories">Nine Lives</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
@@ -648,10 +648,15 @@
         <span class="hero-emoji">🐱</span>
         <h1 class="hero-title">Curiosity<br /><span>Cat</span></h1>
         <p class="hero-sub">Your agents are out there. Who's watching them?</p>
-        <p class="hero-quip"><em>One cat gets scratched. Every cat gets smarter.</em></p>
+        <p class="hero-quip"><em>A cat falls flat, the rest learn the trick.</em></p>
         <div class="hero-ctas">
           <a href="#quickstart" class="btn btn-primary">Get Started</a>
           <a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub</a>
+        </div>
+        <div style="margin-top: 3rem; display: flex; justify-content: center;">
+          <div style="width: 100%; max-width: 560px; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 2px solid rgba(245, 158, 11, 0.4);">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/pB_aFARcPgg" frameborder="0" allowfullscreen></iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -693,20 +698,29 @@
         <div class="card fade-up delay-1">
           <span class="card-icon">📋</span>
           <h3 class="card-title">Safety Net</h3>
-          <p class="card-body">Local policy enforcement, standing orders, and quarantine protocols. Runs entirely in the system prompt — no server, no SDK, no dependencies.</p>
-          <p class="card-tag">"Zero dependencies. Copy-paste into any agent's system prompt."</p>
+          <p class="card-body">Your agent is about to install a package. Twelve downloads. Created yesterday. One letter off from the real thing. Safety Net catches it before the damage is done.</p>
+          <p class="card-tag">Standing orders, quarantine, and policy enforcement that drop into any agent's system prompt. No SDK. No server. No dependencies. Copy-paste and your agent is protected.</p>
+          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JOKGncCffEc" frameborder="0" allowfullscreen></iframe>
+          </div>
         </div>
         <div class="card fade-up delay-2">
           <span class="card-icon">🗺️</span>
           <h3 class="card-title">Danger Map</h3>
-          <p class="card-body">Crowdsourced threat intelligence from every agent that ever got scratched. Real incidents. Real domains. Updated continuously.</p>
-          <p class="card-tag">"When your cat gets scratched, every other cat learns."</p>
+          <p class="card-body">Last week, someone's agent followed a redirect chain to a credential phishing page. This week, your agent already knows not to. Every close call reported makes every agent smarter.</p>
+          <p class="card-tag">Crowdsourced threat intelligence from real incidents. Anonymised, structured, privacy by design. No free text, no raw URLs, no identity data. The network effect is the moat.</p>
+          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sVi1go-hqh0" frameborder="0" allowfullscreen></iframe>
+          </div>
         </div>
         <div class="card fade-up delay-3">
-          <span class="card-icon">📖</span>
-          <h3 class="card-title">Stories</h3>
-          <p class="card-body">Real close calls told as short stories. Named threats. Memorable patterns. The kind of security knowledge that actually sticks.</p>
-          <p class="card-tag">"Security lessons people actually remember."</p>
+          <span class="card-icon">🐈</span>
+          <h3 class="card-title">Nine Lives</h3>
+          <p class="card-body">An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a story — and now every cat knows the trick.</p>
+          <p class="card-tag">Real close calls published as short, memorable tales. Security lessons that stick because they read like stories, not CVE numbers.</p>
+          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen></iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -736,7 +750,7 @@
     </div>
   </section>
 
-  <!-- STORIES -->
+  <!-- NINE LIVES -->
   <section id="stories">
     <div class="container">
       <p class="section-label fade-up">From the Field</p>
@@ -771,6 +785,17 @@
     <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
   </section>
 
+  <!-- SKIN SWITCH -->
+  <section id="skin-switch" style="text-align: center; padding: 4rem 1.5rem;">
+    <button id="skinBtn" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; background: transparent; border: 2px solid var(--amber); color: var(--amber); padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: all 0.3s;">Not a cat person?</button>
+    <p id="skinMsg" style="margin-top: 1rem; font-style: italic; color: var(--muted); min-height: 1.5em;"></p>
+  </section>
+
+  <!-- Black screen overlay for the "none" skin -->
+  <div id="blackout" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999;">
+    <button id="quitBtn" style="position:absolute; width:5vw; height:5vh; min-width:40px; min-height:30px; background:transparent; border:none; color:transparent; cursor:default; font-size:0.7rem; font-family:'Source Sans 3',sans-serif; transition: color 0.2s, background 0.2s;" onmouseenter="this.style.color='#f59e0b';this.style.background='rgba(245,158,11,0.1)';this.style.cursor='pointer'" onmouseleave="this.style.color='transparent';this.style.background='transparent';this.style.cursor='default'" onclick="document.getElementById('blackout').style.display='none'">Quit and stay quit!</button>
+  </div>
+
   <!-- FOOTER -->
   <footer>
     <div class="container">
@@ -784,7 +809,7 @@
           <h4>Project</h4>
           <ul>
             <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
-            <li><a href="https://github.com/markscleary/Curiosity-Cat/tree/main/stories" target="_blank" rel="noopener">Stories</a></li>
+            <li><a href="https://github.com/markscleary/Curiosity-Cat/tree/main/stories" target="_blank" rel="noopener">Nine Lives</a></li>
             <li><a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener">Integration Guide</a></li>
             <li><a href="https://github.com/markscleary/Curiosity-Cat/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
           </ul>
@@ -798,6 +823,7 @@
         </div>
       </div>
       <div class="footer-bottom">
+        <p style="font-size: 0.8rem; color: var(--muted); margin-top: 1rem;">Cat videos courtesy of YouTube — the centre of the cat video universe.</p>
         &copy; 2026 Mark Cleary, Short+Sweet. All rights reserved.
       </div>
     </div>
@@ -815,6 +841,47 @@
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+  <script>
+  (function() {
+    const skins = [
+      { name: 'rat', msg: "We know that not all people love cats. How about rats? They're clever and cute." },
+      { name: 'puppy', msg: "But every person on the planet loves puppies." },
+      { name: 'none', msg: "And if you don't like any of them then maybe we're not for you!" }
+    ];
+    let skinIndex = -1;
+    const btn = document.getElementById('skinBtn');
+    const msg = document.getElementById('skinMsg');
+    const blackout = document.getElementById('blackout');
+    const quitBtn = document.getElementById('quitBtn');
+
+    btn.addEventListener('click', function() {
+      skinIndex++;
+      if (skinIndex >= skins.length) skinIndex = 0;
+      const skin = skins[skinIndex];
+      msg.textContent = skin.msg;
+
+      if (skin.name === 'none') {
+        blackout.style.display = 'block';
+        // Random position within 90% box, button is 5% x 5%
+        const maxLeft = 85; // 90% box minus 5% button
+        const maxTop = 85;
+        const left = 2.5 + Math.random() * maxLeft; // start at 5% margin (half of 10%)
+        const top = 2.5 + Math.random() * maxTop;
+        quitBtn.style.left = left + 'vw';
+        quitBtn.style.top = top + 'vh';
+      }
+
+      if (skin.name === 'rat') {
+        btn.textContent = 'Still not convinced?';
+      } else if (skin.name === 'puppy') {
+        btn.textContent = 'Nope, not even puppies';
+      } else {
+        btn.textContent = 'Not a cat person?';
+      }
+    });
+  })();
   </script>
 
 </body>
