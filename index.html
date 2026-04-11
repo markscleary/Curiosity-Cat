@@ -1004,28 +1004,8 @@
   }
 
   const skins = [
-    {
-      name: 'rat',
-      above: "So you don't like clever rats or cute mice?",
-      below: "You're hard to please. One more chance?",
-      msg: "If the bomb drops tomorrow then these cute and clever creatures will likely make it through unscathed. They can keep your agents safe with their rat cunning and more escape tricks than Harry Houdini.",
-      btnText: "One more chance?",
-      btnBorder: "#8B7355",
-      btnColor: "#8B7355",
-      delayMsg: "You're obviously very hard to please.",
-      delaySeconds: 20
-    },
-    {
-      name: 'puppy',
-      above: "Puppies! Not a fan? Maybe you're in the wrong place.",
-      below: "Or maybe we just don't need your type hanging around.",
-      msg: "Bloodhounds for sniffing out danger. Rottweilers for guard dog duty. Greyhounds for speedy escapes. Man's best friend has your agents covered.",
-      btnText: "Last chance...",
-      btnBorder: "#C4956A",
-      btnColor: "#C4956A",
-      delayMsg: null,
-      delaySeconds: 0
-    },
+    { name: 'rat', above: 'Welcome to the rat side.', below: "If the bomb drops tomorrow, these cute and clever creatures will likely make it through unscathed. Rat cunning. More escape tricks than Houdini. And they never forget a threat.", msg: '', btnText: 'Still not convinced?', btnBorder: '#8B7355', btnColor: '#8B7355', delayMsg: "You're still here? You're obviously very hard to please.", delaySeconds: 20 },
+    { name: 'puppy', above: 'Everyone loves puppies. Right?', below: 'Bloodhounds sniff out danger before it arrives. Rottweilers stand guard while you sleep. Greyhounds get your agents out fast when things go wrong. Loyal, fearless, and they never leave your side.', msg: '', btnText: 'Not even puppies?', btnBorder: '#C4956A', btnColor: '#C4956A', delayMsg: null, delaySeconds: 0 },
     {
       name: 'none',
       above: "",
@@ -1052,46 +1032,50 @@
 
     if (skin.name === 'none') {
       blackout.style.display = 'block';
-      var maxLeft = 85;
-      var maxTop = 85;
-      var left = 2.5 + Math.random() * maxLeft;
-      var top = 2.5 + Math.random() * maxTop;
-      quitBtn.style.left = left + 'vw';
-      quitBtn.style.top = top + 'vh';
-
-      // After 5 seconds show hint
       setTimeout(function() {
-        var hint = document.createElement('p');
-        hint.style.cssText = 'position:fixed;bottom:10vh;width:100%;text-align:center;color:#f59e0b;font-size:1.1rem;font-family:Source Sans 3,sans-serif;z-index:10000;';
-        hint.textContent = 'Click the little box and you are on your way.';
-        blackout.appendChild(hint);
-        quitBtn.style.border = '1px solid rgba(245,158,11,0.3)';
-
-        // Jump the button every 3 seconds
-        var jumpInterval = setInterval(function() {
-          var newLeft = 2.5 + Math.random() * 85;
-          var newTop = 2.5 + Math.random() * 85;
-          quitBtn.style.left = newLeft + 'vw';
-          quitBtn.style.top = newTop + 'vh';
+        var line1 = document.createElement('p');
+        line1.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
+        line1.textContent = 'Well. That is that then.';
+        blackout.appendChild(line1);
+        setTimeout(function() { line1.style.opacity = '1'; }, 100);
+        setTimeout(function() {
+          line1.style.opacity = '0';
+          setTimeout(function() {
+            line1.textContent = 'Actually. There is one way out.';
+            line1.style.opacity = '1';
+            setTimeout(function() {
+              line1.style.opacity = '0';
+              setTimeout(function() {
+                line1.textContent = 'Find the little box. Click it. If you can.';
+                line1.style.opacity = '1';
+                quitBtn.style.left = (2.5 + Math.random() * 85) + 'vw';
+                quitBtn.style.top = (2.5 + Math.random() * 85) + 'vh';
+                quitBtn.style.border = '1px solid rgba(245,158,11,0.3)';
+                quitBtn.textContent = 'Fine. Go.';
+                var jumpInterval = setInterval(function() {
+                  quitBtn.style.left = (2.5 + Math.random() * 85) + 'vw';
+                  quitBtn.style.top = (2.5 + Math.random() * 85) + 'vh';
+                }, 3000);
+                quitBtn.onclick = function() {
+                  clearInterval(jumpInterval);
+                  blackout.style.display = 'none';
+                  blackout.querySelectorAll('p').forEach(function(el) { el.remove(); });
+                  quitBtn.style.border = 'none';
+                  quitBtn.textContent = 'Quit and stay quit!';
+                  skinIndex = -1;
+                  textAbove.textContent = "So you're not a cat person?";
+                  textBelow.textContent = 'Just press the button.';
+                  btn.textContent = 'Press the button';
+                  btn.style.borderColor = '#f59e0b';
+                  btn.style.color = '#f59e0b';
+                  msgEl.style.display = 'none';
+                  swapAccent('#f59e0b');
+                  swapVideos('cat');
+                };
+              }, 1000);
+            }, 2000);
+          }, 1000);
         }, 3000);
-
-        // Clear interval when blackout is dismissed
-        quitBtn.addEventListener('click', function() {
-          clearInterval(jumpInterval);
-          blackout.style.display = 'none';
-          if (hint.parentNode) hint.parentNode.removeChild(hint);
-          quitBtn.style.border = 'none';
-          // Reset
-          skinIndex = -1;
-          textAbove.textContent = "So you're not a cat person?";
-          textBelow.textContent = "Just press the button.";
-          btn.textContent = "Press the button";
-          btn.style.borderColor = '#f59e0b';
-          btn.style.color = '#f59e0b';
-          msgEl.style.display = 'none';
-          swapVideos('cat');
-          swapAccent('#f59e0b');
-        });
       }, 5000);
       return;
     }
