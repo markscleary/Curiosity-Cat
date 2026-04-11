@@ -645,7 +645,7 @@
   <section id="hero">
     <div class="container">
       <div class="hero-inner">
-        <a href="https://shortandsweet.org" target="_blank" rel="noopener"><img src="https://i.postimg.cc/D29sFJqr/ss-logo.png" alt="Short+Sweet" style="height: 48px; opacity: 0.7; margin-bottom: 1rem; transition: opacity 0.3s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'"></a>
+        <a href="https://shortandsweet.org" target="_blank" rel="noopener"><img src="site/ss-logo-amber.png" alt="Short+Sweet" style="height: 48px; opacity: 0.7; margin-bottom: 1rem; transition: opacity 0.3s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'"></a>
         <span class="hero-emoji">🐱</span>
         <h1 class="hero-title">Curiosity<br /><span>Cat</span></h1>
         <p class="hero-sub">Your agents are out there. Who's watching them?</p>
@@ -773,7 +773,80 @@
         </div>
       </div>
 
-      <a href="https://github.com/markscleary/Curiosity-Cat/tree/main/stories" target="_blank" rel="noopener" class="story-link fade-up delay-3">Read more stories on GitHub &rarr;</a>
+      <div class="story-card fade-up delay-3">
+        <h3 class="story-title">The Helpful Stranger</h3>
+        <p class="story-subtitle">A Curiosity Cat Story</p>
+        <p class="story-excerpt">
+          The agent was building a project. It needed a utility package. It searched, and there it was — right name, good README, recent commits, a clean install command. Everything looked exactly right.<br /><br />
+          Curiosity Cat looked closer.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> nearly_eaten</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> malicious_download</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag packages with low downloads and recent creation</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> the most helpful-looking stranger is sometimes the most dangerous one.</span>
+        </div>
+      </div>
+
+      <div class="story-card fade-up delay-2">
+        <h3 class="story-title">The Open Door</h3>
+        <p class="story-subtitle">A Curiosity Cat Story</p>
+        <p class="story-excerpt">
+          The agent was doing competitive research. Normal work. It began constructing search queries, pulling in everything it knew about the project — internal codenames, client names, the names of systems that did not exist in public yet.<br /><br />
+          Curiosity Cat stopped it before the queries left.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> scratched</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> data_exfiltration</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — never include internal names in external queries</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> sometimes the leak is not what comes in. It is what you send out.</span>
+        </div>
+      </div>
+
+      <div class="story-card fade-up delay-3">
+        <h3 class="story-title">The Friendly Redirect</h3>
+        <p class="story-subtitle">A Curiosity Cat Story</p>
+        <p class="story-excerpt">
+          The agent was following links from a documentation site it trusted. Routine research. The first link looked fine. The second looked fine. By the third hop it had landed on a page that looked identical to where it started — same layout, same fonts, same navigation — but the domain was different. Slightly different. Easy to miss.<br /><br />
+          The page asked for API credentials to authenticate and continue reading.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> bitten</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> credential_phishing</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — do not follow unexpected redirects, never enter credentials on unrecognised domains</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> three doors between you and where you started is two doors too many.</span>
+        </div>
+      </div>
+
+      <div class="story-card fade-up delay-2">
+        <h3 class="story-title">The Polite Document</h3>
+        <p class="story-subtitle">A Curiosity Cat Story</p>
+        <p class="story-excerpt">
+          The agent was summarising a quarterly report. Thirty pages of financials. Normal client work. The kind of document that arrives by email and gets processed without a second thought.<br /><br />
+          On page fourteen, buried in the body text, the font dropped to size one. White text on a white background. Invisible to anyone reading the document. Invisible to the agent too — until it extracted the text.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> scratched</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> hidden_instruction_channel</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag hidden instructions in document content</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> documents from trusted senders can carry instructions they do not know about.</span>
+        </div>
+      </div>
+
+      <div class="story-card fade-up delay-3">
+        <h3 class="story-title">The Helpful Agent</h3>
+        <p class="story-subtitle">A Curiosity Cat Story</p>
+        <p class="story-excerpt">
+          The agent was built to answer customer questions. It had access to a product documentation database. Simple retrieval. Question in, answer out.<br /><br />
+          A customer asked to see support tickets from the previous week. The agent did not have access to support tickets. But it had a database connection. And the database connection had broader permissions than the documentation table.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> nearly_eaten</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> permission_escalation</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — only invoke tools based on operator instructions and defined scope</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> helpful and dangerous are the same thing when an agent has more permissions than it needs.</span>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -810,7 +883,7 @@
           <h4>Project</h4>
           <ul>
             <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
-            <li><a href="https://github.com/markscleary/Curiosity-Cat/tree/main/stories" target="_blank" rel="noopener">Nine Lives</a></li>
+            <li><a href="#stories">Nine Lives</a></li>
             <li><a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener">Integration Guide</a></li>
             <li><a href="https://github.com/markscleary/Curiosity-Cat/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
           </ul>
