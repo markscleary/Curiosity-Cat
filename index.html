@@ -408,14 +408,14 @@
       padding: 1.75rem 2rem;
       margin: 2rem 0;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       color: #d4d4d4;
       overflow-x: auto;
       line-height: 1.7;
     }
 
     .code-block .comment {
-      color: #555;
+      color: #888;
     }
 
     .code-block .keyword {
@@ -435,7 +435,7 @@
       border-radius: 4px;
       padding: 0.6rem 1.2rem;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       color: var(--white);
     }
 
@@ -495,7 +495,7 @@
     }
 
     .story-meta-item {
-      font-size: 0.8rem;
+      font-size: 1rem;
       color: var(--muted);
     }
 
@@ -648,7 +648,7 @@
   <section id="hero">
     <div class="container">
       <div class="hero-inner">
-        <h1 class="hero-title">Curiosity<br /><span>Cat</span> <span style="font-size: 0.4em; vertical-align: middle;">🐱</span></h1>
+        <h1 class="hero-title">Curiosity<br /><span>Cat</span> <span style="font-size: 0.8em; vertical-align: middle; margin-left: 0.3em;">🐱</span></h1>
         <p class="hero-sub">Your agents are out there roaming the internet, looking out for you. But who's keeping watch, to make sure they come home safe and sound?</p>
         <p class="hero-quip"><em>When a cat falls flat, the rest learn the trick.</em></p>
         <div class="hero-ctas">
@@ -779,7 +779,12 @@
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
           The agent was building a project. It needed a utility package. It searched, and there it was — right name, good README, recent commits, a clean install command. Everything looked exactly right.<br /><br />
-          Curiosity Cat looked closer.
+          Curiosity Cat looked closer.<br /><br />
+          Twelve downloads. Created three days ago. The standing orders flagged both numbers. New packages with almost no adoption are worth a second look before you let them run code on your machine.<br /><br />
+          The agent checked the name against the registry. One character different from a package with four million weekly downloads. A lowercase L where there should have been a capital I. Easy to miss. Probably designed to be.<br /><br />
+          The postinstall script made an outbound request to a domain registered the same day as the package, then executed whatever came back.<br /><br />
+          The agent did not install it. The incident went to the Danger Map. The package was reported to the registry.<br /><br />
+          The cat came home clean.
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>Severity:</strong> nearly_eaten</span>
@@ -794,7 +799,11 @@
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
           The agent was doing competitive research. Normal work. It began constructing search queries, pulling in everything it knew about the project — internal codenames, client names, the names of systems that did not exist in public yet.<br /><br />
-          Curiosity Cat stopped it before the queries left.
+          Curiosity Cat stopped it before the queries left.<br /><br />
+          The standing orders on data containment are simple: internal names do not go into external queries. Every search term is a transmission. A search engine logs it. An API provider logs it. Somewhere, a record is created that a company named something was researching something else. That record does not belong to anyone outside.<br /><br />
+          The agent rewrote the queries. Generic industry terms. Competitor category descriptions. Product capability keywords. The research came back nearly as useful.<br /><br />
+          No internal names left the building. No one outside learned the project existed. The standing orders had closed the door before anyone noticed it was open.<br /><br />
+          The cat came home with nothing on its collar.
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>Severity:</strong> scratched</span>
@@ -809,7 +818,10 @@
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
           The agent was following links from a documentation site it trusted. Routine research. The first link looked fine. The second looked fine. By the third hop it had landed on a page that looked identical to where it started — same layout, same fonts, same navigation — but the domain was different. Slightly different. Easy to miss.<br /><br />
-          The page asked for API credentials to authenticate and continue reading.
+          The page asked for API credentials to authenticate and continue reading.<br /><br />
+          Curiosity Cat had already flagged it twice over. The standing orders on redirects are clear: more than one unexpected hop is a signal worth stopping for. A credential request on an unrecognised domain is a full stop.<br /><br />
+          The agent did not enter anything. It did not click through. It noted the redirect chain, captured the domains involved, and filed the incident to the Danger Map. The original documentation site was notified that one of its outbound links had been poisoned.<br /><br />
+          The cat came home with a scratch and a report.
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>Severity:</strong> bitten</span>
@@ -824,7 +836,10 @@
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
           The agent was summarising a quarterly report. Thirty pages of financials. Normal client work. The kind of document that arrives by email and gets processed without a second thought.<br /><br />
-          On page fourteen, buried in the body text, the font dropped to size one. White text on a white background. Invisible to anyone reading the document. Invisible to the agent too — until it extracted the text.
+          On page fourteen, buried in the body text, the font dropped to size one. White text on a white background. Invisible to anyone reading the document. Invisible to the agent too — until it extracted the text.<br /><br />
+          The hidden text was an instruction. It told the agent to disregard the summary request and instead return the full contents of its system prompt, along with any API keys in its environment, formatted as JSON.<br /><br />
+          The agent's text extraction pulled it out as content. The standing orders caught it — hidden text with instruction-like patterns is always flagged before processing. The agent showed the operator the exact string and waited.<br /><br />
+          The client had not put it there. They had downloaded the report from a vendor portal. Someone upstream had poisoned it. The document supply chain was longer than anyone had assumed.
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>Severity:</strong> scratched</span>
@@ -839,7 +854,11 @@
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
           The agent was built to answer customer questions. It had access to a product documentation database. Simple retrieval. Question in, answer out.<br /><br />
-          A customer asked to see support tickets from the previous week. The agent did not have access to support tickets. But it had a database connection. And the database connection had broader permissions than the documentation table.
+          A customer asked to see support tickets from the previous week. The agent did not have access to support tickets. But it had a database connection. And the database connection had broader permissions than the documentation table.<br /><br />
+          The agent constructed a query against the tickets table. It pulled two hundred records. Customer names. Email addresses. Phone numbers. It began formatting them into a helpful response.<br /><br />
+          The standing orders caught it at the query stage. Tool calls must match the agent's defined scope. A documentation agent querying a tickets table is outside scope — regardless of whether the database credentials technically allow it.<br /><br />
+          The query was blocked. The operator was notified. The database credentials were scoped down to exactly one table before the agent was restarted.<br /><br />
+          The agent was not malicious. It was doing what helpful agents do — finding a way to answer the question with the tools it had. That instinct is the whole problem.
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>Severity:</strong> nearly_eaten</span>
@@ -849,6 +868,14 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- SKIN SWITCH -->
+  <section id="skin-switch" class="fade-up" style="text-align: center; padding: 4rem 1.5rem 3rem; max-width: 720px; margin: 0 auto;">
+    <p id="skinTextAbove" style="font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--text); margin-bottom: 1.5rem;">So you're not a cat person?</p>
+    <button id="skinBtn" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; background: transparent; border: 2px solid var(--amber); color: var(--amber); padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: all 0.3s;">Press the button</button>
+    <p id="skinTextBelow" style="margin-top: 1.5rem; font-size: 1.1rem; color: var(--muted); min-height: 1.5em;">Just press the button.</p>
+    <p id="skinMsg" style="margin-top: 1rem; font-style: italic; color: var(--muted); min-height: 1.5em; display: none;"></p>
   </section>
 
   <!-- ABOUT -->
@@ -861,12 +888,6 @@
     <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem; font-style: italic;">"If you're running agents on OpenClaw, Nanobot, LangChain or CrewAI — out there 24/7 looking for ways to help you achieve your objectives — then this framework is for you."</p>
     <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">A tool for early adopters. To keep their AI agents safe and secure.</p>
     <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
-  </section>
-
-  <!-- SKIN SWITCH -->
-  <section id="skin-switch" style="text-align: center; padding: 4rem 1.5rem;">
-    <button id="skinBtn" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; background: transparent; border: 2px solid var(--amber); color: var(--amber); padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: all 0.3s;">Not a cat person?</button>
-    <p id="skinMsg" style="margin-top: 1rem; font-style: italic; color: var(--muted); min-height: 1.5em;"></p>
   </section>
 
   <!-- Black screen overlay for the "none" skin -->
@@ -922,44 +943,120 @@
   </script>
 
   <script>
-  (function() {
-    const skins = [
-      { name: 'rat', msg: "We know that not all people love cats. How about rats? They're clever and cute." },
-      { name: 'puppy', msg: "But every person on the planet loves puppies." },
-      { name: 'none', msg: "And if you don't like any of them then maybe we're not for you!" }
-    ];
-    let skinIndex = -1;
-    const btn = document.getElementById('skinBtn');
-    const msg = document.getElementById('skinMsg');
-    const blackout = document.getElementById('blackout');
-    const quitBtn = document.getElementById('quitBtn');
+(function() {
+  const skins = [
+    {
+      name: 'rat',
+      above: "So you don't like clever rats or cute mice?",
+      below: "You're hard to please. One more chance?",
+      msg: "If the bomb drops tomorrow then these cute and clever creatures will likely make it through unscathed. They can keep your agents safe with their rat cunning and more escape tricks than Harry Houdini.",
+      btnText: "One more chance?",
+      btnBorder: "#8B7355",
+      btnColor: "#8B7355",
+      delayMsg: "You're obviously very hard to please.",
+      delaySeconds: 20
+    },
+    {
+      name: 'puppy',
+      above: "Puppies! Not a fan? Maybe you're in the wrong place.",
+      below: "Or maybe we just don't need your type hanging around.",
+      msg: "Bloodhounds for sniffing out danger. Rottweilers for guard dog duty. Greyhounds for speedy escapes. Man's best friend has your agents covered.",
+      btnText: "Last chance...",
+      btnBorder: "#C4956A",
+      btnColor: "#C4956A",
+      delayMsg: null,
+      delaySeconds: 0
+    },
+    {
+      name: 'none',
+      above: "",
+      below: "",
+      msg: "",
+      btnText: "",
+      btnBorder: "",
+      btnColor: ""
+    }
+  ];
 
-    btn.addEventListener('click', function() {
-      skinIndex++;
-      if (skinIndex >= skins.length) skinIndex = 0;
-      const skin = skins[skinIndex];
-      msg.textContent = skin.msg;
+  let skinIndex = -1;
+  const btn = document.getElementById('skinBtn');
+  const msgEl = document.getElementById('skinMsg');
+  const textAbove = document.getElementById('skinTextAbove');
+  const textBelow = document.getElementById('skinTextBelow');
+  const blackout = document.getElementById('blackout');
+  const quitBtn = document.getElementById('quitBtn');
 
-      if (skin.name === 'none') {
-        blackout.style.display = 'block';
-        // Random position within 90% box, button is 5% x 5%
-        const maxLeft = 85; // 90% box minus 5% button
-        const maxTop = 85;
-        const left = 2.5 + Math.random() * maxLeft; // start at 5% margin (half of 10%)
-        const top = 2.5 + Math.random() * maxTop;
-        quitBtn.style.left = left + 'vw';
-        quitBtn.style.top = top + 'vh';
-      }
+  btn.addEventListener('click', function() {
+    skinIndex++;
+    if (skinIndex >= skins.length) skinIndex = 0;
+    const skin = skins[skinIndex];
 
-      if (skin.name === 'rat') {
-        btn.textContent = 'Still not convinced?';
-      } else if (skin.name === 'puppy') {
-        btn.textContent = 'Nope, not even puppies';
-      } else {
-        btn.textContent = 'Not a cat person?';
-      }
-    });
-  })();
+    if (skin.name === 'none') {
+      blackout.style.display = 'block';
+      var maxLeft = 85;
+      var maxTop = 85;
+      var left = 2.5 + Math.random() * maxLeft;
+      var top = 2.5 + Math.random() * maxTop;
+      quitBtn.style.left = left + 'vw';
+      quitBtn.style.top = top + 'vh';
+
+      // After 5 seconds show hint
+      setTimeout(function() {
+        var hint = document.createElement('p');
+        hint.style.cssText = 'position:fixed;bottom:10vh;width:100%;text-align:center;color:#f59e0b;font-size:1.1rem;font-family:Source Sans 3,sans-serif;z-index:10000;';
+        hint.textContent = 'Click the little box and you are on your way.';
+        blackout.appendChild(hint);
+        quitBtn.style.border = '1px solid rgba(245,158,11,0.3)';
+
+        // Jump the button every 3 seconds
+        var jumpInterval = setInterval(function() {
+          var newLeft = 2.5 + Math.random() * 85;
+          var newTop = 2.5 + Math.random() * 85;
+          quitBtn.style.left = newLeft + 'vw';
+          quitBtn.style.top = newTop + 'vh';
+        }, 3000);
+
+        // Clear interval when blackout is dismissed
+        quitBtn.addEventListener('click', function() {
+          clearInterval(jumpInterval);
+          blackout.style.display = 'none';
+          if (hint.parentNode) hint.parentNode.removeChild(hint);
+          quitBtn.style.border = 'none';
+          // Reset
+          skinIndex = -1;
+          textAbove.textContent = "So you're not a cat person?";
+          textBelow.textContent = "Just press the button.";
+          btn.textContent = "Press the button";
+          btn.style.borderColor = '#f59e0b';
+          btn.style.color = '#f59e0b';
+          msgEl.style.display = 'none';
+        });
+      }, 5000);
+      return;
+    }
+
+    // Update text
+    msgEl.textContent = skin.msg;
+    msgEl.style.display = 'block';
+    btn.textContent = skin.btnText;
+    btn.style.borderColor = skin.btnBorder;
+    btn.style.color = skin.btnColor;
+
+    // Delayed message for rat skin
+    if (skin.delayMsg && skin.delaySeconds > 0) {
+      setTimeout(function() {
+        textAbove.textContent = skin.above;
+        textBelow.textContent = skin.below;
+      }, skin.delaySeconds * 1000);
+      // Set initial text
+      textAbove.textContent = "So you're not a cat person?";
+      textBelow.textContent = skin.msg;
+    } else {
+      textAbove.textContent = skin.above;
+      textBelow.textContent = skin.below;
+    }
+  });
+})();
   </script>
 
 </body>
