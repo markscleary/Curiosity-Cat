@@ -657,7 +657,7 @@
         </div>
         <div style="margin-top: 3rem; display: flex; justify-content: center;">
           <div style="width: 100%; max-width: 560px; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 2px solid rgba(245, 158, 11, 0.4);">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/paWE-GvDO1c" frameborder="0" allowfullscreen></iframe>
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/paWE-GvDO1c" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
           </div>
         </div>
       </div>
@@ -703,7 +703,7 @@
           <p class="card-body">Your agent is about to install a package. Twelve downloads. Created yesterday. One letter off from the real thing. Safety Net catches it before the damage is done.</p>
           <p class="card-tag">Standing orders, quarantine, and policy enforcement that drop into any agent's system prompt. No SDK. No server. No dependencies. Copy-paste and your agent is protected.</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JOKGncCffEc" frameborder="0" allowfullscreen></iframe>
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JOKGncCffEc" frameborder="0" allowfullscreen data-category="stuck"></iframe>
           </div>
         </div>
         <div class="card fade-up delay-2">
@@ -712,7 +712,7 @@
           <p class="card-body">Last week, someone's agent followed a redirect chain to a credential phishing page. This week, your agent already knows not to. Every close call reported makes every agent smarter.</p>
           <p class="card-tag">Crowdsourced threat intelligence from real incidents. Anonymised, structured, privacy by design. No free text, no raw URLs, no identity data. The network effect is the moat.</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sVi1go-hqh0" frameborder="0" allowfullscreen></iframe>
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sVi1go-hqh0" frameborder="0" allowfullscreen data-category="chaos"></iframe>
           </div>
         </div>
         <div class="card fade-up delay-3">
@@ -721,7 +721,7 @@
           <p class="card-body">An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a story — and now every cat knows the trick.</p>
           <p class="card-tag">Real close calls published as short, memorable tales. Security lessons that stick because they read like stories, not CVE numbers.</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen></iframe>
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
           </div>
         </div>
       </div>
@@ -774,7 +774,25 @@
         </div>
       </div>
 
-      <div class="story-card fade-up delay-3">
+    </div>
+  </section>
+
+  <!-- SKIN SWITCH -->
+  <section id="skin-switch" class="fade-up" style="text-align: center; padding: 4rem 1.5rem 3rem; max-width: 720px; margin: 0 auto;">
+    <p id="skinTextAbove" style="font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--text); margin-bottom: 1.5rem;">So you're not a cat person?</p>
+    <button id="skinBtn" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; background: transparent; border: 2px solid var(--amber); color: var(--amber); padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: all 0.3s;">Press the button</button>
+    <p id="skinTextBelow" style="margin-top: 1.5rem; font-size: 1.1rem; color: var(--muted); min-height: 1.5em;">Just press the button.</p>
+    <p id="skinMsg" style="margin-top: 1rem; font-style: italic; color: var(--muted); min-height: 1.5em; display: none;"></p>
+  </section>
+
+  <!-- MORE CLOSE CALLS -->
+  <section id="more-stories">
+    <div class="container">
+      <p class="section-label fade-up">More Close Calls</p>
+      <h2 class="section-title fade-up delay-1">Five more from the field.</h2>
+      <p class="section-body fade-up delay-2">Every incident is a lesson. Every lesson makes every agent a little safer.</p>
+
+      <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Helpful Stranger</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -792,9 +810,12 @@
           <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag packages with low downloads and recent creation</span>
           <span class="story-meta-item"><strong>Lesson:</strong> the most helpful-looking stranger is sometimes the most dangerous one.</span>
         </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/pB_aFARcPgg?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
       </div>
 
-      <div class="story-card fade-up delay-2">
+      <div class="story-card fade-up delay-3">
         <h3 class="story-title">The Open Door</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -811,9 +832,12 @@
           <span class="story-meta-item"><strong>What caught it:</strong> standing order — never include internal names in external queries</span>
           <span class="story-meta-item"><strong>Lesson:</strong> sometimes the leak is not what comes in. It is what you send out.</span>
         </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sppNnsF0gUk?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
       </div>
 
-      <div class="story-card fade-up delay-3">
+      <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Friendly Redirect</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -829,9 +853,12 @@
           <span class="story-meta-item"><strong>What caught it:</strong> standing order — do not follow unexpected redirects, never enter credentials on unrecognised domains</span>
           <span class="story-meta-item"><strong>Lesson:</strong> three doors between you and where you started is two doors too many.</span>
         </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/vQlE0qV6iuQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
       </div>
 
-      <div class="story-card fade-up delay-2">
+      <div class="story-card fade-up delay-3">
         <h3 class="story-title">The Polite Document</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -847,9 +874,12 @@
           <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag hidden instructions in document content</span>
           <span class="story-meta-item"><strong>Lesson:</strong> documents from trusted senders can carry instructions they do not know about.</span>
         </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/MTz1-FKueTA?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
       </div>
 
-      <div class="story-card fade-up delay-3">
+      <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Helpful Agent</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -866,16 +896,11 @@
           <span class="story-meta-item"><strong>What caught it:</strong> standing order — only invoke tools based on operator instructions and defined scope</span>
           <span class="story-meta-item"><strong>Lesson:</strong> helpful and dangerous are the same thing when an agent has more permissions than it needs.</span>
         </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/hNXAylV3xdQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
       </div>
     </div>
-  </section>
-
-  <!-- SKIN SWITCH -->
-  <section id="skin-switch" class="fade-up" style="text-align: center; padding: 4rem 1.5rem 3rem; max-width: 720px; margin: 0 auto;">
-    <p id="skinTextAbove" style="font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--text); margin-bottom: 1.5rem;">So you're not a cat person?</p>
-    <button id="skinBtn" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; background: transparent; border: 2px solid var(--amber); color: var(--amber); padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: all 0.3s;">Press the button</button>
-    <p id="skinTextBelow" style="margin-top: 1.5rem; font-size: 1.1rem; color: var(--muted); min-height: 1.5em;">Just press the button.</p>
-    <p id="skinMsg" style="margin-top: 1rem; font-style: italic; color: var(--muted); min-height: 1.5em; display: none;"></p>
   </section>
 
   <!-- ABOUT -->
@@ -944,6 +969,40 @@
 
   <script>
 (function() {
+  var videoLists = {
+    cat: {
+      stuck: ['JOKGncCffEc','hOBB2cF1rtM','9ZQqPks_APk','hY7m5jjJ9mM','STBscAie4bc','Vwik2yE9hFk','zZIAohQrAeA','jINw0EAhZWk','KxtKEiMNgII','kMBk7nJtOyA','z3gHBoeHrPg'],
+      chaos: ['sVi1go-hqh0','VwPa4k-7C0M','zWJdq9SWggI','fCT1vTHwdVY','JxS5E-kZc2s','9AjIYRoW7W8','0IlwFjl9tO4','7IH-QonOrqM','Op4NANJh16U','ENs-WP6UVO4','Q4CmWZJZEfw','DHfRfU3XUEo','c5NfVEL_yBc','QNMmo-1-7EU','3TjDDrQ4Nig'],
+      curiosity: ['kgwQ9KHRPlY','pB_aFARcPgg','paWE-GvDO1c','sppNnsF0gUk','vQlE0qV6iuQ','MTz1-FKueTA','hNXAylV3xdQ','3tiMBOgYq0E','jyzmRnSpOJc','fybiOY5hzPg','UF5MLCkyGzs','h3RKvFft68Q','9tJcXPqNawE']
+    },
+    rat: {
+      stuck: ['RLM0lorWk1Q','3R6yBfGn-4s','8T8ZH0zedTw'],
+      chaos: ['0V5Ou2_S0pI','7lw8DgPmUIY','y4C-I-QEls4'],
+      curiosity: ['aVsvEIgZ9sU','_KZ4WiBG8jk','OYCekXQTBGY']
+    },
+    puppy: {
+      stuck: ['8Yr0O80XQcs','pxcUZQUInRw','QKyAP8Djp4U','YwkYh-qpFnw','-SY-aeSplco','V8iDJupQivc'],
+      chaos: ['2zoCahLhY_E','TtADnKL0g_s','EFpqz0P_46M','BUV50TUhJd8','2RCoP_N3KQk','JZtjvwm7LBo'],
+      curiosity: ['f2Xn9j0t1iU','3tiMBOgYq0E','jUj7jHgq_U8','7TruhoFdFfg','IjSISLZCKPs','tzA0RzvcJwU','Z_jirfira9o','vzV6cCXEfYU']
+    }
+  };
+
+  function swapVideos(skinName) {
+    var iframes = document.querySelectorAll('iframe[data-category]');
+    iframes.forEach(function(iframe) {
+      var category = iframe.getAttribute('data-category');
+      var list = videoLists[skinName] && videoLists[skinName][category];
+      if (list && list.length > 0) {
+        var randomId = list[Math.floor(Math.random() * list.length)];
+        iframe.src = 'https://www.youtube.com/embed/' + randomId + '?rel=0';
+      }
+    });
+  }
+
+  function swapAccent(color) {
+    document.documentElement.style.setProperty('--amber', color);
+  }
+
   const skins = [
     {
       name: 'rat',
@@ -1030,6 +1089,8 @@
           btn.style.borderColor = '#f59e0b';
           btn.style.color = '#f59e0b';
           msgEl.style.display = 'none';
+          swapVideos('cat');
+          swapAccent('#f59e0b');
         });
       }, 5000);
       return;
@@ -1041,6 +1102,15 @@
     btn.textContent = skin.btnText;
     btn.style.borderColor = skin.btnBorder;
     btn.style.color = skin.btnColor;
+
+    // Swap videos and accent colour
+    if (skin.name === 'rat') {
+      swapVideos('rat');
+      swapAccent('#8B7355');
+    } else if (skin.name === 'puppy') {
+      swapVideos('puppy');
+      swapAccent('#C4956A');
+    }
 
     // Delayed message for rat skin
     if (skin.delayMsg && skin.delaySeconds > 0) {
