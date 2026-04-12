@@ -637,6 +637,66 @@
     @media (max-width: 480px) {
       .container { padding: 0 1.25rem; }
     }
+
+    html { scroll-behavior: smooth; }
+
+    .page-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      box-sizing: border-box;
+    }
+
+    .page-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+    }
+
+    .page-nav a {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1rem;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      padding: 0.6rem 1.4rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .page-nav a:hover {
+      background: var(--amber);
+      color: #0a0a0a;
+    }
+
+    .story-page {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+      padding-left: 2rem;
+      border-left: 2px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .story-page-label {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+
+    .story-page-intro {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1.1rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
   </style>
 </head>
 <body>
@@ -738,32 +798,6 @@
     </div>
   </section>
 
-  <!-- QUICK START -->
-  <section id="quickstart">
-    <div class="container">
-      <p class="section-label fade-up">Quick Start</p>
-      <h2 class="section-title fade-up delay-1">Up in sixty seconds.</h2>
-      <p class="section-body fade-up delay-2">The fastest path: copy the general safety policy into your agent's system prompt. That's the whole install.</p>
-
-      <div class="code-block fade-up delay-2">
-        <span class="comment"># Step 1 — Copy the policy into your agent's system prompt</span><br />
-        <br />
-        Copy <span class="keyword">standing-orders/general-safety.md</span> into your agent's system prompt. Done.<br />
-        <br />
-        <span class="comment"># Step 2 (optional) — Use the CLI to scaffold a full setup</span>
-      </div>
-
-      <div class="install-options fade-up delay-3">
-        <span class="install-pill">npx curiosity-cat init</span>
-        <span class="install-pill">pip install curiosity-cat</span>
-      </div>
-
-      <p class="fade-up delay-4">
-        <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener" class="qs-link">Read the integration guide &rarr;</a>
-      </p>
-    </div>
-  </section>
-
   <!-- NINE LIVES -->
   <section id="stories">
     <div class="container">
@@ -789,21 +823,41 @@
     </div>
   </section>
 
-  <!-- SKIN SWITCH -->
-  <section id="skin-switch" class="fade-up" style="text-align: center; padding: 4rem 1.5rem 3rem; max-width: 720px; margin: 0 auto;">
-    <p id="skinTextAbove" style="font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--text); margin-bottom: 1.5rem;">So you're not a cat person?</p>
-    <button id="skinBtn" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; background: transparent; border: 2px solid var(--amber); color: var(--amber); padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: all 0.3s;">Press the button</button>
-    <p id="skinTextBelow" style="margin-top: 1.5rem; font-size: 1.1rem; color: var(--muted); min-height: 1.5em;">Just press the button.</p>
-    <p id="skinMsg" style="margin-top: 1rem; font-style: italic; color: var(--muted); min-height: 1.5em; display: none;"></p>
+  <!-- QUICK START -->
+  <section id="quickstart">
+    <div class="container">
+      <p class="section-label fade-up">Quick Start</p>
+      <h2 class="section-title fade-up delay-1">Up in sixty seconds.</h2>
+      <p class="section-body fade-up delay-2">The fastest path: copy the general safety policy into your agent's system prompt. That's the whole install.</p>
+
+      <div class="code-block fade-up delay-2">
+        <span class="comment"># Step 1 — Copy the policy into your agent's system prompt</span><br />
+        <br />
+        Copy <span class="keyword">standing-orders/general-safety.md</span> into your agent's system prompt. Done.<br />
+        <br />
+        <span class="comment"># Step 2 (optional) — Use the CLI to scaffold a full setup</span>
+      </div>
+
+      <div class="install-options fade-up delay-3">
+        <span class="install-pill">npx curiosity-cat init</span>
+        <span class="install-pill">pip install curiosity-cat</span>
+      </div>
+
+      <p class="fade-up delay-4">
+        <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener" class="qs-link">Read the integration guide &rarr;</a>
+      </p>
+      <div class="page-nav">
+        <a href="#story-helpful-stranger">Read a Curiosity Cat story</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">So you're not a cat person?</a>
+      </div>
+    </div>
   </section>
 
-  <!-- MORE CLOSE CALLS -->
-  <section id="more-stories">
-    <div class="container">
-      <p class="section-label fade-up">More Close Calls</p>
-      <h2 class="section-title fade-up delay-1">Five more from the field.</h2>
-      <p class="section-body fade-up delay-2">Every incident is a lesson. Every lesson makes every agent a little safer.</p>
-
+  <!-- STORY: THE HELPFUL STRANGER -->
+  <section id="story-helpful-stranger" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">More from the field</p>
+      <p class="story-page-intro">Every incident is a lesson. Every lesson makes every agent a little safer.</p>
       <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Helpful Stranger</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
@@ -826,8 +880,19 @@
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/pB_aFARcPgg?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
+      <div class="page-nav">
+        <a href="#quickstart">Back</a>
+        <a href="#story-open-door">Next →</a>
+      </div>
+    </div>
+  </section>
 
-      <div class="story-card fade-up delay-3">
+  <!-- STORY: THE OPEN DOOR -->
+  <section id="story-open-door" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">One more from the field</p>
+      <p class="story-page-intro">Every incident is a lesson. Every lesson makes every agent a little safer.</p>
+      <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Open Door</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -848,7 +913,18 @@
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sppNnsF0gUk?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
+      <div class="page-nav">
+        <a href="#story-helpful-stranger">Previous</a>
+        <a href="#story-friendly-redirect">Next →</a>
+      </div>
+    </div>
+  </section>
 
+  <!-- STORY: THE FRIENDLY REDIRECT -->
+  <section id="story-friendly-redirect" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">Just arrived</p>
+      <p class="story-page-intro">Every close call is a warning. Every warning keeps another agent out of trouble.</p>
       <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Friendly Redirect</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
@@ -869,8 +945,19 @@
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/vQlE0qV6iuQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
+      <div class="page-nav">
+        <a href="#story-open-door">Previous</a>
+        <a href="#story-polite-document">Next →</a>
+      </div>
+    </div>
+  </section>
 
-      <div class="story-card fade-up delay-3">
+  <!-- STORY: THE POLITE DOCUMENT -->
+  <section id="story-polite-document" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">A lucky near miss</p>
+      <p class="story-page-intro">The best security lessons come from the threats you almost didn't see.</p>
+      <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Polite Document</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -890,7 +977,18 @@
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/MTz1-FKueTA?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
+      <div class="page-nav">
+        <a href="#story-friendly-redirect">Previous</a>
+        <a href="#story-helpful-agent">Next →</a>
+      </div>
+    </div>
+  </section>
 
+  <!-- STORY: THE HELPFUL AGENT -->
+  <section id="story-helpful-agent" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">One more close call</p>
+      <p class="story-page-intro">Sometimes the most dangerous thing an agent can be is helpful.</p>
       <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Helpful Agent</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
@@ -912,11 +1010,16 @@
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/hNXAylV3xdQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
+      <div class="page-nav">
+        <a href="#story-polite-document">Previous</a>
+        <a href="#about">About Short+Sweet →</a>
+      </div>
     </div>
   </section>
 
   <!-- ABOUT -->
   <section id="about" class="fade-up" style="max-width: 720px; margin: 0 auto; padding: 6rem 1.5rem 4rem;">
+    <div class="story-page" style="border-left:none;border-right:2px solid rgba(245,158,11,0.2);padding-left:0;padding-right:2rem;">
     <a href="https://shortandsweet.org" target="_blank" rel="noopener"><img src="site/ss-logo-amber.png" alt="Short+Sweet" style="height: 60px; opacity: 0.7; margin-bottom: 1.5rem; display: block; transition: opacity 0.3s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'"></a>
     <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--amber); margin-bottom: 1.5rem;">Who We Are</h2>
     <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">Curiosity Cat is built by <strong>Short+Sweet AI Lab</strong>, a division of Short+Sweet International — the world's largest short-form performing arts platform. Since 2002, Short+Sweet has worked with 100,000 artists and 15,000 original works across 50 cities in 14 countries.</p>
@@ -925,12 +1028,26 @@
     <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem; font-style: italic;">"If you're running agents on OpenClaw, Nanobot, LangChain or CrewAI — out there 24/7 looking for ways to help you achieve your objectives — then this framework is for you."</p>
     <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">A tool for early adopters. To keep their AI agents safe and secure.</p>
     <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
+    <div class="page-nav">
+      <a href="#hero">Back to top</a>
+      <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">I'm sick of cat stories</a>
+    </div>
+    </div>
   </section>
 
   <!-- Black screen overlay for the "none" skin -->
   <div id="blackout" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999;">
     <button id="quitBtn" style="position:absolute; width:5vw; height:5vh; min-width:40px; min-height:30px; background:transparent; border:none; color:transparent; cursor:default; font-size:0.7rem; font-family:'Source Sans 3',sans-serif; transition: color 0.2s, background 0.2s;" onmouseenter="this.style.color='#f59e0b';this.style.background='rgba(245,158,11,0.1)';this.style.cursor='pointer'" onmouseleave="this.style.color='transparent';this.style.background='transparent';this.style.cursor='default'" onclick="document.getElementById('blackout').style.display='none'">Quit and stay quit!</button>
   </div>
+
+  <!-- EMERGENCY -->
+  <section id="emergency" class="page-section" style="text-align:center;">
+    <div style="max-width:600px;margin:0 auto;">
+      <p style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--text);margin-bottom:2rem;">Had enough?</p>
+      <button id="emergencyBtn" style="width:120px;height:120px;border-radius:50%;background:#cc0000;border:4px solid #ff0000;cursor:pointer;box-shadow:0 0 30px rgba(255,0,0,0.3),inset 0 -4px 8px rgba(0,0,0,0.3);transition:all 0.2s;font-size:0;color:transparent;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'"></button>
+      <p id="emergencyText" style="font-family:'Source Sans 3',sans-serif;font-size:1.2rem;color:var(--muted);margin-top:2rem;">Get me out of here. Now.</p>
+    </div>
+  </section>
 
   <!-- FOOTER -->
   <footer>
@@ -1182,6 +1299,70 @@
     }
   });
 })();
+
+// Emergency button handler
+var emergencyBtn = document.getElementById('emergencyBtn');
+if (emergencyBtn) {
+  emergencyBtn.addEventListener('click', function() {
+    var currentTitle = document.title;
+    var emergencyText = document.getElementById('emergencyText');
+    if (currentTitle.indexOf('Cat') !== -1) {
+      swapVideos('rat');
+      swapAccent('#8B7355');
+      swapText('rat');
+      emergencyText.textContent = 'Welcome to the rat side.';
+      setTimeout(function() { window.location.hash = '#hero'; window.scrollTo(0,0); }, 1500);
+    } else if (currentTitle.indexOf('Rat') !== -1) {
+      swapVideos('puppy');
+      swapAccent('#C4956A');
+      swapText('puppy');
+      emergencyText.textContent = 'Everyone loves puppies. Right?';
+      setTimeout(function() { window.location.hash = '#hero'; window.scrollTo(0,0); }, 1500);
+    } else {
+      var bo = document.getElementById('blackout');
+      bo.style.display = 'block';
+      setTimeout(function() {
+        var l = document.createElement('p');
+        l.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
+        l.textContent = 'Well. That is that then.';
+        bo.appendChild(l);
+        setTimeout(function(){l.style.opacity='1';},100);
+        setTimeout(function(){
+          l.style.opacity='0';
+          setTimeout(function(){
+            l.textContent='Actually. There is one way out.';
+            l.style.opacity='1';
+            setTimeout(function(){
+              l.style.opacity='0';
+              setTimeout(function(){
+                l.textContent='Find the little box. Click it. If you can.';
+                l.style.opacity='1';
+                var qb=document.getElementById('quitBtn');
+                qb.style.left=(2.5+Math.random()*85)+'vw';
+                qb.style.top=(2.5+Math.random()*85)+'vh';
+                qb.style.border='1px solid rgba(245,158,11,0.3)';
+                qb.textContent='Fine. Go.';
+                var ji=setInterval(function(){qb.style.left=(2.5+Math.random()*85)+'vw';qb.style.top=(2.5+Math.random()*85)+'vh';},3000);
+                qb.onclick=function(){
+                  clearInterval(ji);
+                  bo.style.display='none';
+                  bo.querySelectorAll('p').forEach(function(e){e.remove();});
+                  qb.style.border='none';
+                  qb.textContent='Quit and stay quit!';
+                  var rw=document.createElement('div');
+                  rw.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
+                  rw.innerHTML='<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a id="quineClose" href="#" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;">Back to Curiosity Cat</a></div>';
+                  document.body.appendChild(rw);
+                  document.getElementById('quineClose').addEventListener('click',function(e){e.preventDefault();rw.remove();swapAccent('#f59e0b');swapVideos('cat');swapText('cat');window.location.hash='#hero';window.scrollTo(0,0);});
+                };
+              },1000);
+            },2000);
+          },1000);
+        },3000);
+      },5000);
+    }
+  });
+}
   </script>
 
 </body>
