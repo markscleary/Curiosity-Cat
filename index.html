@@ -909,6 +909,16 @@
       else if (skinName === 'puppy') emojiEl.textContent = '\uD83D\uDC36';
       else emojiEl.textContent = '\uD83D\uDC31';
     }
+
+  // Swap emergency page background
+  var emergencySection = document.getElementById('emergency');
+  if (emergencySection) {
+    if (skinName === 'puppy') {
+      emergencySection.style.backgroundImage = "url('site/puppy-collage-emergency.jpg')";
+    } else {
+      emergencySection.style.backgroundImage = "url('site/cat-collage-emergency.jpg')";
+    }
+  }
   }
   </script>
 
