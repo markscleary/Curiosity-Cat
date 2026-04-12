@@ -652,7 +652,7 @@
       </div>
       <div class="page-nav">
         <a href="#story-open-door">Next story</a>
-        <a href="#quickstart">Back to Quick Start</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Not a cat person?</a>
       </div>
     </div>
   </section>
@@ -684,8 +684,8 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-friendly-redirect">Next story</a>
-        <a href="#story-helpful-stranger">Previous story</a>
+        <a href="#story-friendly-redirect">One more story</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Had enough cats?</a>
       </div>
     </div>
   </section>
@@ -716,8 +716,8 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-polite-document">Next story</a>
-        <a href="#story-open-door">Previous story</a>
+        <a href="#story-polite-document">Keep reading</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Cats aren't your thing?</a>
       </div>
     </div>
   </section>
@@ -748,8 +748,8 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-helpful-agent">Next story</a>
-        <a href="#story-friendly-redirect">Previous story</a>
+        <a href="#story-helpful-agent">Just one more</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Seriously, no more cats</a>
       </div>
     </div>
   </section>
@@ -782,7 +782,7 @@
       </div>
       <div class="page-nav">
         <a href="#about">About Short+Sweet</a>
-        <a href="#story-polite-document">Previous story</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Get me out of here</a>
       </div>
     </div>
   </section>
@@ -913,7 +913,9 @@
   // Swap emergency page background
   var emergencySection = document.getElementById('emergency');
   if (emergencySection) {
-    if (skinName === 'puppy') {
+    if (skinName === 'rat') {
+      emergencySection.style.backgroundImage = "url('site/rat-collage-emergency.jpg')";
+    } else if (skinName === 'puppy') {
       emergencySection.style.backgroundImage = "url('site/puppy-collage-emergency.jpg')";
     } else {
       emergencySection.style.backgroundImage = "url('site/cat-collage-emergency.jpg')";
@@ -998,7 +1000,7 @@
                 var ji = setInterval(function() {
                   qb.style.left = (2.5 + Math.random() * 85) + 'vw';
                   qb.style.top = (2.5 + Math.random() * 85) + 'vh';
-                }, 3000);
+                }, 1000);
                 qb.onclick = function() {
                   clearInterval(ji);
                   document.getElementById('blackout').style.display = 'none';
