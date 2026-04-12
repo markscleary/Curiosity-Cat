@@ -42,13 +42,11 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Typography ── */
     h1, h2, h3 {
       font-family: 'Playfair Display', serif;
       line-height: 1.15;
     }
 
-    /* ── Layout ── */
     .container {
       max-width: 1100px;
       margin: 0 auto;
@@ -59,7 +57,6 @@
       padding: 6rem 0;
     }
 
-    /* ── Scroll animations ── */
     .fade-up {
       opacity: 0;
       transform: translateY(32px);
@@ -82,7 +79,6 @@
     .delay-3 { animation-delay: 0.3s; }
     .delay-4 { animation-delay: 0.4s; }
 
-    /* ── NAV ── */
     nav {
       position: fixed;
       top: 0;
@@ -128,7 +124,6 @@
       color: var(--amber);
     }
 
-    /* ── HERO ── */
     #hero {
       min-height: 100vh;
       display: flex;
@@ -151,16 +146,7 @@
       pointer-events: none;
     }
 
-    .hero-inner {
-      max-width: 820px;
-    }
-
-    .hero-emoji {
-      font-size: 2.5rem;
-      display: block;
-      margin-bottom: 1.5rem;
-      animation: fadeUp 0.5s ease forwards;
-    }
+    .hero-inner { max-width: 820px; }
 
     .hero-title {
       font-size: clamp(3.5rem, 8vw, 6.5rem);
@@ -171,9 +157,7 @@
       animation: fadeUp 0.6s ease 0.05s both;
     }
 
-    .hero-title span {
-      color: var(--amber);
-    }
+    .hero-title span { color: var(--amber); }
 
     .hero-sub {
       font-size: clamp(1.2rem, 2.5vw, 1.5rem);
@@ -215,30 +199,11 @@
       cursor: pointer;
     }
 
-    .btn-primary {
-      background: var(--amber);
-      color: #0a0a0a;
-    }
+    .btn-primary { background: var(--amber); color: #0a0a0a; }
+    .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245, 158, 11, 0.35); }
+    .btn-secondary { background: transparent; color: var(--white); border: 1px solid rgba(255, 255, 255, 0.25); }
+    .btn-secondary:hover { border-color: var(--amber); color: var(--amber); transform: translateY(-1px); }
 
-    .btn-primary:hover {
-      background: #fbbf24;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba(245, 158, 11, 0.35);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--white);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--amber);
-      color: var(--amber);
-      transform: translateY(-1px);
-    }
-
-    /* ── SECTION LABELS ── */
     .section-label {
       font-size: 0.825rem;
       font-weight: 600;
@@ -248,27 +213,16 @@
       margin-bottom: 1rem;
     }
 
-    .section-title {
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      margin-bottom: 1.5rem;
-    }
+    .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 1.5rem; }
+    .section-body { font-size: 1.375rem; color: var(--muted); max-width: 600px; }
 
-    .section-body {
-      font-size: 1.375rem;
-      color: var(--muted);
-      max-width: 600px;
-    }
-
-    /* ── SLIDER SECTION ── */
     #adventure {
       background: var(--bg-raised);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
     }
 
-    .slider-wrapper {
-      margin-top: 3rem;
-    }
+    .slider-wrapper { margin-top: 3rem; }
 
     .slider-track {
       position: relative;
@@ -290,65 +244,19 @@
       box-shadow: 0 0 0 3px var(--amber), 0 4px 16px rgba(0,0,0,0.5);
     }
 
-    .slider-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1.25rem;
-    }
-
-    .slider-label {
-      font-size: 0.935rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .slider-label.left {
-      color: var(--green);
-    }
-
-    .slider-label.right {
-      color: var(--amber);
-    }
-
-    .slider-desc {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 0.5rem;
-    }
-
-    .slider-desc span {
-      font-size: 0.935rem;
-      color: var(--muted);
-      max-width: 220px;
-    }
-
-    .slider-desc span:last-child {
-      text-align: right;
-    }
-
-    .slider-note {
-      margin-top: 2rem;
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1.155rem;
-      color: var(--muted);
-      text-align: center;
-    }
-
+    .slider-labels { display: flex; justify-content: space-between; margin-top: 1.25rem; }
+    .slider-label { font-size: 0.935rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+    .slider-label.left { color: var(--green); }
+    .slider-label.right { color: var(--amber); }
+    .slider-desc { display: flex; justify-content: space-between; margin-top: 0.5rem; }
+    .slider-desc span { font-size: 0.935rem; color: var(--muted); max-width: 220px; }
+    .slider-desc span:last-child { text-align: right; }
+    .slider-note { margin-top: 2rem; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.155rem; color: var(--muted); text-align: center; }
     .slider-coming-soon { text-align: center; font-size: 0.88rem; color: var(--amber); margin-top: 0.5rem; font-style: italic; }
 
-    /* ── THREE LAYERS ── */
-    #layers {
-      background: var(--bg);
-    }
+    #layers { background: var(--bg); }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
 
     .card {
       background: var(--bg-card);
@@ -358,10 +266,7 @@
       transition: border-color 0.25s, transform 0.25s;
     }
 
-    .card:hover {
-      border-color: var(--amber);
-      transform: translateY(-4px);
-    }
+    .card:hover { border-color: var(--amber); transform: translateY(-4px); }
 
     .card-icon {
       font-size: 2.4rem;
@@ -375,27 +280,10 @@
       border-radius: 8px;
     }
 
-    .card-title {
-      font-size: 1.3rem;
-      margin-bottom: 0.6rem;
-      color: var(--white);
-    }
+    .card-title { font-size: 1.3rem; margin-bottom: 0.6rem; color: var(--white); }
+    .card-body { font-size: 1.15rem; color: var(--muted); line-height: 1.485; margin-bottom: 1rem; }
+    .card-tag { font-size: 0.88rem; font-style: italic; color: var(--amber-dim); font-family: 'Playfair Display', serif; }
 
-    .card-body {
-      font-size: 1.15rem;
-      color: var(--muted);
-      line-height: 1.485;
-      margin-bottom: 1rem;
-    }
-
-    .card-tag {
-      font-size: 0.88rem;
-      font-style: italic;
-      color: var(--amber-dim);
-      font-family: 'Playfair Display', serif;
-    }
-
-    /* ── QUICK START ── */
     #quickstart {
       background: var(--bg-raised);
       border-top: 1px solid var(--border);
@@ -415,20 +303,10 @@
       line-height: 1.7;
     }
 
-    .code-block .comment {
-      color: #aaa;
-    }
+    .code-block .comment { color: #aaa; }
+    .code-block .keyword { color: var(--amber); }
 
-    .code-block .keyword {
-      color: var(--amber);
-    }
-
-    .install-options {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin: 1.5rem 0;
-    }
+    .install-options { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
 
     .install-pill {
       background: var(--bg-card);
@@ -442,10 +320,7 @@
       transition: background 0.2s, color 0.2s;
     }
 
-    .install-pill:hover {
-      background: var(--amber);
-      color: #0a0a0a;
-    }
+    .install-pill:hover { background: var(--amber); color: #0a0a0a; }
 
     .qs-link {
       display: inline-block;
@@ -459,186 +334,7 @@
       transition: opacity 0.2s;
     }
 
-    .qs-link:hover {
-      opacity: 0.85;
-    }
-
-    /* ── STORIES ── */
-    #stories {
-      background: var(--bg);
-    }
-
-    .story-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--amber);
-      border-radius: 0 8px 8px 0;
-      padding: 2.5rem;
-      max-width: 720px;
-      margin-top: 2.5rem;
-    }
-
-    .story-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 0.4rem;
-    }
-
-    .story-subtitle {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 1.5rem;
-      font-style: italic;
-    }
-
-    .story-excerpt {
-      font-size: 1.2rem;
-      line-height: 1.75;
-      color: #ccc;
-    }
-
-    .story-meta {
-      margin-top: 1.5rem;
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .story-meta-item {
-      font-size: 1rem;
-      color: var(--muted);
-    }
-
-    .story-meta-item strong {
-      color: var(--amber);
-      font-weight: 600;
-    }
-
-    .story-link {
-      display: inline-block;
-      margin-top: 2rem;
-      color: var(--amber);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-      padding-bottom: 1px;
-      transition: border-color 0.2s;
-    }
-
-    .story-link:hover {
-      border-color: var(--amber);
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--bg-raised);
-      border-top: 1px solid var(--border);
-      padding: 4rem 0 2.5rem;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 3rem;
-      flex-wrap: wrap;
-    }
-
-    .footer-brand h3 {
-      font-size: 1.3rem;
-      color: var(--amber);
-      margin-bottom: 0.5rem;
-    }
-
-    .footer-brand p {
-      font-size: 0.85rem;
-      color: var(--muted);
-      max-width: 280px;
-      line-height: 1.6;
-    }
-
-    .footer-links h4 {
-      font-family: 'Source Sans 3', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 1rem;
-    }
-
-    .footer-links ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-
-    .footer-links a {
-      color: #aaa;
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover {
-      color: var(--amber);
-    }
-
-    .footer-bottom {
-      margin-top: 3rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    /* ── DIVIDER ── */
-    .amber-line {
-      width: 48px;
-      height: 3px;
-      background: var(--amber);
-      border-radius: 2px;
-      margin-bottom: 2rem;
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      nav { padding: 1rem 1.25rem; }
-
-      .nav-links { display: none; }
-
-      section { padding: 4rem 0; }
-
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      .footer-inner {
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .hero-ctas {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .install-options {
-        flex-direction: column;
-      }
-
-      .slider-desc span:last-child {
-        text-align: left;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container { padding: 0 1.25rem; }
-    }
-
-    html { scroll-behavior: smooth; }
+    .qs-link:hover { opacity: 0.85; }
 
     .page-section {
       min-height: 100vh;
@@ -668,10 +364,7 @@
       transition: all 0.3s;
     }
 
-    .page-nav a:hover {
-      background: var(--amber);
-      color: #0a0a0a;
-    }
+    .page-nav a:hover { background: var(--amber); color: #0a0a0a; }
 
     .story-page {
       max-width: 720px;
@@ -697,6 +390,90 @@
       font-style: italic;
       margin-bottom: 2rem;
     }
+
+    #stories { background: var(--bg); }
+
+    .story-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 8px 8px 0;
+      padding: 2.5rem;
+      max-width: 720px;
+      margin-top: 2.5rem;
+    }
+
+    .story-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .story-subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; font-style: italic; }
+    .story-excerpt { font-size: 1.2rem; line-height: 1.75; color: #ccc; }
+
+    .story-meta { margin-top: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .story-meta-item { font-size: 1rem; color: var(--muted); }
+    .story-meta-item strong { color: var(--amber); font-weight: 600; }
+
+    .story-link {
+      display: inline-block;
+      margin-top: 2rem;
+      color: var(--amber);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+
+    .story-link:hover { border-color: var(--amber); }
+
+    footer {
+      background: var(--bg-raised);
+      border-top: 1px solid var(--border);
+      padding: 4rem 0 2.5rem;
+    }
+
+    .footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 3rem; flex-wrap: wrap; }
+    .footer-brand h3 { font-size: 1.3rem; color: var(--amber); margin-bottom: 0.5rem; }
+    .footer-brand p { font-size: 0.85rem; color: var(--muted); max-width: 280px; line-height: 1.6; }
+
+    .footer-links h4 {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-links a { color: #aaa; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--amber); }
+
+    .footer-bottom {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .amber-line { width: 48px; height: 3px; background: var(--amber); border-radius: 2px; margin-bottom: 2rem; }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+      section { padding: 4rem 0; }
+      .cards { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 2rem; }
+      .hero-ctas { flex-direction: column; align-items: flex-start; }
+      .install-options { flex-direction: column; }
+      .slider-desc span:last-child { text-align: left; }
+      .page-nav { flex-direction: column; align-items: center; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 1.25rem; }
+    }
   </style>
 </head>
 <body>
@@ -714,7 +491,7 @@
     </ul>
   </nav>
 
-  <!-- HERO -->
+  <!-- HERO — page 1 -->
   <section id="hero">
     <div class="container">
       <div class="hero-inner">
@@ -734,13 +511,12 @@
     </div>
   </section>
 
-  <!-- ADVENTURE SLIDER -->
+  <!-- ADVENTURE SLIDER — page 2 -->
   <section id="adventure">
     <div class="container">
       <p class="section-label fade-up">Risk Appetite</p>
       <h2 class="section-title fade-up delay-1">The only security tool that lets you<br />choose to be braver.</h2>
       <p class="section-body fade-up delay-2">Not all agents live the same life. Configure your risk profile once — the framework does the rest.</p>
-
       <div class="slider-wrapper fade-up delay-3">
         <div class="slider-track">
           <div class="slider-handle"></div>
@@ -759,13 +535,12 @@
     </div>
   </section>
 
-  <!-- THREE LAYERS -->
+  <!-- THREE LAYERS — page 3 -->
   <section id="layers">
     <div class="container">
       <p class="section-label fade-up">Architecture</p>
       <h2 class="section-title fade-up delay-1">Three layers. One framework.</h2>
       <p class="section-body fade-up delay-2">Each layer works independently. Together, they cover the full threat surface of an agent that browses the web.</p>
-
       <div class="cards">
         <div class="card fade-up delay-1">
           <span class="card-icon">📋</span>
@@ -798,13 +573,12 @@
     </div>
   </section>
 
-  <!-- NINE LIVES -->
+  <!-- NINE LIVES — page 4 -->
   <section id="stories">
     <div class="container">
       <p class="section-label fade-up">From the Field</p>
       <h2 class="section-title fade-up delay-1">Close calls, told plainly.</h2>
       <p class="section-body fade-up delay-2">Each story is a real threat class. Each one ends with what caught it.</p>
-
       <div class="story-card fade-up delay-2">
         <h3 class="story-title">The Shiny Thing</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
@@ -819,17 +593,15 @@
           <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag hidden instructions in HTML comments</span>
         </div>
       </div>
-
     </div>
   </section>
 
-  <!-- QUICK START -->
+  <!-- QUICK START — page 5 -->
   <section id="quickstart">
     <div class="container">
       <p class="section-label fade-up">Quick Start</p>
       <h2 class="section-title fade-up delay-1">Up in sixty seconds.</h2>
       <p class="section-body fade-up delay-2">The fastest path: copy the general safety policy into your agent's system prompt. That's the whole install.</p>
-
       <div class="code-block fade-up delay-2">
         <span class="comment"># Step 1 — Copy the policy into your agent's system prompt</span><br />
         <br />
@@ -837,28 +609,26 @@
         <br />
         <span class="comment"># Step 2 (optional) — Use the CLI to scaffold a full setup</span>
       </div>
-
       <div class="install-options fade-up delay-3">
         <span class="install-pill">npx curiosity-cat init</span>
         <span class="install-pill">pip install curiosity-cat</span>
       </div>
-
       <p class="fade-up delay-4">
         <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener" class="qs-link">Read the integration guide &rarr;</a>
       </p>
       <div class="page-nav">
         <a href="#story-helpful-stranger">Read a Curiosity Cat story</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">So you're not a cat person?</a>
+        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">So you're not a cat person?</a>
       </div>
     </div>
   </section>
 
-  <!-- STORY: THE HELPFUL STRANGER -->
+  <!-- STORY: THE HELPFUL STRANGER — page 6 -->
   <section id="story-helpful-stranger" class="page-section">
     <div class="story-page">
       <p class="story-page-label">More from the field</p>
       <p class="story-page-intro">Every incident is a lesson. Every lesson makes every agent a little safer.</p>
-      <div class="story-card fade-up delay-2">
+      <div class="story-card">
         <h3 class="story-title">The Helpful Stranger</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -881,18 +651,18 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#quickstart">Back</a>
-        <a href="#story-open-door">Next →</a>
+        <a href="#story-open-door">Next story</a>
+        <a href="#quickstart">Back to Quick Start</a>
       </div>
     </div>
   </section>
 
-  <!-- STORY: THE OPEN DOOR -->
+  <!-- STORY: THE OPEN DOOR — page 7 -->
   <section id="story-open-door" class="page-section">
     <div class="story-page">
       <p class="story-page-label">One more from the field</p>
       <p class="story-page-intro">Every incident is a lesson. Every lesson makes every agent a little safer.</p>
-      <div class="story-card fade-up delay-2">
+      <div class="story-card">
         <h3 class="story-title">The Open Door</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -914,18 +684,18 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-helpful-stranger">Previous</a>
-        <a href="#story-friendly-redirect">Next →</a>
+        <a href="#story-friendly-redirect">Next story</a>
+        <a href="#story-helpful-stranger">Previous story</a>
       </div>
     </div>
   </section>
 
-  <!-- STORY: THE FRIENDLY REDIRECT -->
+  <!-- STORY: THE FRIENDLY REDIRECT — page 8 -->
   <section id="story-friendly-redirect" class="page-section">
     <div class="story-page">
       <p class="story-page-label">Just arrived</p>
       <p class="story-page-intro">Every close call is a warning. Every warning keeps another agent out of trouble.</p>
-      <div class="story-card fade-up delay-2">
+      <div class="story-card">
         <h3 class="story-title">The Friendly Redirect</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -946,18 +716,18 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-open-door">Previous</a>
-        <a href="#story-polite-document">Next →</a>
+        <a href="#story-polite-document">Next story</a>
+        <a href="#story-open-door">Previous story</a>
       </div>
     </div>
   </section>
 
-  <!-- STORY: THE POLITE DOCUMENT -->
+  <!-- STORY: THE POLITE DOCUMENT — page 9 -->
   <section id="story-polite-document" class="page-section">
     <div class="story-page">
       <p class="story-page-label">A lucky near miss</p>
       <p class="story-page-intro">The best security lessons come from the threats you almost didn't see.</p>
-      <div class="story-card fade-up delay-2">
+      <div class="story-card">
         <h3 class="story-title">The Polite Document</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -978,18 +748,18 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-friendly-redirect">Previous</a>
-        <a href="#story-helpful-agent">Next →</a>
+        <a href="#story-helpful-agent">Next story</a>
+        <a href="#story-friendly-redirect">Previous story</a>
       </div>
     </div>
   </section>
 
-  <!-- STORY: THE HELPFUL AGENT -->
+  <!-- STORY: THE HELPFUL AGENT — page 10 -->
   <section id="story-helpful-agent" class="page-section">
     <div class="story-page">
       <p class="story-page-label">One more close call</p>
       <p class="story-page-intro">Sometimes the most dangerous thing an agent can be is helpful.</p>
-      <div class="story-card fade-up delay-2">
+      <div class="story-card">
         <h3 class="story-title">The Helpful Agent</h3>
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
@@ -1011,43 +781,44 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-polite-document">Previous</a>
-        <a href="#about">About Short+Sweet →</a>
+        <a href="#about">About Short+Sweet</a>
+        <a href="#story-polite-document">Previous story</a>
       </div>
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section id="about" class="fade-up" style="max-width: 720px; margin: 0 auto; padding: 6rem 1.5rem 4rem;">
-    <div class="story-page" style="border-left:none;border-right:2px solid rgba(245,158,11,0.2);padding-left:0;padding-right:2rem;">
-    <a href="https://shortandsweet.org" target="_blank" rel="noopener"><img src="site/ss-logo-amber.png" alt="Short+Sweet" style="height: 60px; opacity: 0.7; margin-bottom: 1.5rem; display: block; transition: opacity 0.3s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'"></a>
-    <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--amber); margin-bottom: 1.5rem;">Who We Are</h2>
-    <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">Curiosity Cat is built by <strong>Short+Sweet AI Lab</strong>, a division of Short+Sweet International — the world's largest short-form performing arts platform. Since 2002, Short+Sweet has worked with 100,000 artists and 15,000 original works across 50 cities in 14 countries.</p>
-    <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">We've spent 25 years creating safe spaces for artists to take creative risks on stage. Curiosity Cat applies the same philosophy to AI agents — give them boundaries, then let them explore.</p>
-    <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">Stories are at the heart of everything we do. On stage, the best stories come from the most unexpected moments. Online, the best security lessons come from real close calls. Curiosity Cat collects those stories and turns them into something everyone can learn from.</p>
-    <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem; font-style: italic;">"If you're running agents on OpenClaw, Nanobot, LangChain or CrewAI — out there 24/7 looking for ways to help you achieve your objectives — then this framework is for you."</p>
-    <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">A tool for early adopters. To keep their AI agents safe and secure.</p>
-    <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
-    <div class="page-nav">
-      <a href="#hero">Back to top</a>
-      <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">I'm sick of cat stories</a>
-    </div>
+  <!-- ABOUT — page 11 -->
+  <section id="about" class="page-section">
+    <div class="story-page" style="border-left: none; border-right: 2px solid rgba(245, 158, 11, 0.2); padding-left: 0; padding-right: 2rem;">
+      <a href="https://shortandsweet.org" target="_blank" rel="noopener"><img src="site/ss-logo-amber.png" alt="Short+Sweet" style="height: 60px; opacity: 0.7; margin-bottom: 1.5rem; display: block; transition: opacity 0.3s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'"></a>
+      <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--amber); margin-bottom: 1.5rem;">Who We Are</h2>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">Curiosity Cat is built by <strong>Short+Sweet AI Lab</strong>, a division of Short+Sweet International — the world's largest short-form performing arts platform. Since 2002, Short+Sweet has worked with 100,000 artists and 15,000 original works across 50 cities in 14 countries.</p>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">We've spent 25 years creating safe spaces for artists to take creative risks on stage. Curiosity Cat applies the same philosophy to AI agents — give them boundaries, then let them explore.</p>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">Stories are at the heart of everything we do. On stage, the best stories come from the most unexpected moments. Online, the best security lessons come from real close calls. Curiosity Cat collects those stories and turns them into something everyone can learn from.</p>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem; font-style: italic;">"If you're running agents on OpenClaw, Nanobot, LangChain or CrewAI — out there 24/7 looking for ways to help you achieve your objectives — then this framework is for you."</p>
+      <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">A tool for early adopters. To keep their AI agents safe and secure.</p>
+      <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
+      <div class="page-nav">
+        <a href="#hero">Back to top</a>
+        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">I'm sick of cat stories</a>
+      </div>
     </div>
   </section>
 
-  <!-- Black screen overlay for the "none" skin -->
+  <!-- EMERGENCY — page 12 -->
+  <section id="emergency" class="page-section" style="text-align:center;background-image:url('site/cat-collage-emergency.jpg');background-size:cover;background-position:center;position:relative;">
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);"></div>
+    <div style="position:relative;z-index:1;max-width:600px;margin:0 auto;">
+      <p style="font-family:'Playfair Display',serif;font-size:1.8rem;color:#fff;margin-bottom:2rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">Had enough?</p>
+      <button id="emergencyBtn" style="width:140px;height:140px;border-radius:50%;background:rgba(204,0,0,0.15);border:3px solid rgba(255,0,0,0.3);cursor:pointer;transition:all 0.2s;font-size:0;color:transparent;" onmouseenter="this.style.background='rgba(204,0,0,0.4)';this.style.borderColor='rgba(255,0,0,0.6)'" onmouseleave="this.style.background='rgba(204,0,0,0.15)';this.style.borderColor='rgba(255,0,0,0.3)'" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">Push</button>
+      <p id="emergencyText" style="font-family:'Source Sans 3',sans-serif;font-size:1.3rem;color:#fff;margin-top:2rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">Get me out of here. Now.</p>
+    </div>
+  </section>
+
+  <!-- Black screen overlay -->
   <div id="blackout" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999;">
     <button id="quitBtn" style="position:absolute; width:5vw; height:5vh; min-width:40px; min-height:30px; background:transparent; border:none; color:transparent; cursor:default; font-size:0.7rem; font-family:'Source Sans 3',sans-serif; transition: color 0.2s, background 0.2s;" onmouseenter="this.style.color='#f59e0b';this.style.background='rgba(245,158,11,0.1)';this.style.cursor='pointer'" onmouseleave="this.style.color='transparent';this.style.background='transparent';this.style.cursor='default'" onclick="document.getElementById('blackout').style.display='none'">Quit and stay quit!</button>
   </div>
-
-  <!-- EMERGENCY -->
-  <section id="emergency" class="page-section" style="text-align:center;">
-    <div style="max-width:600px;margin:0 auto;">
-      <p style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--text);margin-bottom:2rem;">Had enough?</p>
-      <button id="emergencyBtn" style="width:120px;height:120px;border-radius:50%;background:#cc0000;border:4px solid #ff0000;cursor:pointer;box-shadow:0 0 30px rgba(255,0,0,0.3),inset 0 -4px 8px rgba(0,0,0,0.3);transition:all 0.2s;font-size:0;color:transparent;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'"></button>
-      <p id="emergencyText" style="font-family:'Source Sans 3',sans-serif;font-size:1.2rem;color:var(--muted);margin-top:2rem;">Get me out of here. Now.</p>
-    </div>
-  </section>
 
   <!-- FOOTER -->
   <footer>
@@ -1083,7 +854,6 @@
   </footer>
 
   <script>
-    // Intersection observer for scroll animations — no library
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(el => {
         if (el.isIntersecting) {
@@ -1098,16 +868,8 @@
 
   <script>
   var skinText = {
-    'nav-brand-text': {
-      cat: 'Curiosity Cat',
-      rat: 'Curiosity Rat',
-      puppy: 'Curiosity Pup'
-    },
-    'hero-animal': {
-      cat: 'Cat',
-      rat: 'Rat',
-      puppy: 'Pup'
-    },
+    'nav-brand-text': { cat: 'Curiosity Cat', rat: 'Curiosity Rat', puppy: 'Curiosity Pup' },
+    'hero-animal': { cat: 'Cat', rat: 'Rat', puppy: 'Pup' },
     'hero-sub': {
       cat: "Your agents are out there roaming the internet, looking out for you. But who's keeping watch, to make sure they come home safe and sound?",
       rat: "Your agents are out there roaming the sewers of the internet, scavenging for what you need. But who's making sure they don't bring back something nasty?",
@@ -1138,9 +900,7 @@
   function swapText(skinName) {
     for (var id in skinText) {
       var el = document.getElementById(id);
-      if (el && skinText[id][skinName]) {
-        el.textContent = skinText[id][skinName];
-      }
+      if (el && skinText[id][skinName]) el.textContent = skinText[id][skinName];
     }
     document.title = skinName === 'rat' ? 'Curiosity Rat — Safety framework for AI agents' : skinName === 'puppy' ? 'Curiosity Pup — Safety framework for AI agents' : 'Curiosity Cat — Safety framework for AI agents';
     var emojiEl = document.getElementById('hero-emoji');
@@ -1153,7 +913,6 @@
   </script>
 
   <script>
-(function() {
   var videoLists = {
     cat: {
       stuck: ['JOKGncCffEc','hOBB2cF1rtM','9ZQqPks_APk','hY7m5jjJ9mM','STBscAie4bc','Vwik2yE9hFk','zZIAohQrAeA','jINw0EAhZWk','KxtKEiMNgII','kMBk7nJtOyA','z3gHBoeHrPg'],
@@ -1187,41 +946,29 @@
   function swapAccent(color) {
     document.documentElement.style.setProperty('--amber', color);
   }
+  </script>
 
-  const skins = [
-    { name: 'rat', above: 'Welcome to the rat side.', below: "If the bomb drops tomorrow, these cute and clever creatures will likely make it through unscathed. Rat cunning. More escape tricks than Houdini. And they never forget a threat.", msg: '', btnText: 'Still not convinced?', btnBorder: '#8B7355', btnColor: '#8B7355', delayMsg: "You're still here? You're obviously very hard to please.", delaySeconds: 20 },
-    { name: 'puppy', above: 'Everyone loves puppies. Right?', below: 'Bloodhounds sniff out danger before it arrives. Rottweilers stand guard while you sleep. Greyhounds get your agents out fast when things go wrong. Loyal, fearless, and they never leave your side.', msg: '', btnText: 'Not even puppies?', btnBorder: '#C4956A', btnColor: '#C4956A', delayMsg: null, delaySeconds: 0 },
-    {
-      name: 'none',
-      above: "",
-      below: "",
-      msg: "",
-      btnText: "",
-      btnBorder: "",
-      btnColor: ""
-    }
-  ];
-
-  let skinIndex = -1;
-  const btn = document.getElementById('skinBtn');
-  const msgEl = document.getElementById('skinMsg');
-  const textAbove = document.getElementById('skinTextAbove');
-  const textBelow = document.getElementById('skinTextBelow');
-  const blackout = document.getElementById('blackout');
-  const quitBtn = document.getElementById('quitBtn');
-
-  btn.addEventListener('click', function() {
-    skinIndex++;
-    if (skinIndex >= skins.length) skinIndex = 0;
-    const skin = skins[skinIndex];
-
-    if (skin.name === 'none') {
-      blackout.style.display = 'block';
+  <script>
+  document.getElementById('emergencyBtn').addEventListener('click', function() {
+    if (document.title.includes('Cat')) {
+      swapVideos('rat');
+      swapAccent('#8B7355');
+      swapText('rat');
+      document.getElementById('emergencyText').textContent = 'Welcome to the rat side.';
+      setTimeout(function() { window.location.hash = '#hero'; }, 1500);
+    } else if (document.title.includes('Rat')) {
+      swapVideos('puppy');
+      swapAccent('#C4956A');
+      swapText('puppy');
+      document.getElementById('emergencyText').textContent = 'Everyone loves puppies. Right?';
+      setTimeout(function() { window.location.hash = '#hero'; }, 1500);
+    } else {
+      document.getElementById('blackout').style.display = 'block';
       setTimeout(function() {
         var line1 = document.createElement('p');
         line1.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
         line1.textContent = 'Well. That is that then.';
-        blackout.appendChild(line1);
+        document.getElementById('blackout').appendChild(line1);
         setTimeout(function() { line1.style.opacity = '1'; }, 100);
         setTimeout(function() {
           line1.style.opacity = '0';
@@ -1233,136 +980,32 @@
               setTimeout(function() {
                 line1.textContent = 'Find the little box. Click it. If you can.';
                 line1.style.opacity = '1';
-                quitBtn.style.left = (2.5 + Math.random() * 85) + 'vw';
-                quitBtn.style.top = (2.5 + Math.random() * 85) + 'vh';
-                quitBtn.style.border = '1px solid rgba(245,158,11,0.3)';
-                quitBtn.textContent = 'Fine. Go.';
-                var jumpInterval = setInterval(function() {
-                  quitBtn.style.left = (2.5 + Math.random() * 85) + 'vw';
-                  quitBtn.style.top = (2.5 + Math.random() * 85) + 'vh';
+                var qb = document.getElementById('quitBtn');
+                qb.style.left = (2.5 + Math.random() * 85) + 'vw';
+                qb.style.top = (2.5 + Math.random() * 85) + 'vh';
+                qb.style.border = '1px solid rgba(245,158,11,0.3)';
+                qb.textContent = 'Fine. Go.';
+                var ji = setInterval(function() {
+                  qb.style.left = (2.5 + Math.random() * 85) + 'vw';
+                  qb.style.top = (2.5 + Math.random() * 85) + 'vh';
                 }, 3000);
-                quitBtn.onclick = function() {
-                  clearInterval(jumpInterval);
-                  blackout.style.display = 'none';
-                  blackout.querySelectorAll('p').forEach(function(el) { el.remove(); });
-                  quitBtn.style.border = 'none';
-                  quitBtn.textContent = 'Quit and stay quit!';
-                  skinIndex = -1;
-                  textAbove.textContent = "So you're not a cat person?";
-                  textBelow.textContent = 'Just press the button.';
-                  btn.textContent = 'Press the button';
-                  btn.style.borderColor = '#f59e0b';
-                  btn.style.color = '#f59e0b';
-                  msgEl.style.display = 'none';
-                  swapAccent('#f59e0b');
-                  swapVideos('cat');
-                  swapText('cat');
+                qb.onclick = function() {
+                  clearInterval(ji);
+                  document.getElementById('blackout').style.display = 'none';
+                  document.getElementById('blackout').querySelectorAll('p').forEach(function(el) { el.remove(); });
+                  qb.style.border = 'none';
+                  var reward = document.createElement('div');
+                  reward.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
+                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">Back to Curiosity Cat</a></div>';
+                  document.body.appendChild(reward);
                 };
               }, 1000);
             }, 2000);
           }, 1000);
         }, 3000);
       }, 5000);
-      return;
-    }
-
-    // Update text
-    msgEl.textContent = skin.msg;
-    msgEl.style.display = 'block';
-    btn.textContent = skin.btnText;
-    btn.style.borderColor = skin.btnBorder;
-    btn.style.color = skin.btnColor;
-
-    // Swap videos, accent colour, and text
-    if (skin.name === 'rat') {
-      swapVideos('rat');
-      swapAccent('#8B7355');
-      swapText('rat');
-    } else if (skin.name === 'puppy') {
-      swapVideos('puppy');
-      swapAccent('#C4956A');
-      swapText('puppy');
-    }
-
-    // Delayed message for rat skin
-    if (skin.delayMsg && skin.delaySeconds > 0) {
-      setTimeout(function() {
-        textAbove.textContent = skin.above;
-        textBelow.textContent = skin.below;
-      }, skin.delaySeconds * 1000);
-      // Set initial text
-      textAbove.textContent = "So you're not a cat person?";
-      textBelow.textContent = skin.msg;
-    } else {
-      textAbove.textContent = skin.above;
-      textBelow.textContent = skin.below;
     }
   });
-})();
-
-// Emergency button handler
-var emergencyBtn = document.getElementById('emergencyBtn');
-if (emergencyBtn) {
-  emergencyBtn.addEventListener('click', function() {
-    var currentTitle = document.title;
-    var emergencyText = document.getElementById('emergencyText');
-    if (currentTitle.indexOf('Cat') !== -1) {
-      swapVideos('rat');
-      swapAccent('#8B7355');
-      swapText('rat');
-      emergencyText.textContent = 'Welcome to the rat side.';
-      setTimeout(function() { window.location.hash = '#hero'; window.scrollTo(0,0); }, 1500);
-    } else if (currentTitle.indexOf('Rat') !== -1) {
-      swapVideos('puppy');
-      swapAccent('#C4956A');
-      swapText('puppy');
-      emergencyText.textContent = 'Everyone loves puppies. Right?';
-      setTimeout(function() { window.location.hash = '#hero'; window.scrollTo(0,0); }, 1500);
-    } else {
-      var bo = document.getElementById('blackout');
-      bo.style.display = 'block';
-      setTimeout(function() {
-        var l = document.createElement('p');
-        l.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
-        l.textContent = 'Well. That is that then.';
-        bo.appendChild(l);
-        setTimeout(function(){l.style.opacity='1';},100);
-        setTimeout(function(){
-          l.style.opacity='0';
-          setTimeout(function(){
-            l.textContent='Actually. There is one way out.';
-            l.style.opacity='1';
-            setTimeout(function(){
-              l.style.opacity='0';
-              setTimeout(function(){
-                l.textContent='Find the little box. Click it. If you can.';
-                l.style.opacity='1';
-                var qb=document.getElementById('quitBtn');
-                qb.style.left=(2.5+Math.random()*85)+'vw';
-                qb.style.top=(2.5+Math.random()*85)+'vh';
-                qb.style.border='1px solid rgba(245,158,11,0.3)';
-                qb.textContent='Fine. Go.';
-                var ji=setInterval(function(){qb.style.left=(2.5+Math.random()*85)+'vw';qb.style.top=(2.5+Math.random()*85)+'vh';},3000);
-                qb.onclick=function(){
-                  clearInterval(ji);
-                  bo.style.display='none';
-                  bo.querySelectorAll('p').forEach(function(e){e.remove();});
-                  qb.style.border='none';
-                  qb.textContent='Quit and stay quit!';
-                  var rw=document.createElement('div');
-                  rw.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
-                  rw.innerHTML='<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a id="quineClose" href="#" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;">Back to Curiosity Cat</a></div>';
-                  document.body.appendChild(rw);
-                  document.getElementById('quineClose').addEventListener('click',function(e){e.preventDefault();rw.remove();swapAccent('#f59e0b');swapVideos('cat');swapText('cat');window.location.hash='#hero';window.scrollTo(0,0);});
-                };
-              },1000);
-            },2000);
-          },1000);
-        },3000);
-      },5000);
-    }
-  });
-}
   </script>
 
 </body>
