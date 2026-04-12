@@ -176,10 +176,11 @@
     }
 
     .hero-sub {
-      font-size: clamp(1.725rem, 3.75vw, 2.1rem);
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+      line-height: 1.44;
       font-weight: 300;
       color: var(--white);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
       max-width: 700px;
       animation: fadeUp 0.6s ease 0.15s both;
     }
@@ -188,15 +189,15 @@
       font-family: 'Playfair Display', serif;
       font-style: italic;
       font-size: 1.575rem;
-      color: var(--muted);
-      margin-bottom: 2.5rem;
+      color: var(--amber);
+      margin-bottom: 2.0rem;
       animation: fadeUp 0.6s ease 0.25s both;
     }
 
     .hero-ctas {
       display: flex;
       gap: 1rem;
-      margin-bottom: 3rem;
+      margin-bottom: 2.4rem;
       flex-wrap: wrap;
       animation: fadeUp 0.6s ease 0.35s both;
     }
@@ -239,7 +240,7 @@
 
     /* ── SECTION LABELS ── */
     .section-label {
-      font-size: 0.75rem;
+      font-size: 0.825rem;
       font-weight: 600;
       letter-spacing: 0.15em;
       text-transform: uppercase;
@@ -253,7 +254,7 @@
     }
 
     .section-body {
-      font-size: 1.25rem;
+      font-size: 1.375rem;
       color: var(--muted);
       max-width: 600px;
     }
@@ -296,7 +297,7 @@
     }
 
     .slider-label {
-      font-size: 0.85rem;
+      font-size: 0.935rem;
       font-weight: 600;
       letter-spacing: 0.05em;
       text-transform: uppercase;
@@ -317,7 +318,7 @@
     }
 
     .slider-desc span {
-      font-size: 0.85rem;
+      font-size: 0.935rem;
       color: var(--muted);
       max-width: 220px;
     }
@@ -330,12 +331,12 @@
       margin-top: 2rem;
       font-family: 'Playfair Display', serif;
       font-style: italic;
-      font-size: 1.05rem;
+      font-size: 1.155rem;
       color: var(--muted);
       text-align: center;
     }
 
-    .slider-coming-soon { text-align: center; font-size: 0.8rem; color: var(--amber); opacity: 0.6; margin-top: 0.5rem; font-style: italic; }
+    .slider-coming-soon { text-align: center; font-size: 0.88rem; color: var(--amber); margin-top: 0.5rem; font-style: italic; }
 
     /* ── THREE LAYERS ── */
     #layers {
@@ -363,12 +364,12 @@
     }
 
     .card-icon {
-      font-size: 1.6rem;
-      margin-bottom: 1.25rem;
+      font-size: 2.4rem;
+      margin-bottom: 0.75rem;
       display: block;
-      width: 48px;
-      height: 48px;
-      line-height: 48px;
+      width: 64px;
+      height: 64px;
+      line-height: 64px;
       text-align: center;
       background: var(--amber-glow);
       border-radius: 8px;
@@ -383,12 +384,12 @@
     .card-body {
       font-size: 1.15rem;
       color: var(--muted);
-      line-height: 1.65;
+      line-height: 1.485;
       margin-bottom: 1rem;
     }
 
     .card-tag {
-      font-size: 0.8rem;
+      font-size: 0.88rem;
       font-style: italic;
       color: var(--amber-dim);
       font-family: 'Playfair Display', serif;
@@ -415,7 +416,7 @@
     }
 
     .code-block .comment {
-      color: #888;
+      color: #aaa;
     }
 
     .code-block .keyword {
@@ -431,26 +432,35 @@
 
     .install-pill {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 4px;
+      border: 1px solid var(--amber);
+      border-radius: 6px;
       padding: 0.6rem 1.2rem;
       font-family: 'Courier New', Courier, monospace;
       font-size: 1.1rem;
       color: var(--white);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .install-pill:hover {
+      background: var(--amber);
+      color: #0a0a0a;
     }
 
     .qs-link {
-      color: var(--amber);
+      display: inline-block;
+      background: var(--amber);
+      color: #0a0a0a;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.95rem;
-      border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-      padding-bottom: 1px;
-      transition: border-color 0.2s;
+      padding: 0.65rem 1.4rem;
+      border-radius: 6px;
+      transition: opacity 0.2s;
     }
 
     .qs-link:hover {
-      border-color: var(--amber);
+      opacity: 0.85;
     }
 
     /* ── STORIES ── */
@@ -648,7 +658,7 @@
   <section id="hero">
     <div class="container">
       <div class="hero-inner">
-        <h1 class="hero-title">Curiosity<br /><span id="hero-animal">Cat</span> <span id="hero-emoji" style="font-size: 0.8em; vertical-align: middle; margin-left: 0.3em;">🐱</span></h1>
+        <h1 class="hero-title">Curiosity<br /><span id="hero-animal">Cat</span> <span id="hero-emoji" style="font-size: 0.8em; vertical-align: bottom; line-height: 1; margin-left: 0.3em;">🐱</span></h1>
         <p class="hero-sub" id="hero-sub">Your agents are out there roaming the internet, looking out for you. But who's keeping watch, to make sure they come home safe and sound?</p>
         <p class="hero-quip" id="hero-quip"><em>When a cat falls flat, the rest learn the trick.</em></p>
         <div class="hero-ctas">
@@ -700,8 +710,8 @@
         <div class="card fade-up delay-1">
           <span class="card-icon">📋</span>
           <h3 class="card-title">Safety Net</h3>
-          <p class="card-body" id="safety-scenario">Your agent is about to install a package. Twelve downloads. Created yesterday. One letter off from the real thing. Safety Net catches it before the damage is done.</p>
-          <p class="card-tag">Standing orders, quarantine, and policy enforcement that drop into any agent's system prompt. No SDK. No server. No dependencies. Copy-paste and your agent is protected.</p>
+          <p class="card-body" id="safety-scenario">Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net catches it before the damage is done. Every close call reported makes every agent smarter.</p>
+          <p class="card-tag">C-Cat standing orders, quarantine, and policy enforcement that drop into any agent's system prompt. No SDK. No server. No dependencies. Copy-paste and your agent is protected.</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JOKGncCffEc" frameborder="0" allowfullscreen data-category="stuck"></iframe>
           </div>
@@ -709,7 +719,7 @@
         <div class="card fade-up delay-2">
           <span class="card-icon">🗺️</span>
           <h3 class="card-title">Danger Map</h3>
-          <p class="card-body" id="danger-scenario">Last week, someone's agent followed a redirect chain to a credential phishing page. This week, your agent already knows not to. Every close call reported makes every agent smarter.</p>
+          <p class="card-body" id="danger-scenario">Last week, a graphic designer in Singapore's OpenClaw agent followed a redirect chain to a credential phishing page. This week, other agents around the world know not to take the bait. The Danger Map is updated and every agent knows to beware.</p>
           <p class="card-tag">Crowdsourced threat intelligence from real incidents. Anonymised, structured, privacy by design. No free text, no raw URLs, no identity data. The network effect is the moat.</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sVi1go-hqh0" frameborder="0" allowfullscreen data-category="chaos"></iframe>
@@ -718,8 +728,8 @@
         <div class="card fade-up delay-3">
           <span class="card-icon">🐈</span>
           <h3 class="card-title">Nine Lives</h3>
-          <p class="card-body" id="ninelives-scenario">An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a story — and now every cat knows the trick.</p>
-          <p class="card-tag">Real close calls published as short, memorable tales. Security lessons that stick because they read like stories, not CVE numbers.</p>
+          <p class="card-body" id="ninelives-scenario">An agent from an engineering firm in Seattle browsed a documentation page. Hidden in the HTML comments was a different set of instructions. It never saw them. The standing orders caught it. That close call became a story — now every cat knows the trick.</p>
+          <p class="card-tag">Real close calls published as short, memorable tales. Security lessons from C-Cat that stick because they read like stories, not CVE numbers. Keeps you and your agents safe and sound.</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
           </div>
@@ -737,7 +747,9 @@
 
       <div class="code-block fade-up delay-2">
         <span class="comment"># Step 1 — Copy the policy into your agent's system prompt</span><br />
-        Copy <span class="keyword">standing-orders/general-safety.md</span> into your agent's system prompt. Done.<br /><br />
+        <br />
+        Copy <span class="keyword">standing-orders/general-safety.md</span> into your agent's system prompt. Done.<br />
+        <br />
         <span class="comment"># Step 2 (optional) — Use the CLI to scaffold a full setup</span>
       </div>
 
@@ -990,17 +1002,17 @@
       puppy: "When a pup gets lost, the pack finds the way."
     },
     'safety-scenario': {
-      cat: "Your agent is about to install a package. Twelve downloads. Created yesterday. One letter off from the real thing. Safety Net catches it before the damage is done.",
+      cat: "Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net catches it before the damage is done. Every close call reported makes every agent smarter.",
       rat: "Your agent is about to crawl into a pipe that leads nowhere good. Twelve downloads. Created yesterday. One letter off from the real thing. The Safety Net blocks the tunnel before the trap springs.",
       puppy: "Your agent is about to fetch a stick from a stranger. Twelve downloads. Created yesterday. One letter off from the real thing. The Safety Net calls it back before it bites."
     },
     'danger-scenario': {
-      cat: "Last week, someone's agent followed a redirect chain to a credential phishing page. This week, your agent already knows not to. Every close call reported makes every agent smarter.",
+      cat: "Last week, a graphic designer in Singapore's OpenClaw agent followed a redirect chain to a credential phishing page. This week, other agents around the world know not to take the bait. The Danger Map is updated and every agent knows to beware.",
       rat: "Last week, someone's agent followed a baited trail to a credential trap. This week, your agent already knows the scent. Every close call reported makes every agent craftier.",
       puppy: "Last week, someone's agent followed a trail to a credential trap. This week, your agent already knows not to follow that scent. Every close call reported makes the whole pack sharper."
     },
     'ninelives-scenario': {
-      cat: "An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a story — and now every cat knows the trick.",
+      cat: "An agent from an engineering firm in Seattle browsed a documentation page. Hidden in the HTML comments was a different set of instructions. It never saw them. The standing orders caught it. That close call became a story — now every cat knows the trick.",
       rat: "An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a warning — and now every rat knows the tunnel.",
       puppy: "An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a lesson — and now every pup in the pack knows better."
     }
