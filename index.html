@@ -921,6 +921,33 @@
       emergencySection.style.backgroundImage = "url('site/cat-collage-emergency.jpg')";
     }
   }
+
+  // Swap Cat/Rat/Pup in all page-nav links
+  var navLinks = document.querySelectorAll('.page-nav a');
+  navLinks.forEach(function(link) {
+    var text = link.textContent;
+    if (skinName === 'rat') {
+      text = text.replace(/Curiosity Cat/g, 'Curiosity Rat');
+      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Rat' : m === 'cat' ? 'rat' : m === 'CAT' ? 'RAT' : 'rat'; });
+      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Rats' : 'rats'; });
+    } else if (skinName === 'puppy') {
+      text = text.replace(/Curiosity Cat/g, 'Curiosity Pup');
+      text = text.replace(/Curiosity Rat/g, 'Curiosity Pup');
+      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Pup' : 'pup'; });
+      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Pups' : 'pups'; });
+      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Pup' : 'pup'; });
+      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Pups' : 'pups'; });
+    } else {
+      // Reset to cat — need to handle both rat and pup words
+      text = text.replace(/Curiosity Rat/g, 'Curiosity Cat');
+      text = text.replace(/Curiosity Pup/g, 'Curiosity Cat');
+      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Cat' : 'cat'; });
+      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Cats' : 'cats'; });
+      text = text.replace(/\bpup\b/gi, function(m) { return m === 'Pup' ? 'Cat' : 'cat'; });
+      text = text.replace(/\bpups\b/gi, function(m) { return m === 'Pups' ? 'Cats' : 'cats'; });
+    }
+    link.textContent = text;
+  });
   }
   </script>
 
