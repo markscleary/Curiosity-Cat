@@ -820,6 +820,32 @@
     <button id="quitBtn" style="position:absolute; width:5vw; height:5vh; min-width:40px; min-height:30px; background:transparent; border:none; color:transparent; cursor:default; font-size:0.7rem; font-family:'Source Sans 3',sans-serif; transition: color 0.2s, background 0.2s;" onmouseenter="this.style.color='#f59e0b';this.style.background='rgba(245,158,11,0.1)';this.style.cursor='pointer'" onmouseleave="this.style.color='transparent';this.style.background='transparent';this.style.cursor='default'" onclick="document.getElementById('blackout').style.display='none'">Quit and stay quit!</button>
   </div>
 
+  <!-- HOW IT WORKS — technical details -->
+  <section id="how-it-works" class="page-section">
+    <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
+      <div style="display:flex;gap:1.5rem;margin-bottom:2.5rem;justify-content:center;">
+        <span style="font-size:2.4rem;">📋</span>
+        <span style="font-size:2.4rem;">🗺️</span>
+        <span style="font-size:2.4rem;">🐈</span>
+      </div>
+      <h2 class="section-title" style="margin-bottom:2rem;">How It Actually Works</h2>
+      <div style="font-family:'Source Sans 3',sans-serif;font-size:1.15rem;color:var(--text);line-height:1.8;">
+        <p style="margin-bottom:1.5rem;">It started with a problem. We were running AI agents across our international festival network — researching venues, drafting contracts, pulling together production schedules across a dozen countries. The agents were fast and tireless. They were also wandering into trouble.</p>
+        <p style="margin-bottom:1.5rem;">One agent nearly installed a malicious package that was one letter off from the real thing. Another followed a chain of redirects to a credential phishing page. A third started leaking internal project names into public search queries without anyone noticing. These were not hypothetical scenarios. They happened to us.</p>
+        <p style="margin-bottom:1.5rem;">So we built a safety net. Not a platform. Not a service. A text file. A set of standing orders that you paste into your agent's system prompt. The agent reads them, follows them, and that is the whole install. No SDK. No server. No dependencies. It works with OpenClaw, LangChain, CrewAI, AutoGen, or anything else that accepts a system prompt — which is everything.</p>
+        <p style="margin-bottom:1.5rem;">The standing orders tell an agent what to check before it fetches a URL, what to quarantine before it executes a download, how to spot hidden instructions buried in documents and web pages, and when to refuse to hand over credentials. Simple rules, clearly stated. The kind of thing a good security team would brief a new employee on — except agents do not get briefed. Until now.</p>
+        <p style="margin-bottom:1.5rem;">Then we realised that every close call we caught was a lesson someone else could learn from. So we built the Danger Map — a crowdsourced threat intelligence layer. When one agent encounters a threat, it files a structured, anonymous report. No free text. No raw URLs. No identity data. Just the threat class, the severity, and what caught it. Every report makes every other agent a little smarter. The network effect is the moat.</p>
+        <p style="margin-bottom:1.5rem;">And because we are a theatre company — because we have spent 25 years learning that the best lessons are the ones people actually remember — we turned those close calls into stories. Nine Lives. Short tales about real threats, told plainly, that stick in your head the way a good scene does. Security bulletins get filed. Stories get told.</p>
+        <p style="margin-bottom:1.5rem;">The whole framework is open source. It costs nothing. It takes sixty seconds to deploy. And it was built by people who know what it means to create a safe space for taking risks — because that is what we have been doing on stages around the world since 2002.</p>
+        <p style="margin-bottom:2rem;color:var(--amber);font-style:italic;">That is how one theatre company ended up building a safety net for AI agents. One thing led to another.</p>
+      </div>
+      <div class="page-nav">
+        <a href="#hero">Back to top</a>
+        <a href="https://shortandsweet.org" target="_blank">What we do as our day job →</a>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer>
     <div class="container">
@@ -1035,8 +1061,9 @@
                   qb.style.border = 'none';
                   var reward = document.createElement('div');
                   reward.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
-                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">Back to Curiosity Cat</a></div>';
+                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">Back to Curiosity Cat</a><br><br><a id="quineHowItWorks" href="#how-it-works" style="color:var(--muted);font-family:Source Sans 3,sans-serif;text-decoration:none;font-size:0.95rem;">Curious how it actually works? →</a></div>';
                   document.body.appendChild(reward);
+                  document.getElementById('quineHowItWorks').addEventListener('click',function(e){e.preventDefault();reward.remove();swapAccent('#f59e0b');swapVideos('cat');swapText('cat');window.location.hash='#how-it-works';});
                 };
               }, 1000);
             }, 2000);
