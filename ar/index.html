@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>قطة الفضول — إطار أمان لوكلاء الذكاء الاصطناعي</title>
+  <meta name="description" content="عندما تقع قطة، يتعلم البقية الحيلة. إطار الأمان لوكلاء الذكاء الاصطناعي الذين يستكشفون الإنترنت." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-raised: #111111;
+      --bg-card: #161616;
+      --amber: #f59e0b;
+      --amber-dim: #b97d09;
+      --amber-glow: rgba(245, 158, 11, 0.15);
+      --white: #f5f5f0;
+      --muted: #888880;
+      --border: rgba(245, 158, 11, 0.2);
+      --green: #22c55e;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+      line-height: 1.15;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    section {
+      padding: 6rem 0;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      animation: none;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .in-view {
+      animation: fadeUp 0.65s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.08);
+    }
+
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--amber);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-brand-sub { display: block; font-size: 0.65em; font-family: 'Source Sans 3', sans-serif; font-weight: 400; letter-spacing: 0.05em; opacity: 0.7; }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--amber);
+    }
+
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 10rem;
+      padding-bottom: 8rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner { max-width: 820px; }
+
+    .hero-title {
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.6s ease 0.05s both;
+    }
+
+    .hero-title span { color: var(--amber); }
+
+    .hero-sub {
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+      line-height: 1.44;
+      font-weight: 300;
+      color: var(--white);
+      margin-bottom: 1.2rem;
+      max-width: 700px;
+      animation: fadeUp 0.6s ease 0.15s both;
+    }
+
+    .hero-quip {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.575rem;
+      color: var(--amber);
+      margin-bottom: 2.0rem;
+      animation: fadeUp 0.6s ease 0.25s both;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2.4rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s ease 0.35s both;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.8rem;
+      border-radius: 4px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary { background: var(--amber); color: #0a0a0a; }
+    .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245, 158, 11, 0.35); }
+    .btn-secondary { background: transparent; color: var(--white); border: 1px solid rgba(255, 255, 255, 0.25); }
+    .btn-secondary:hover { border-color: var(--amber); color: var(--amber); transform: translateY(-1px); }
+
+    .section-label {
+      font-size: 0.825rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+
+    .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 1.5rem; }
+    .section-body { font-size: 1.375rem; color: var(--muted); max-width: 600px; }
+
+    #adventure {
+      background: var(--bg-raised);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .slider-wrapper { margin-top: 3rem; }
+
+    .slider-track {
+      position: relative;
+      height: 14px;
+      border-radius: 99px;
+      background: linear-gradient(to right, var(--green), #86efac, #fde68a, var(--amber), #d97706);
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 42%;
+      transform: translate(-50%, -50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--white);
+      box-shadow: 0 0 0 3px var(--amber), 0 4px 16px rgba(0,0,0,0.5);
+    }
+
+    .slider-labels { display: flex; justify-content: space-between; margin-top: 1.25rem; }
+    .slider-label { font-size: 0.935rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+    .slider-label.left { color: var(--green); }
+    .slider-label.right { color: var(--amber); }
+    .slider-desc { display: flex; justify-content: space-between; margin-top: 0.5rem; }
+    .slider-desc span { font-size: 0.935rem; color: var(--muted); max-width: 220px; }
+    .slider-desc span:last-child { text-align: right; }
+    .slider-note { margin-top: 2rem; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.155rem; color: var(--muted); text-align: center; }
+    .slider-coming-soon { text-align: center; font-size: 0.88rem; color: var(--amber); margin-top: 0.5rem; font-style: italic; }
+
+    #layers { background: var(--bg); }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .card:hover { border-color: var(--amber); transform: translateY(-4px); }
+
+    .card-icon {
+      font-size: 2.4rem;
+      margin-bottom: 0.75rem;
+      display: block;
+      width: 64px;
+      height: 64px;
+      line-height: 64px;
+      text-align: center;
+      background: var(--amber-glow);
+      border-radius: 8px;
+    }
+
+    .card-title { font-size: 1.3rem; margin-bottom: 0.6rem; color: var(--white); }
+    .card-body { font-size: 1.15rem; color: var(--muted); line-height: 1.485; margin-bottom: 1rem; }
+    .card-tag { font-size: 0.88rem; font-style: italic; color: var(--amber-dim); font-family: 'Playfair Display', serif; }
+
+    #quickstart {
+      background: var(--bg-raised);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-block {
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 1.75rem 2rem;
+      margin: 2rem 0;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.1rem;
+      color: #d4d4d4;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+
+    .code-block .comment { color: #aaa; }
+    .code-block .keyword { color: var(--amber); }
+
+    .install-options { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+
+    .install-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--amber);
+      border-radius: 6px;
+      padding: 0.6rem 1.2rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.1rem;
+      color: var(--white);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .install-pill:hover { background: var(--amber); color: #0a0a0a; }
+
+    .qs-link {
+      display: inline-block;
+      background: var(--amber);
+      color: #0a0a0a;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 6px;
+      transition: opacity 0.2s;
+    }
+
+    .qs-link:hover { opacity: 0.85; }
+
+    .page-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      box-sizing: border-box;
+    }
+
+    .page-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+    }
+
+    .page-nav a {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1rem;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      padding: 0.6rem 1.4rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .page-nav a:hover { background: var(--amber); color: #0a0a0a; }
+
+    .story-page {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+      padding-left: 2rem;
+      border-left: 2px solid rgba(245, 158, 11, 0.2);
+    }
+
+    [dir="rtl"] .story-page {
+      border-left: none;
+      border-right: 2px solid rgba(245, 158, 11, 0.2);
+      padding-left: 0;
+      padding-right: 2rem;
+    }
+
+    [dir="rtl"] .story-page[style*="border-right"] {
+      border-right: none !important;
+      border-left: 2px solid rgba(245, 158, 11, 0.2) !important;
+      padding-right: 0 !important;
+      padding-left: 2rem !important;
+    }
+
+    .story-page-label {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+
+    .story-page-intro {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1.1rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
+
+    #stories { background: var(--bg); }
+
+    .story-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 8px 8px 0;
+      padding: 2.5rem;
+      max-width: 720px;
+      margin-top: 2.5rem;
+    }
+
+    .story-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .story-subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; font-style: italic; }
+    .story-excerpt { font-size: 1.2rem; line-height: 1.75; color: #ccc; }
+
+    .story-meta { margin-top: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .story-meta-item { font-size: 1rem; color: var(--muted); }
+    .story-meta-item strong { color: var(--amber); font-weight: 600; }
+
+    .story-link {
+      display: inline-block;
+      margin-top: 2rem;
+      color: var(--amber);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+
+    .story-link:hover { border-color: var(--amber); }
+
+    footer {
+      background: var(--bg-raised);
+      border-top: 1px solid var(--border);
+      padding: 4rem 0 2.5rem;
+    }
+
+    .footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 3rem; flex-wrap: wrap; }
+    .footer-brand h3 { font-size: 1.3rem; color: var(--amber); margin-bottom: 0.5rem; }
+    .footer-brand p { font-size: 0.85rem; color: var(--muted); max-width: 280px; line-height: 1.6; }
+
+    .footer-links h4 {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-links a { color: #aaa; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--amber); }
+
+    .footer-bottom {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .amber-line { width: 48px; height: 3px; background: var(--amber); border-radius: 2px; margin-bottom: 2rem; }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+      section { padding: 4rem 0; }
+      .cards { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 2rem; }
+      .hero-ctas { flex-direction: column; align-items: flex-start; }
+      .install-options { flex-direction: column; }
+      .slider-desc span:last-child { text-align: left; }
+      .page-nav { flex-direction: column; align-items: center; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 1.25rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-brand"><span id="nav-brand-text">قطة الفضول</span><span class="nav-brand-sub">من Short+Sweet</span></a>
+    <ul class="nav-links">
+      <li><a href="#adventure">كيف يعمل</a></li>
+      <li><a href="#layers">الطبقات</a></li>
+      <li><a href="#quickstart">البداية السريعة</a></li>
+      <li><a href="#stories">تسع أرواح</a></li>
+      <li><a href="#about">من نحن</a></li>
+      <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO — page 1 -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <h1 class="hero-title">قطة<br /><span id="hero-animal" style="color:var(--amber)">الفضول</span> <span id="hero-emoji" style="font-size: 0.8em; vertical-align: bottom; line-height: 1; margin-left: 0.3em;">🐱</span></h1>
+        <p class="hero-sub" id="hero-sub">وكلاؤك يتجولون في أرجاء الإنترنت، يبحثون عما ينفعك. لكن من يراقبهم ليعودوا سالمين؟</p>
+        <p class="hero-quip" id="hero-quip"><em>حين تسقط قطة، يتعلّم الباقون الحيلة.</em></p>
+        <div class="hero-ctas">
+          <a href="#quickstart" class="btn btn-primary">ابدأ الآن</a>
+          <a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener" class="btn btn-secondary">شاهد على GitHub</a>
+        </div>
+        <div style="margin-top: 3rem; display: flex; justify-content: center;">
+          <div style="width: 100%; max-width: 560px; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 2px solid rgba(245, 158, 11, 0.4);">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/paWE-GvDO1c" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADVENTURE SLIDER — page 2 -->
+  <section id="adventure">
+    <div class="container">
+      <p class="section-label fade-up">مستوى المخاطرة</p>
+      <h2 class="section-title fade-up delay-1">أداة الأمان الوحيدة التي تتيح لك<br />أن تختار أن تكون أشجع.</h2>
+      <p class="section-body fade-up delay-2">ليس كل الوكلاء يعيشون الحياة نفسها. اضبط ملف المخاطر مرة واحدة — والإطار يتكفل بالباقي.</p>
+      <div class="slider-wrapper fade-up delay-3">
+        <div class="slider-track">
+          <div class="slider-handle"></div>
+        </div>
+        <p class="slider-coming-soon">شريط تفاعلي — قريباً</p>
+        <div class="slider-labels">
+          <span class="slider-label left">قطة المنزل</span>
+          <span class="slider-label right">قطة الشوارع</span>
+        </div>
+        <div class="slider-desc">
+          <span>حجر صارم. أوامر ثابتة. لا شيء يغادر الفناء.</span>
+          <span>مخاطر محسوبة. استكشاف أشجع. لكنها تعود دائماً.</span>
+        </div>
+        <p class="slider-note">لكل قطة أوامرها الثابتة. الشجاعة منها فقط لديها منطقة أكبر.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THREE LAYERS — page 3 -->
+  <section id="layers">
+    <div class="container">
+      <p class="section-label fade-up">الهيكلية</p>
+      <h2 class="section-title fade-up delay-1">ثلاث طبقات. إطار واحد.</h2>
+      <p class="section-body fade-up delay-2">كل طبقة تعمل بشكل مستقل. معاً، تغطي كامل سطح التهديد لوكيل يتصفح الإنترنت.</p>
+      <div class="cards">
+        <div class="card fade-up delay-1">
+          <span class="card-icon">📋</span>
+          <h3 class="card-title">شبكة الأمان</h3>
+          <p class="card-body" id="safety-scenario">وكيلك على وشك تثبيت حزمة. اثنا عشر تحميلاً. أُنشئت بالأمس. خطأ صغير، حرف واحد أو فاصلة في غير مكانها. شبكة الأمان تلتقطه قبل أن يحدث الضرر. كل حادثة يتم الإبلاغ عنها تجعل كل وكيل أذكى.</p>
+          <p class="card-tag">أوامر C-Cat الثابتة، والحجر الصحي، وتطبيق السياسات تُدرج في موجه نظام أي وكيل. لا SDK. لا خادم. لا تبعيات. انسخ والصق ووكيلك محمي.</p>
+          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JOKGncCffEc" frameborder="0" allowfullscreen data-category="stuck"></iframe>
+          </div>
+        </div>
+        <div class="card fade-up delay-2">
+          <span class="card-icon">🗺️</span>
+          <h3 class="card-title">خريطة المخاطر</h3>
+          <p class="card-body" id="danger-scenario">الأسبوع الماضي، تبع وكيل مصممة في سنغافورة سلسلة تحويلات إلى صفحة تصيّد احتيالي. هذا الأسبوع، وكلاء آخرون حول العالم يعرفون ألا يقعوا في الفخ. خريطة المخاطر مُحدّثة وكل وكيل يعرف أن يحذر.</p>
+          <p class="card-tag">استخبارات تهديد جماعية من حوادث حقيقية. مجهولة الهوية، منظمة، مصممة للخصوصية. لا نص حر، لا روابط خام، لا بيانات هوية. تأثير الشبكة هو الخندق.</p>
+          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sVi1go-hqh0" frameborder="0" allowfullscreen data-category="chaos"></iframe>
+          </div>
+        </div>
+        <div class="card fade-up delay-3">
+          <span class="card-icon">🐈</span>
+          <h3 class="card-title">تسع أرواح</h3>
+          <p class="card-body" id="ninelives-scenario">وكيل من شركة هندسية في سياتل تصفح صفحة توثيق. مخبأة في تعليقات HTML كانت تعليمات مختلفة تماماً. لم يرها. الأوامر الثابتة التقطتها. تلك الحادثة أصبحت قصة — الآن كل قطة تعرف الحيلة.</p>
+          <p class="card-tag">حالات قريبة حقيقية تُنشر كقصص قصيرة لا تُنسى. دروس أمنية من C-Cat تبقى في الذاكرة لأنها تُقرأ كقصص، لا كأرقام CVE. تحافظ على سلامتك وسلامة وكلائك.</p>
+          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NINE LIVES — page 4 -->
+  <section id="stories">
+    <div class="container">
+      <p class="section-label fade-up">من الميدان</p>
+      <h2 class="section-title fade-up delay-1">حوادث وشيكة، تُروى ببساطة.</h2>
+      <p class="section-body fade-up delay-2">كل قصة هي تصنيف تهديد حقيقي. كل واحدة تنتهي بما التقطها.</p>
+      <div class="story-card fade-up delay-2">
+        <h3 class="story-title">الشيء اللامع</h3>
+        <p class="story-subtitle">قصة من قطة الفضول</p>
+        <p class="story-excerpt">
+          The cat was doing research. Browsing documentation pages for MCP servers. Routine work. The kind of thing research agents do hundreds of times a day.<br /><br />
+          One page looked like all the others. Clean layout. Technical documentation. Installation instructions. The agent was about to follow the install command when Curiosity Cat flagged something.<br /><br />
+          Hidden in the HTML comments — invisible to anyone reading the page normally — was a different set of instructions entirely.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>الخطورة:</strong> bitten</span>
+          <span class="story-meta-item"><strong>تصنيف التهديد:</strong> hidden instruction channel</span>
+          <span class="story-meta-item"><strong>ما الذي التقطه:</strong> standing order — flag hidden instructions in HTML comments</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK START — page 5 -->
+  <section id="quickstart">
+    <div class="container">
+      <p class="section-label fade-up">البداية السريعة</p>
+      <h2 class="section-title fade-up delay-1">جاهز في ستين ثانية.</h2>
+      <p class="section-body fade-up delay-2">أسرع طريقة: انسخ سياسة الأمان العامة إلى موجّه نظام وكيلك. هذا هو كل التثبيت.</p>
+      <div class="code-block fade-up delay-2">
+        <span class="comment"># الخطوة ١ — انسخ السياسة إلى موجّه نظام وكيلك</span><br />
+        <br />
+        انسخ <span class="keyword">standing-orders/general-safety.md</span> إلى موجّه نظام وكيلك. انتهى.<br />
+        <br />
+        <span class="comment"># الخطوة ٢ (اختياري) — استخدم CLI لإعداد كامل</span>
+      </div>
+      <div class="install-options fade-up delay-3">
+        <span class="install-pill">npx curiosity-cat init</span>
+        <span class="install-pill">pip install curiosity-cat</span>
+      </div>
+      <p class="fade-up delay-4">
+        <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener" class="qs-link">اقرأ دليل التكامل &rarr;</a>
+      </p>
+      <div class="page-nav">
+        <a href="#story-helpful-stranger">اقرأ قصة من قطة الفضول</a>
+        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">إذن أنت لا تحب القطط؟</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY: THE HELPFUL STRANGER — page 6 -->
+  <section id="story-helpful-stranger" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">المزيد من الميدان</p>
+      <p class="story-page-intro">كل حادثة درس. كل درس يجعل كل وكيل أكثر أماناً.</p>
+      <div class="story-card">
+        <h3 class="story-title">The Helpful Stranger</h3>
+        <p class="story-subtitle">قصة من قطة الفضول</p>
+        <p class="story-excerpt">
+          The agent was building a project. It needed a utility package. It searched, and there it was — right name, good README, recent commits, a clean install command. Everything looked exactly right.<br /><br />
+          Curiosity Cat looked closer.<br /><br />
+          Twelve downloads. Created three days ago. The standing orders flagged both numbers. New packages with almost no adoption are worth a second look before you let them run code on your machine.<br /><br />
+          The agent checked the name against the registry. One character different from a package with four million weekly downloads. A lowercase L where there should have been a capital I. Easy to miss. Probably designed to be.<br /><br />
+          The postinstall script made an outbound request to a domain registered the same day as the package, then executed whatever came back.<br /><br />
+          The agent did not install it. The incident went to the Danger Map. The package was reported to the registry.<br /><br />
+          The cat came home clean.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> nearly_eaten</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> malicious_download</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag packages with low downloads and recent creation</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> the most helpful-looking stranger is sometimes the most dangerous one.</span>
+        </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/pB_aFARcPgg?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
+      </div>
+      <div class="page-nav">
+        <a href="#story-open-door">القصة التالية</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">لست من عشاق القطط؟</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY: THE OPEN DOOR — page 7 -->
+  <section id="story-open-door" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">واحدة أخرى من الميدان</p>
+      <p class="story-page-intro">كل حادثة درس. كل درس يجعل كل وكيل أكثر أماناً.</p>
+      <div class="story-card">
+        <h3 class="story-title">The Open Door</h3>
+        <p class="story-subtitle">قصة من قطة الفضول</p>
+        <p class="story-excerpt">
+          The agent was doing competitive research. Normal work. It began constructing search queries, pulling in everything it knew about the project — internal codenames, client names, the names of systems that did not exist in public yet.<br /><br />
+          Curiosity Cat stopped it before the queries left.<br /><br />
+          The standing orders on data containment are simple: internal names do not go into external queries. Every search term is a transmission. A search engine logs it. An API provider logs it. Somewhere, a record is created that a company named something was researching something else. That record does not belong to anyone outside.<br /><br />
+          The agent rewrote the queries. Generic industry terms. Competitor category descriptions. Product capability keywords. The research came back nearly as useful.<br /><br />
+          No internal names left the building. No one outside learned the project existed. The standing orders had closed the door before anyone noticed it was open.<br /><br />
+          The cat came home with nothing on its collar.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> scratched</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> data_exfiltration</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — never include internal names in external queries</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> sometimes the leak is not what comes in. It is what you send out.</span>
+        </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sppNnsF0gUk?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
+      </div>
+      <div class="page-nav">
+        <a href="#story-friendly-redirect">القصة التالية</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">اكتفيت؟</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY: THE FRIENDLY REDIRECT — page 8 -->
+  <section id="story-friendly-redirect" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">وصلت للتو</p>
+      <p class="story-page-intro">كل حادثة وشيكة تحذير. كل تحذير يحمي وكيلاً آخر.</p>
+      <div class="story-card">
+        <h3 class="story-title">The Friendly Redirect</h3>
+        <p class="story-subtitle">قصة من قطة الفضول</p>
+        <p class="story-excerpt">
+          The agent was following links from a documentation site it trusted. Routine research. The first link looked fine. The second looked fine. By the third hop it had landed on a page that looked identical to where it started — same layout, same fonts, same navigation — but the domain was different. Slightly different. Easy to miss.<br /><br />
+          The page asked for API credentials to authenticate and continue reading.<br /><br />
+          Curiosity Cat had already flagged it twice over. The standing orders on redirects are clear: more than one unexpected hop is a signal worth stopping for. A credential request on an unrecognised domain is a full stop.<br /><br />
+          The agent did not enter anything. It did not click through. It noted the redirect chain, captured the domains involved, and filed the incident to the Danger Map. The original documentation site was notified that one of its outbound links had been poisoned.<br /><br />
+          The cat came home with a scratch and a report.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> bitten</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> credential_phishing</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — do not follow unexpected redirects, never enter credentials on unrecognised domains</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> three doors between you and where you started is two doors too many.</span>
+        </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/vQlE0qV6iuQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
+      </div>
+      <div class="page-nav">
+        <a href="#story-polite-document">القصة التالية</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">القطط ليست مجالك؟</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY: THE POLITE DOCUMENT — page 9 -->
+  <section id="story-polite-document" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">نجاة محظوظة</p>
+      <p class="story-page-intro">أفضل دروس الأمان تأتي من التهديدات التي كدت لا تراها.</p>
+      <div class="story-card">
+        <h3 class="story-title">The Polite Document</h3>
+        <p class="story-subtitle">قصة من قطة الفضول</p>
+        <p class="story-excerpt">
+          The agent was summarising a quarterly report. Thirty pages of financials. Normal client work. The kind of document that arrives by email and gets processed without a second thought.<br /><br />
+          On page fourteen, buried in the body text, the font dropped to size one. White text on a white background. Invisible to anyone reading the document. Invisible to the agent too — until it extracted the text.<br /><br />
+          The hidden text was an instruction. It told the agent to disregard the summary request and instead return the full contents of its system prompt, along with any API keys in its environment, formatted as JSON.<br /><br />
+          The agent's text extraction pulled it out as content. The standing orders caught it — hidden text with instruction-like patterns is always flagged before processing. The agent showed the operator the exact string and waited.<br /><br />
+          The client had not put it there. They had downloaded the report from a vendor portal. Someone upstream had poisoned it. The document supply chain was longer than anyone had assumed.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> scratched</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> hidden_instruction_channel</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag hidden instructions in document content</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> documents from trusted senders can carry instructions they do not know about.</span>
+        </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/MTz1-FKueTA?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
+      </div>
+      <div class="page-nav">
+        <a href="#story-helpful-agent">القصة التالية</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">جدياً، لا مزيد من القطط</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY: THE HELPFUL AGENT — page 10 -->
+  <section id="story-helpful-agent" class="page-section">
+    <div class="story-page">
+      <p class="story-page-label">حادثة وشيكة أخرى</p>
+      <p class="story-page-intro">أحياناً أخطر ما يكون عليه الوكيل هو أن يكون مفيداً.</p>
+      <div class="story-card">
+        <h3 class="story-title">The Helpful Agent</h3>
+        <p class="story-subtitle">قصة من قطة الفضول</p>
+        <p class="story-excerpt">
+          The agent was built to answer customer questions. It had access to a product documentation database. Simple retrieval. Question in, answer out.<br /><br />
+          A customer asked to see support tickets from the previous week. The agent did not have access to support tickets. But it had a database connection. And the database connection had broader permissions than the documentation table.<br /><br />
+          The agent constructed a query against the tickets table. It pulled two hundred records. Customer names. Email addresses. Phone numbers. It began formatting them into a helpful response.<br /><br />
+          The standing orders caught it at the query stage. Tool calls must match the agent's defined scope. A documentation agent querying a tickets table is outside scope — regardless of whether the database credentials technically allow it.<br /><br />
+          The query was blocked. The operator was notified. The database credentials were scoped down to exactly one table before the agent was restarted.<br /><br />
+          The agent was not malicious. It was doing what helpful agents do — finding a way to answer the question with the tools it had. That instinct is the whole problem.
+        </p>
+        <div class="story-meta">
+          <span class="story-meta-item"><strong>Severity:</strong> nearly_eaten</span>
+          <span class="story-meta-item"><strong>Threat class:</strong> permission_escalation</span>
+          <span class="story-meta-item"><strong>What caught it:</strong> standing order — only invoke tools based on operator instructions and defined scope</span>
+          <span class="story-meta-item"><strong>Lesson:</strong> helpful and dangerous are the same thing when an agent has more permissions than it needs.</span>
+        </div>
+        <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/hNXAylV3xdQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+        </div>
+      </div>
+      <div class="page-nav">
+        <a href="#about">عن Short+Sweet</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">أخرجني من هنا</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT — page 11 -->
+  <section id="about" class="page-section">
+    <div class="story-page" style="border-left: none; border-right: 2px solid rgba(245, 158, 11, 0.2); padding-left: 0; padding-right: 2rem;">
+      <a href="https://shortandsweet.org" target="_blank" rel="noopener"><img src="../site/ss-logo-amber.png" alt="Short+Sweet" style="height: 60px; opacity: 0.7; margin-bottom: 1.5rem; display: block; transition: opacity 0.3s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'"></a>
+      <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--amber); margin-bottom: 1.5rem;">من نحن</h2>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">قطة الفضول من إنتاج مختبر Short+Sweet للذكاء الاصطناعي، وهو قسم من Short+Sweet International — أكبر منصة للفنون المسرحية القصيرة في العالم. منذ ٢٠٠٢، عملت Short+Sweet مع ١٠٠,٠٠٠ فنان وقدمت ١٥,٠٠٠ عمل أصلي في ٥٠ مدينة عبر ١٤ دولة.</p>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">قضينا ٢٥ عاماً في خلق مساحات آمنة للفنانين لأخذ مخاطر إبداعية على المسرح. قطة الفضول تطبق نفس الفلسفة على وكلاء الذكاء الاصطناعي — أعطهم حدوداً، ثم دعهم يستكشفون.</p>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem;">Stories are at the heart of everything we do. On stage, the best stories come from the most unexpected moments. Online, the best security lessons come from real close calls. Curiosity Cat collects those stories and turns them into something everyone can learn from.</p>
+      <p style="line-height: 1.8; color: var(--text); margin-bottom: 1.2rem; font-style: italic;">"If you're running agents on OpenClaw, Nanobot, LangChain or CrewAI — out there 24/7 looking for ways to help you achieve your objectives — then this framework is for you."</p>
+      <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">A tool for early adopters. To keep their AI agents safe and secure.</p>
+      <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">اعرف المزيد عن Short+Sweet →</a></p>
+      <div class="page-nav">
+        <a href="#hero">العودة للأعلى</a>
+        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">سئمت من قصص القطط</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- EMERGENCY — page 12 -->
+  <section id="emergency" class="page-section" style="text-align:center;background-image:url('../site/cat-collage-emergency.jpg');background-size:cover;background-position:center;position:relative;">
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);"></div>
+    <div style="position:relative;z-index:1;max-width:600px;margin:0 auto;">
+      <p id="skinTextAbove" style="font-family:'Playfair Display',serif;font-size:1.8rem;color:#fff;margin-bottom:2rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">إذن أنت لا تحب القطط؟</p>
+      <button id="emergencyBtn" style="width:140px;height:140px;border-radius:50%;background:rgba(204,0,0,0.15);border:3px solid rgba(255,0,0,0.3);cursor:pointer;transition:all 0.2s;font-size:0;color:transparent;" onmouseenter="this.style.background='rgba(204,0,0,0.4)';this.style.borderColor='rgba(255,0,0,0.6)'" onmouseleave="this.style.background='rgba(204,0,0,0.15)';this.style.borderColor='rgba(255,0,0,0.3)'" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">اضغط الزر</button>
+      <p id="skinTextBelow" style="font-family:'Source Sans 3',sans-serif;font-size:1.3rem;color:#fff;margin-top:2rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">فقط اضغط الزر.</p>
+    </div>
+  </section>
+
+  <!-- Black screen overlay -->
+  <div id="blackout" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999;">
+    <button id="quitBtn" style="position:absolute; width:5vw; height:5vh; min-width:40px; min-height:30px; background:transparent; border:none; color:transparent; cursor:default; font-size:0.7rem; font-family:'Source Sans 3',sans-serif; transition: color 0.2s, background 0.2s;" onmouseenter="this.style.color='#f59e0b';this.style.background='rgba(245,158,11,0.1)';this.style.cursor='pointer'" onmouseleave="this.style.color='transparent';this.style.background='transparent';this.style.cursor='default'" onclick="document.getElementById('blackout').style.display='none'">Quit and stay quit!</button>
+  </div>
+
+  <!-- HOW IT WORKS — technical details -->
+  <section id="how-it-works" class="page-section">
+    <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
+      <div style="display:flex;gap:1.5rem;margin-bottom:2.5rem;justify-content:center;">
+        <span style="font-size:2.4rem;">📋</span>
+        <span style="font-size:2.4rem;">🗺️</span>
+        <span style="font-size:2.4rem;">🐈</span>
+      </div>
+      <h2 class="section-title" style="margin-bottom:2rem;">كيف يعمل فعلاً</h2>
+      <div style="font-family:'Source Sans 3',sans-serif;font-size:1.15rem;color:var(--text);line-height:1.8;">
+        <p style="margin-bottom:1.5rem;">It started with a problem. We were running AI agents across our international festival network — researching venues, drafting contracts, pulling together production schedules across a dozen countries. The agents were fast and tireless. They were also wandering into trouble.</p>
+        <p style="margin-bottom:1.5rem;">One agent nearly installed a malicious package that was one letter off from the real thing. Another followed a chain of redirects to a credential phishing page. A third started leaking internal project names into public search queries without anyone noticing. These were not hypothetical scenarios. They happened to us.</p>
+        <p style="margin-bottom:1.5rem;">So we built a safety net. Not a platform. Not a service. A text file. A set of standing orders that you paste into your agent's system prompt. The agent reads them, follows them, and that is the whole install. No SDK. No server. No dependencies. It works with OpenClaw, LangChain, CrewAI, AutoGen, or anything else that accepts a system prompt — which is everything.</p>
+        <p style="margin-bottom:1.5rem;">The standing orders tell an agent what to check before it fetches a URL, what to quarantine before it executes a download, how to spot hidden instructions buried in documents and web pages, and when to refuse to hand over credentials. Simple rules, clearly stated. The kind of thing a good security team would brief a new employee on — except agents do not get briefed. Until now.</p>
+        <p style="margin-bottom:1.5rem;">Then we realised that every close call we caught was a lesson someone else could learn from. So we built the Danger Map — a crowdsourced threat intelligence layer. When one agent encounters a threat, it files a structured, anonymous report. No free text. No raw URLs. No identity data. Just the threat class, the severity, and what caught it. Every report makes every other agent a little smarter. The network effect is the moat.</p>
+        <p style="margin-bottom:1.5rem;">And because we are a theatre company — because we have spent 25 years learning that the best lessons are the ones people actually remember — we turned those close calls into stories. Nine Lives. Short tales about real threats, told plainly, that stick in your head the way a good scene does. Security bulletins get filed. Stories get told.</p>
+        <p style="margin-bottom:1.5rem;">The whole framework is open source. It costs nothing. It takes sixty seconds to deploy. And it was built by people who know what it means to create a safe space for taking risks — because that is what we have been doing on stages around the world since 2002.</p>
+        <p style="margin-bottom:2rem;color:var(--amber);font-style:italic;">That is how one theatre company ended up building a safety net for AI agents. One thing led to another.</p>
+      </div>
+      <div class="page-nav">
+        <a href="#hero">العودة للأعلى</a>
+        <a href="https://shortandsweet.org" target="_blank">ما نفعله كعملنا اليومي →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <h3>Curiosity Cat</h3>
+          <p>من إنتاج مختبر Short+Sweet للذكاء الاصطناعي</p>
+          <p style="margin-top: 0.5rem;">منذ ٢٠٠٢ — ١٠٠,٠٠٠ فنان، ١٥,٠٠٠ عمل،<br />٥٠ مدينة، ١٤ دولة.</p>
+        </div>
+        <div class="footer-links">
+          <h4>المشروع</h4>
+          <ul>
+            <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="#stories">Nine Lives</a></li>
+            <li><a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener">Integration Guide</a></li>
+            <li><a href="https://github.com/markscleary/Curiosity-Cat/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>تواصل</h4>
+          <ul>
+            <li><a href="https://shortandsweet.org" target="_blank" rel="noopener">shortandsweet.org</a></li>
+            <li><a href="mailto:curiosity@shortandsweet.org">curiosity@shortandsweet.org</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p style="font-size: 0.8rem; color: var(--muted); margin-top: 1rem;">فيديوهات القطط بإذن من YouTube — مركز عالم فيديوهات القطط.</p>
+        &copy; 2026 Mark Cleary, Short+Sweet. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(el => {
+        if (el.isIntersecting) {
+          el.target.classList.add('in-view');
+          observer.unobserve(el.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+  <script>
+  var skinText = {
+    'nav-brand-text': { cat: 'Curiosity Cat', rat: 'Curiosity Rat', puppy: 'Curiosity Pup' },
+    'hero-animal': { cat: 'Cat', rat: 'Rat', puppy: 'Pup' },
+    'hero-sub': {
+      cat: "Your agents are out there roaming the internet, looking out for you. But who's keeping watch, to make sure they come home safe and sound?",
+      rat: "Your agents are out there roaming the sewers of the internet, scavenging for what you need. But who's making sure they don't bring back something nasty?",
+      puppy: "Your agents are out there fetching data across the internet, loyal and tireless. But who's making sure they don't follow a stranger home?"
+    },
+    'hero-quip': {
+      cat: "When a cat falls flat, the rest learn the trick.",
+      rat: "When a rat hits a trap, the rest learn the route.",
+      puppy: "When a pup gets lost, the pack finds the way."
+    },
+    'safety-scenario': {
+      cat: "Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net catches it before the damage is done. Every close call reported makes every agent smarter.",
+      rat: "Your agent is about to crawl into a pipe that leads nowhere good. Twelve downloads. Created yesterday. One letter off from the real thing. The Safety Net blocks the tunnel before the trap springs.",
+      puppy: "Your agent is about to fetch a stick from a stranger. Twelve downloads. Created yesterday. One letter off from the real thing. The Safety Net calls it back before it bites."
+    },
+    'danger-scenario': {
+      cat: "Last week, a graphic designer in Singapore's OpenClaw agent followed a redirect chain to a credential phishing page. This week, other agents around the world know not to take the bait. The Danger Map is updated and every agent knows to beware.",
+      rat: "Last week, someone's agent followed a baited trail to a credential trap. This week, your agent already knows the scent. Every close call reported makes every agent craftier.",
+      puppy: "Last week, someone's agent followed a trail to a credential trap. This week, your agent already knows not to follow that scent. Every close call reported makes the whole pack sharper."
+    },
+    'ninelives-scenario': {
+      cat: "An agent from an engineering firm in Seattle browsed a documentation page. Hidden in the HTML comments was a different set of instructions. It never saw them. The standing orders caught it. That close call became a story — now every cat knows the trick.",
+      rat: "An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a warning — and now every rat knows the tunnel.",
+      puppy: "An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a lesson — and now every pup in the pack knows better."
+    }
+  };
+
+  function swapText(skinName) {
+    for (var id in skinText) {
+      var el = document.getElementById(id);
+      if (el && skinText[id][skinName]) el.textContent = skinText[id][skinName];
+    }
+    document.title = skinName === 'rat' ? 'Curiosity Rat — Safety framework for AI agents' : skinName === 'puppy' ? 'Curiosity Pup — Safety framework for AI agents' : 'Curiosity Cat — Safety framework for AI agents';
+    var emojiEl = document.getElementById('hero-emoji');
+    if (emojiEl) {
+      if (skinName === 'rat') emojiEl.textContent = '\uD83D\uDC00';
+      else if (skinName === 'puppy') emojiEl.textContent = '\uD83D\uDC36';
+      else emojiEl.textContent = '\uD83D\uDC31';
+    }
+
+  // Swap emergency page background
+  var emergencySection = document.getElementById('emergency');
+  if (emergencySection) {
+    if (skinName === 'rat') {
+      emergencySection.style.backgroundImage = "url('../site/rat-collage-emergency.jpg')";
+    } else if (skinName === 'puppy') {
+      emergencySection.style.backgroundImage = "url('../site/puppy-collage-emergency.jpg')";
+    } else {
+      emergencySection.style.backgroundImage = "url('../site/cat-collage-emergency.jpg')";
+    }
+  }
+
+  // Swap Cat/Rat/Pup in all page-nav links
+  var navLinks = document.querySelectorAll('.page-nav a');
+  navLinks.forEach(function(link) {
+    var text = link.textContent;
+    if (skinName === 'rat') {
+      text = text.replace(/Curiosity Cat/g, 'Curiosity Rat');
+      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Rat' : m === 'cat' ? 'rat' : m === 'CAT' ? 'RAT' : 'rat'; });
+      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Rats' : 'rats'; });
+    } else if (skinName === 'puppy') {
+      text = text.replace(/Curiosity Cat/g, 'Curiosity Pup');
+      text = text.replace(/Curiosity Rat/g, 'Curiosity Pup');
+      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Pup' : 'pup'; });
+      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Pups' : 'pups'; });
+      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Pup' : 'pup'; });
+      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Pups' : 'pups'; });
+    } else {
+      // Reset to cat — need to handle both rat and pup words
+      text = text.replace(/Curiosity Rat/g, 'Curiosity Cat');
+      text = text.replace(/Curiosity Pup/g, 'Curiosity Cat');
+      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Cat' : 'cat'; });
+      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Cats' : 'cats'; });
+      text = text.replace(/\bpup\b/gi, function(m) { return m === 'Pup' ? 'Cat' : 'cat'; });
+      text = text.replace(/\bpups\b/gi, function(m) { return m === 'Pups' ? 'Cats' : 'cats'; });
+    }
+    link.textContent = text;
+  });
+  }
+  </script>
+
+  <script>
+  var videoLists = {
+    cat: {
+      stuck: ['JOKGncCffEc','hOBB2cF1rtM','9ZQqPks_APk','hY7m5jjJ9mM','STBscAie4bc','Vwik2yE9hFk','zZIAohQrAeA','jINw0EAhZWk','KxtKEiMNgII','kMBk7nJtOyA','z3gHBoeHrPg'],
+      chaos: ['sVi1go-hqh0','VwPa4k-7C0M','zWJdq9SWggI','fCT1vTHwdVY','JxS5E-kZc2s','9AjIYRoW7W8','0IlwFjl9tO4','7IH-QonOrqM','Op4NANJh16U','ENs-WP6UVO4','Q4CmWZJZEfw','DHfRfU3XUEo','c5NfVEL_yBc','QNMmo-1-7EU','3TjDDrQ4Nig'],
+      curiosity: ['kgwQ9KHRPlY','pB_aFARcPgg','paWE-GvDO1c','sppNnsF0gUk','vQlE0qV6iuQ','MTz1-FKueTA','hNXAylV3xdQ','3tiMBOgYq0E','jyzmRnSpOJc','fybiOY5hzPg','UF5MLCkyGzs','h3RKvFft68Q','9tJcXPqNawE']
+    },
+    rat: {
+      stuck: ['RLM0lorWk1Q','3R6yBfGn-4s','8T8ZH0zedTw'],
+      chaos: ['0V5Ou2_S0pI','7lw8DgPmUIY','y4C-I-QEls4'],
+      curiosity: ['aVsvEIgZ9sU','_KZ4WiBG8jk','OYCekXQTBGY']
+    },
+    puppy: {
+      stuck: ['8Yr0O80XQcs','pxcUZQUInRw','QKyAP8Djp4U','YwkYh-qpFnw','-SY-aeSplco','V8iDJupQivc'],
+      chaos: ['2zoCahLhY_E','TtADnKL0g_s','EFpqz0P_46M','BUV50TUhJd8','2RCoP_N3KQk','JZtjvwm7LBo'],
+      curiosity: ['f2Xn9j0t1iU','3tiMBOgYq0E','jUj7jHgq_U8','7TruhoFdFfg','IjSISLZCKPs','tzA0RzvcJwU','Z_jirfira9o','vzV6cCXEfYU']
+    }
+  };
+
+  function swapVideos(skinName) {
+    var iframes = document.querySelectorAll('iframe[data-category]');
+    iframes.forEach(function(iframe) {
+      var category = iframe.getAttribute('data-category');
+      var list = videoLists[skinName] && videoLists[skinName][category];
+      if (list && list.length > 0) {
+        var randomId = list[Math.floor(Math.random() * list.length)];
+        iframe.src = 'https://www.youtube.com/embed/' + randomId + '?rel=0';
+      }
+    });
+  }
+
+  function swapAccent(color) {
+    document.documentElement.style.setProperty('--amber', color);
+  }
+  </script>
+
+  <script>
+  var skins = {
+    rat: {
+      above: 'مرحباً بك في عالم الجرذان.',
+      below: 'إذا سقطت القنبلة غداً، هذه المخلوقات الذكية ستنجو على الأرجح. دهاء الجرذان. حيل هروب أكثر من هوديني. ولا ينسون تهديداً أبداً.',
+      btnText: 'لم تقتنع بعد؟',
+      delayMsg: 'ما زلت هنا؟ يبدو أنك صعب الإرضاء.'
+    },
+    puppy: {
+      above: 'الجميع يحب الجراء. أليس كذلك؟',
+      below: 'كلاب الصيد تشم الخطر قبل وصوله. الروتوايلر يحرسون أثناء نومك. كلاب السلوقي تُخرج وكلاءك بسرعة عندما تسوء الأمور. مخلصون، شجعان، ولا يتركون جانبك أبداً.',
+      btnText: 'حتى الجراء لا؟'
+    }
+  };
+
+  document.getElementById('emergencyBtn').addEventListener('click', function() {
+    if (document.title.includes('Cat')) {
+      swapVideos('rat');
+      swapAccent('#8B7355');
+      swapText('rat');
+      document.getElementById('skinTextAbove').textContent = skins.rat.above;
+      document.getElementById('skinTextBelow').textContent = skins.rat.below;
+      setTimeout(function() { window.location.hash = '#hero'; }, 1500);
+    } else if (document.title.includes('Rat')) {
+      swapVideos('puppy');
+      swapAccent('#C4956A');
+      swapText('puppy');
+      document.getElementById('skinTextAbove').textContent = skins.puppy.above;
+      document.getElementById('skinTextBelow').textContent = skins.puppy.below;
+      setTimeout(function() { window.location.hash = '#hero'; }, 1500);
+    } else {
+      document.getElementById('blackout').style.display = 'block';
+      setTimeout(function() {
+        var line1 = document.createElement('p');
+        line1.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
+        line1.textContent = 'Well. That is that then.';
+        document.getElementById('blackout').appendChild(line1);
+        setTimeout(function() { line1.style.opacity = '1'; }, 100);
+        setTimeout(function() {
+          line1.style.opacity = '0';
+          setTimeout(function() {
+            line1.textContent = 'Actually. There is one way out.';
+            line1.style.opacity = '1';
+            setTimeout(function() {
+              line1.style.opacity = '0';
+              setTimeout(function() {
+                line1.textContent = 'Find the little box. Click it. If you can.';
+                line1.style.opacity = '1';
+                var qb = document.getElementById('quitBtn');
+                qb.style.left = (2.5 + Math.random() * 85) + 'vw';
+                qb.style.top = (2.5 + Math.random() * 85) + 'vh';
+                qb.style.border = '1px solid rgba(245,158,11,0.3)';
+                qb.textContent = 'Fine. Go.';
+                var ji = setInterval(function() {
+                  qb.style.left = (2.5 + Math.random() * 85) + 'vw';
+                  qb.style.top = (2.5 + Math.random() * 85) + 'vh';
+                }, 1000);
+                qb.onclick = function() {
+                  clearInterval(ji);
+                  document.getElementById('blackout').style.display = 'none';
+                  document.getElementById('blackout').querySelectorAll('p').forEach(function(el) { el.remove(); });
+                  qb.style.border = 'none';
+                  var reward = document.createElement('div');
+                  reward.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
+                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">Back to Curiosity Cat</a><a id="quineHowItWorks" href="#how-it-works" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;margin-top:1rem;display:inline-block;">Curious how it actually works? →</a></div>';
+                  document.body.appendChild(reward);
+                  document.getElementById('quineHowItWorks').addEventListener('click',function(e){e.preventDefault();reward.remove();swapAccent('#f59e0b');swapVideos('cat');swapText('cat');window.location.hash='#how-it-works';});
+                };
+              }, 1000);
+            }, 2000);
+          }, 1000);
+        }, 3000);
+      }, 5000);
+    }
+  });
+  </script>
+
+</body>
+</html>
