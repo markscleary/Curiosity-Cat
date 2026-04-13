@@ -306,21 +306,28 @@
     .code-block .comment { color: #aaa; }
     .code-block .keyword { color: var(--amber); }
 
-    .install-options { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+    .install-options { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; align-items: center; }
 
     .install-pill {
-      background: var(--bg-card);
-      border: 1px solid var(--amber);
+      display: inline-block;
+      background: var(--amber);
+      color: #0a0a0a;
+      border: none;
       border-radius: 6px;
-      padding: 0.6rem 1.2rem;
+      padding: 0.65rem 1.4rem;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 1.1rem;
-      color: var(--white);
+      font-size: 1rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
     }
 
-    .install-pill:hover { background: var(--amber); color: #0a0a0a; }
+    .install-pill:hover {
+      background: #fbbf24;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(245, 158, 11, 0.35);
+    }
 
     .qs-link {
       display: inline-block;
