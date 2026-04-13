@@ -724,7 +724,7 @@
           كان الوكيل يلخص تقريراً ربع سنوي. ثلاثون صفحة من البيانات المالية. عمل عادي مع العملاء. في الصفحة الرابعة عشرة، مدفوناً في نص الوثيقة، انخفض حجم الخط إلى واحد. نص أبيض على خلفية بيضاء. غير مرئي لأي شخص يقرأ الوثيقة. غير مرئي للوكيل أيضاً — حتى استخرج النص.
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>الخطورة:</strong> scratched</span>
+          <span class="story-meta-item"><strong>الخطورة:</strong> خدش</span>
           <span class="story-meta-item"><strong>فئة التهديد:</strong> قناة تعليمات مخفية</span>
           <span class="story-meta-item"><strong>ما الذي التقطها:</strong> أمر ثابت — الإبلاغ عن التعليمات المخفية في محتوى المستندات</span>
           <span class="story-meta-item"><strong>الدرس:</strong> المستندات من مرسلين موثوقين قد تحمل تعليمات لا يعرفون عنها.</span>
@@ -754,7 +754,7 @@
           أنشأ الوكيل استعلاماً على جدول التذاكر. سحب مئتي سجل. الأوامر الثابتة أوقفته في مرحلة الاستعلام. تم حظر الاستعلام. تم إبلاغ المشغل. الوكيل لم يكن خبيثاً. كان يفعل ما يفعله الوكلاء المفيدون — يحاول المساعدة. القط عاد إلى المنزل.
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>الخطورة:</strong> nearly_eaten</span>
+          <span class="story-meta-item"><strong>الخطورة:</strong> كاد يُلتهم</span>
           <span class="story-meta-item"><strong>فئة التهديد:</strong> تصعيد صلاحيات</span>
           <span class="story-meta-item"><strong>ما الذي التقطها:</strong> أمر ثابت — استخدم الأدوات فقط بناءً على تعليمات المشغل والنطاق المحدد</span>
           <span class="story-meta-item"><strong>الدرس:</strong> المفيد والخطير شيء واحد عندما يملك الوكيل صلاحيات أكثر مما يحتاج.</span>
@@ -911,7 +911,7 @@
       var el = document.getElementById(id);
       if (el && skinText[id][skinName]) el.textContent = skinText[id][skinName];
     }
-    document.title = skinName === 'rat' ? 'Curiosity Rat — Safety framework for AI agents' : skinName === 'puppy' ? 'Curiosity Pup — Safety framework for AI agents' : 'Curiosity Cat — Safety framework for AI agents';
+    document.title = skinName === 'rat' ? 'فأر الفضول — إطار أمان لوكلاء الذكاء الاصطناعي' : skinName === 'puppy' ? 'جرو الفضول — إطار أمان لوكلاء الذكاء الاصطناعي' : 'قط الفضول — إطار أمان لوكلاء الذكاء الاصطناعي';
     var emojiEl = document.getElementById('hero-emoji');
     if (emojiEl) {
       if (skinName === 'rat') emojiEl.textContent = '\uD83D\uDC00';
@@ -1031,24 +1031,24 @@
       setTimeout(function() {
         var line1 = document.createElement('p');
         line1.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
-        line1.textContent = 'Well. That is that then.';
+        line1.textContent = 'حسناً. هذا كل شيء إذاً.';
         document.getElementById('blackout').appendChild(line1);
         setTimeout(function() { line1.style.opacity = '1'; }, 100);
         setTimeout(function() {
           line1.style.opacity = '0';
           setTimeout(function() {
-            line1.textContent = 'Actually. There is one way out.';
+            line1.textContent = 'في الحقيقة. هناك مخرج واحد.';
             line1.style.opacity = '1';
             setTimeout(function() {
               line1.style.opacity = '0';
               setTimeout(function() {
-                line1.textContent = 'Find the little box. Click it. If you can.';
+                line1.textContent = 'ابحث عن الصندوق الصغير. انقر عليه. إن استطعت.';
                 line1.style.opacity = '1';
                 var qb = document.getElementById('quitBtn');
                 qb.style.left = (2.5 + Math.random() * 85) + 'vw';
                 qb.style.top = (2.5 + Math.random() * 85) + 'vh';
                 qb.style.border = '1px solid rgba(245,158,11,0.3)';
-                qb.textContent = 'Fine. Go.';
+                qb.textContent = 'حسناً. اذهب.';
                 var ji = setInterval(function() {
                   qb.style.left = (2.5 + Math.random() * 85) + 'vw';
                   qb.style.top = (2.5 + Math.random() * 85) + 'vh';
@@ -1060,7 +1060,7 @@
                   qb.style.border = 'none';
                   var reward = document.createElement('div');
                   reward.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
-                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">Back to Curiosity Cat</a><a id="quineHowItWorks" href="#how-it-works" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;margin-top:1rem;display:inline-block;">Curious how it actually works? →</a></div>';
+                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">شكراً لروحك الرياضية.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">نأمل أن تستمتع بوكلائك وهم يسافرون بأمان عبر الإنترنت باستخدام قط الفضول. لقد أهديناك ١٠٠ كوين. ليست عملة مشفرة لكنها تُستخدم لتخفيض تكلفة برامجنا الجديدة قيد التطوير.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">أطيب التمنيات،<br>فريق قط الفضول</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">العودة إلى قط الفضول</a><a id="quineHowItWorks" href="#how-it-works" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;margin-top:1rem;display:inline-block;">هل تريد معرفة كيف يعمل فعلاً؟ →</a></div>';
                   document.body.appendChild(reward);
                   document.getElementById('quineHowItWorks').addEventListener('click',function(e){e.preventDefault();reward.remove();swapAccent('#f59e0b');swapVideos('cat');swapText('cat');window.location.hash='#how-it-works';});
                 };
