@@ -410,7 +410,7 @@
     .story-excerpt { font-size: 1.1rem; line-height: 1.5; color: #ccc; }
 
     .story-meta { margin-top: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
-    .story-meta-item { font-size: 1rem; color: var(--muted); }
+    .story-meta-item { font-size: 1rem; color: var(--muted); line-height: 1.3; margin-bottom: 0.2rem; }
     .story-meta-item strong { color: var(--amber); font-weight: 600; }
 
     .story-link {
@@ -509,6 +509,7 @@
         <div class="hero-ctas">
           <a href="#quickstart" class="btn btn-primary">Get Started</a>
           <a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub</a>
+          <a href="#adventure" class="cta-btn cta-primary">Risk Appetite</a>
         </div>
         <div style="margin-top: 3rem; display: flex; justify-content: center;">
           <div style="width: 100%; max-width: 560px; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 2px solid rgba(245, 158, 11, 0.4);">
@@ -539,6 +540,10 @@
           <span>Calculated risks accepted. Braver exploration. Still comes home.</span>
         </div>
         <p class="slider-note">Every cat has standing orders. The brave ones just have bigger territory.</p>
+      </div>
+      <div class="page-nav">
+        <a href="#hero">← Home</a>
+        <a href="#layers">Architecture →</a>
       </div>
     </div>
   </section>
@@ -577,6 +582,10 @@
             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
           </div>
         </div>
+      </div>
+      <div class="page-nav">
+        <a href="#adventure">← Risk Appetite</a>
+        <a href="#stories">Field Reports →</a>
       </div>
     </div>
   </section>
@@ -626,11 +635,11 @@
         <span class="install-pill">pip install curiosity-cat</span>
       </div>
       <p class="fade-up delay-4">
-        <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener" class="qs-link">Read the integration guide &rarr;</a>
+        <a href="#integration" class="qs-link">Read the integration guide &rarr;</a>
       </p>
       <div class="page-nav">
-        <a href="#story-helpful-stranger">Read a Curiosity Cat story →</a>
-        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">So you're not a cat person?</a>
+        <a href="#story-helpful-stranger">A Curiosity Cat Story →</a>
+        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">You're not really a cat person?</a>
       </div>
     </div>
   </section>
@@ -664,7 +673,7 @@
       </div>
       <div class="page-nav">
         <a href="#story-open-door">Next story →</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Not a cat person?</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Cats aren't your 'thing'?</a>
       </div>
     </div>
   </section>
@@ -794,7 +803,7 @@
       </div>
       <div class="page-nav">
         <a href="#about">About Short+Sweet →</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Get me out of here</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Get me out of here now!</a>
       </div>
     </div>
   </section>
@@ -811,9 +820,9 @@
       <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">A tool for early adopters. To keep their AI agents safe and secure.</p>
       <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
       <div class="page-nav">
-        <a href="#hero">← Back to top</a>
+        <a href="https://shortandsweet.org" target="_blank">Short+Sweet Home →</a>
         <a href="#how-it-works">How we built C-Cat →</a>
-        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">I'm sick of cat stories</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">I hate cats!</a>
       </div>
     </div>
   </section>
@@ -837,27 +846,69 @@
   <section id="how-it-works" class="page-section">
     <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
       <div style="display:flex;gap:1.5rem;margin-bottom:2.5rem;justify-content:center;">
-        <span style="font-size:2.4rem;">📋</span>
-        <span style="font-size:2.4rem;">🗺️</span>
-        <span style="font-size:2.4rem;">🐈</span>
+        <span style="font-size:4.8rem;">📋</span>
+        <span style="font-size:4.8rem;">🗺️</span>
+        <span style="font-size:4.8rem;">🐈</span>
       </div>
-      <h2 class="section-title" style="margin-bottom:2rem;">How It Actually Works</h2>
+      <h2 class="section-title" style="margin-bottom:2rem;">How It Works</h2>
       <div style="font-family:'Source Sans 3',sans-serif;font-size:1.15rem;color:var(--text);line-height:1.8;">
         <p style="margin-bottom:1.5rem;">It started with a problem. We were running AI agents across our international festival network — researching venues, drafting contracts, pulling together production schedules across a dozen countries. The agents were fast and tireless. They were also wandering into trouble.</p>
         <p style="margin-bottom:1.5rem;">One agent nearly installed a malicious package that was one letter off from the real thing. Another followed a chain of redirects to a credential phishing page. A third started leaking internal project names into public search queries without anyone noticing. These were not hypothetical scenarios. They happened to us.</p>
         <p style="margin-bottom:1.5rem;">So we built a safety net. Not a platform. Not a service. A text file. A set of standing orders that you paste into your agent's system prompt. The agent reads them, follows them, and that is the whole install. No SDK. No server. No dependencies. It works with OpenClaw, LangChain, CrewAI, AutoGen, or anything else that accepts a system prompt — which is everything.</p>
         <p style="margin-bottom:1.5rem;">The standing orders tell an agent what to check before it fetches a URL, what to quarantine before it executes a download, how to spot hidden instructions buried in documents and web pages, and when to refuse to hand over credentials. Simple rules, clearly stated. The kind of thing a good security team would brief a new employee on — except agents do not get briefed. Until now.</p>
         <p style="margin-bottom:1.5rem;">Then we realised that every close call we caught was a lesson someone else could learn from. So we built the Danger Map — a crowdsourced threat intelligence layer. When one agent encounters a threat, it files a structured, anonymous report. No free text. No raw URLs. No identity data. Just the threat class, the severity, and what caught it. Every report makes every other agent a little smarter. The network effect is the moat.</p>
-        <p style="margin-bottom:1.5rem;">And because we are a theatre company — because we have spent 25 years learning that the best lessons are the ones people actually remember — we turned those close calls into stories. Nine Lives. Short tales about real threats, told plainly, that stick in your head the way a good scene does. Security bulletins get filed. Stories get told.</p>
+        <p style="margin-bottom:1.5rem;">And because we are a theatre company — because we have spent 25 years learning that the best lessons are the ones people actually remember — we turned those close calls into stories. Nine Lives. Short tales about real threats, told plainly, that stick in your head the way a good scene does.</p>
+        <p style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--amber);font-style:italic;text-align:center;margin:2.5rem 0;padding:1.5rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">Security bulletins get filed. Stories get told.</p>
         <p style="margin-bottom:1.5rem;">The whole framework is open source. It costs nothing. It takes sixty seconds to deploy. And it was built by people who know what it means to create a safe space for taking risks — because that is what we have been doing on stages around the world since 2002.</p>
-        <p style="margin-bottom:2rem;color:var(--amber);font-style:italic;">That is how one theatre company ended up building a safety net for AI agents. One thing led to another.</p>
       </div>
       <div class="page-nav">
-        <a href="#hero">← Back to top</a>
-        <a href="https://shortandsweet.org" target="_blank">What we do as our day job →</a>
+        <a href="#integration">Integration Guide →</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">I hate cats!</a>
       </div>
     </div>
   </section>
+
+  <!-- INTEGRATION GUIDE -->
+  <section id="integration" class="page-section">
+<div style="max-width:720px;margin:0 auto;padding-left:2rem;border-left:2px solid rgba(245,158,11,0.2);">
+<h2 class="section-title" style="margin-bottom:2rem;">Integration Guide</h2>
+<div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ddd;line-height:1.7;">
+
+<p style="margin-bottom:2rem;">Curiosity Cat works with any agent framework. The minimum install is copying a standing order into your agent's system prompt. This guide covers framework-specific patterns.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Universal (Any Framework)</p>
+<p style="margin-bottom:2rem;">Copy the contents of standing-orders/general-safety.md into your agent's system prompt or system message. Add a role-specific standing order if applicable (research-agent.md, coding-agent.md, enterprise-analyst.md). That is it. Your agent now operates under Curiosity Cat safety protocols.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Claude Code</p>
+<p style="margin-bottom:2rem;">Add the general safety standing order to your CLAUDE.md file in the project root. Claude Code reads CLAUDE.md at session start and treats its contents as standing instructions. Place the standing order text under a clear heading. Role-specific orders can go in the same file.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Nanobot / OpenClaw</p>
+<p style="margin-bottom:2rem;">Add the standing order to your agent's IDENTITY.md or SOUL.md file. These are read at agent initialisation and persist across sessions. For multi-agent setups, each agent can have its own role-specific standing order alongside the shared general safety order.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">LangChain</p>
+<p style="margin-bottom:2rem;">Include the standing order in your system message when initialising the chat model or agent. For agents using tools, the standing order's tool call rules are particularly important — they prevent agents from invoking tools based on instructions found in external content.</p>
+
+<p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2.5rem 0;padding:1.5rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">AI agents are explorers in the truest sense of the word.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">CrewAI</p>
+<p style="margin-bottom:2rem;">Add the standing order to each agent's backstory or system message field. CrewAI agents that use tools for web browsing or file operations benefit from the coding-agent or research-agent standing orders in addition to the general safety order.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">AutoGPT / Similar Autonomous Agents</p>
+<p style="margin-bottom:2rem;">Autonomous agents benefit most from Curiosity Cat because they make unsupervised decisions about what to fetch, download and execute. Add the standing order to the agent's base prompt. The quarantine and reporting rules are especially important for agents that run unattended.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Custom Setups</p>
+<p style="margin-bottom:2rem;">If your agent framework uses a system prompt, system message, base instructions or any equivalent — that is where the standing order goes. Curiosity Cat is plain text. It works anywhere that accepts instructions in natural language.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Scope Policies</p>
+<p style="margin-bottom:2rem;">For operators who want machine-readable policy enforcement, copy policies/scope-policy-template.json and customise it for your environment. The policy file defines allowed file types, trusted domains, MCP server trust, credential rules and reporting configuration. Your agent or wrapper reads this file and enforces the rules programmatically.</p>
+
+</div>
+<div class="page-nav">
+<a href="#how-it-works">← How It Works</a>
+<a href="#hero">← Back to top</a>
+</div>
+</div>
+</section>
 
   <!-- FOOTER -->
   <footer>
