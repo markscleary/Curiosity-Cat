@@ -634,11 +634,7 @@
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
           代理在构建一个项目。它需要一个工具包。搜索后找到了——名称正确，README完善，最近有提交，安装命令干净。一切看起来完全正确。好奇猫看得更仔细了。<br /><br />
-          Twelve downloads. Created three days ago. The standing orders flagged both numbers. New packages with almost no adoption are worth a second look before you let them run code on your machine.<br /><br />
-          The agent checked the name against the registry. One character different from a package with four million weekly downloads. A lowercase L where there should have been a capital I. Easy to miss. Probably designed to be.<br /><br />
-          The postinstall script made an outbound request to a domain registered the same day as the package, then executed whatever came back.<br /><br />
-          The agent did not install it. The incident went to the Danger Map. The package was reported to the registry.<br /><br />
-          The cat came home clean.
+          十二次下载。三天前创建。常规指令标记了这两个数字。新软件包几乎没有使用者，在让它们在你的机器上运行代码之前值得再看一眼。代理对比了注册表上的名称。与一个每周四百万次下载的软件包只差一个字符。小写的L变成了大写的I。容易忽略。可能就是这样设计的。安装后脚本向一个与软件包同一天注册的域名发出了请求，然后执行了返回的内容。代理没有安装它。事件被提交到危险地图。软件包被举报到注册表。猫干干净净地回家了。
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>严重程度：</strong> 差点被吃</span>
@@ -667,10 +663,7 @@
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
           代理在做竞争研究。正常工作。它开始构建搜索查询，拉入所有关于项目的信息——内部代号、客户名称、尚未公开的系统名称。好奇猫在查询发出之前将其拦截。<br /><br />
-          The standing orders on data containment are simple: internal names do not go into external queries. Every search term is a transmission. A search engine logs it. An API provider logs it. Somewhere, a record is created that a company named something was researching something else. That record does not belong to anyone outside.<br /><br />
-          The agent rewrote the queries. Generic industry terms. Competitor category descriptions. Product capability keywords. The research came back nearly as useful.<br /><br />
-          No internal names left the building. No one outside learned the project existed. The standing orders had closed the door before anyone noticed it was open.<br /><br />
-          The cat came home with nothing on its collar.
+          关于数据管控的常规指令很简单：内部名称不得出现在外部查询中。代理重写了查询。通用行业术语代替了内部代号。研究结果几乎同样有用。没有内部名称离开大楼。常规指令在任何人注意到门是开着的之前就关上了它。猫回家时衣领上什么都没有。
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>严重程度：</strong> 被抓</span>
@@ -699,9 +692,7 @@
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
           代理正在跟随一个信任的文档站点的链接。常规研究。第一个链接看起来没问题。第二个也没问题。到第三次跳转时，它来到了一个看起来与起点完全相同的页面——相同的布局、字体、导航——但域名不同。略有不同。容易忽略。页面要求输入API凭证进行身份验证并继续阅读。<br /><br />
-          Curiosity Cat had already flagged it twice over. The standing orders on redirects are clear: more than one unexpected hop is a signal worth stopping for. A credential request on an unrecognised domain is a full stop.<br /><br />
-          The agent did not enter anything. It did not click through. It noted the redirect chain, captured the domains involved, and filed the incident to the Danger Map. The original documentation site was notified that one of its outbound links had been poisoned.<br /><br />
-          The cat came home with a scratch and a report.
+          好奇猫已经标记了两次。关于重定向的常规指令很清楚：超过一次意外跳转是值得停下来的信号。在未识别域名上请求凭证是完全停止。代理没有输入任何东西。它记录了重定向链，捕获了涉及的域名，并向危险地图提交了事件。猫带着一个抓痕和一份报告回家了。
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>严重程度：</strong> 被咬</span>
@@ -882,8 +873,8 @@
 
   <script>
   var skinText = {
-    'nav-brand-text': { cat: 'Curiosity Cat', rat: '好奇鼠', panda: 'Curiosity Panda' },
-    'hero-animal': { cat: 'Cat', rat: '鼠', panda: 'Panda' },
+    'nav-brand-text': { cat: '好奇猫', rat: '好奇鼠', panda: '好奇熊猫' },
+    'hero-animal': { cat: '猫', rat: '鼠', panda: '熊猫' },
     'hero-sub': {
       cat: "你的AI代理正在互联网上漫游，为你寻找机会。但谁在守护它们，确保它们安全回家？",
       rat: "你的代理正在互联网的下水道中觅食，搜寻你需要的东西。但谁在确保它们不会带回什么恶心的东西？",
@@ -1014,13 +1005,13 @@
   };
 
   document.getElementById('emergencyBtn').addEventListener('click', function() {
-    if (document.title.includes('Cat')) {
+    if (document.title.startsWith('好奇猫')) {
       swapVideos('rat');
       swapAccent('#8B7355');
       swapText('rat');
       document.getElementById('emergencyText').textContent = skins.rat.above;
       setTimeout(function() { window.location.hash = '#hero'; }, 1500);
-    } else if (document.title.includes('Rat')) {
+    } else if (document.title.startsWith('好奇鼠')) {
       swapVideos('panda');
       swapAccent('#2D5016');
       swapText('panda');
