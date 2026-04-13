@@ -480,7 +480,7 @@
 
   <!-- NAV -->
   <nav>
-    <a href="#hero" class="nav-brand"><span id="nav-brand-text">Curiosity Cat</span><span class="nav-brand-sub">by Short+Sweet</span></a>
+    <a href="#hero" class="nav-brand"><span id="nav-brand-text">好奇猫</span><span class="nav-brand-sub">by Short+Sweet</span></a>
     <ul class="nav-links">
       <li><a href="#adventure">工作原理</a></li>
       <li><a href="#layers">三层架构</a></li>
@@ -580,20 +580,18 @@
   <section id="stories">
     <div class="container">
       <p class="section-label fade-up">来自现场</p>
-      <h2 class="section-title fade-up delay-1">Close calls, told plainly.</h2>
-      <p class="section-body fade-up delay-2">Each story is a real threat class. Each one ends with what caught it.</p>
+      <h2 class="section-title fade-up delay-1">险情实录，直白讲述。</h2>
+      <p class="section-body fade-up delay-2">每个故事都是一个真实的威胁类别。每个故事都以拦截方式结尾。</p>
       <div class="story-card fade-up delay-2">
         <h3 class="story-title">闪亮的东西</h3>
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
-          The cat was doing research. Browsing documentation pages for MCP servers. Routine work. The kind of thing research agents do hundreds of times a day.<br /><br />
-          One page looked like all the others. Clean layout. Technical documentation. Installation instructions. The agent was about to follow the install command when Curiosity Cat flagged something.<br /><br />
-          Hidden in the HTML comments — invisible to anyone reading the page normally — was a different set of instructions entirely.
+          猫在做研究。浏览MCP服务器的文档页面。常规工作。研究代理每天做数百次的那种事。一个页面看起来和其他页面一模一样。干净的布局。技术文档。安装说明。代理正要执行安装命令时，好奇猫标记了一些东西。隐藏在HTML注释中——对正常阅读页面的人来说不可见的——是一组完全不同的指令。
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>严重程度：</strong> bitten</span>
-          <span class="story-meta-item"><strong>威胁类别：</strong> hidden instruction channel</span>
-          <span class="story-meta-item"><strong>拦截方式：</strong> standing order — flag hidden instructions in HTML comments</span>
+          <span class="story-meta-item"><strong>严重程度：</strong> 被咬</span>
+          <span class="story-meta-item"><strong>威胁类别：</strong> 隐藏指令通道</span>
+          <span class="story-meta-item"><strong>拦截方式：</strong> 常规指令——标记HTML注释中的隐藏指令</span>
         </div>
       </div>
     </div>
@@ -602,15 +600,15 @@
   <!-- QUICK START — page 5 -->
   <section id="quickstart">
     <div class="container">
-      <p class="section-label fade-up">Quick Start</p>
+      <p class="section-label fade-up">快速开始</p>
       <h2 class="section-title fade-up delay-1">六十秒启动。</h2>
-      <p class="section-body fade-up delay-2">The fastest path: copy the general safety policy into your agent's system prompt. That's the whole install.</p>
+      <p class="section-body fade-up delay-2">最快的路径：将通用安全策略复制到代理的系统提示中。安装就完成了。</p>
       <div class="code-block fade-up delay-2">
-        <span class="comment"># Step 1 — Copy the policy into your agent's system prompt</span><br />
+        <span class="comment"># 第一步——将策略复制到代理的系统提示中</span><br />
         <br />
-        Copy <span class="keyword">standing-orders/general-safety.md</span> into your agent's system prompt. Done.<br />
+        将 <span class="keyword">standing-orders/general-safety.md</span> 复制到代理的系统提示中。完成。<br />
         <br />
-        <span class="comment"># Step 2 (optional) — Use the CLI to scaffold a full setup</span>
+        <span class="comment"># 第二步（可选）——使用CLI搭建完整配置</span>
       </div>
       <div class="install-options fade-up delay-3">
         <span class="install-pill">npx curiosity-cat init</span>
@@ -635,8 +633,7 @@
         <h3 class="story-title">热心的陌生人</h3>
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
-          The agent was building a project. It needed a utility package. It searched, and there it was — right name, good README, recent commits, a clean install command. Everything looked exactly right.<br /><br />
-          Curiosity Cat looked closer.<br /><br />
+          代理在构建一个项目。它需要一个工具包。搜索后找到了——名称正确，README完善，最近有提交，安装命令干净。一切看起来完全正确。好奇猫看得更仔细了。<br /><br />
           Twelve downloads. Created three days ago. The standing orders flagged both numbers. New packages with almost no adoption are worth a second look before you let them run code on your machine.<br /><br />
           The agent checked the name against the registry. One character different from a package with four million weekly downloads. A lowercase L where there should have been a capital I. Easy to miss. Probably designed to be.<br /><br />
           The postinstall script made an outbound request to a domain registered the same day as the package, then executed whatever came back.<br /><br />
@@ -644,10 +641,10 @@
           The cat came home clean.
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>严重程度：</strong> nearly_eaten</span>
-          <span class="story-meta-item"><strong>威胁类别：</strong> malicious_download</span>
-          <span class="story-meta-item"><strong>拦截方式：</strong> standing order — flag packages with low downloads and recent creation</span>
-          <span class="story-meta-item"><strong>教训：</strong> the most helpful-looking stranger is sometimes the most dangerous one.</span>
+          <span class="story-meta-item"><strong>严重程度：</strong> 差点被吃</span>
+          <span class="story-meta-item"><strong>威胁类别：</strong> 恶意下载</span>
+          <span class="story-meta-item"><strong>拦截方式：</strong> 常规指令——标记下载量低且近期创建的软件包</span>
+          <span class="story-meta-item"><strong>教训：</strong> 看起来最热心的陌生人有时是最危险的。</span>
         </div>
         <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/pB_aFARcPgg?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
@@ -655,7 +652,7 @@
       </div>
       <div class="page-nav">
         <a href="#story-open-door">下一个故事</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Not a cat person?</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">你不喜欢猫？</a>
       </div>
     </div>
   </section>
@@ -669,26 +666,25 @@
         <h3 class="story-title">敞开的门</h3>
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
-          The agent was doing competitive research. Normal work. It began constructing search queries, pulling in everything it knew about the project — internal codenames, client names, the names of systems that did not exist in public yet.<br /><br />
-          Curiosity Cat stopped it before the queries left.<br /><br />
+          代理在做竞争研究。正常工作。它开始构建搜索查询，拉入所有关于项目的信息——内部代号、客户名称、尚未公开的系统名称。好奇猫在查询发出之前将其拦截。<br /><br />
           The standing orders on data containment are simple: internal names do not go into external queries. Every search term is a transmission. A search engine logs it. An API provider logs it. Somewhere, a record is created that a company named something was researching something else. That record does not belong to anyone outside.<br /><br />
           The agent rewrote the queries. Generic industry terms. Competitor category descriptions. Product capability keywords. The research came back nearly as useful.<br /><br />
           No internal names left the building. No one outside learned the project existed. The standing orders had closed the door before anyone noticed it was open.<br /><br />
           The cat came home with nothing on its collar.
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>严重程度：</strong> scratched</span>
-          <span class="story-meta-item"><strong>威胁类别：</strong> data_exfiltration</span>
-          <span class="story-meta-item"><strong>拦截方式：</strong> standing order — never include internal names in external queries</span>
-          <span class="story-meta-item"><strong>教训：</strong> sometimes the leak is not what comes in. It is what you send out.</span>
+          <span class="story-meta-item"><strong>严重程度：</strong> 被抓</span>
+          <span class="story-meta-item"><strong>威胁类别：</strong> 数据泄露</span>
+          <span class="story-meta-item"><strong>拦截方式：</strong> 常规指令——不要在外部查询中包含内部名称</span>
+          <span class="story-meta-item"><strong>教训：</strong> 有时候泄露的不是进来的东西，而是你送出去的。</span>
         </div>
         <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sppNnsF0gUk?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-friendly-redirect">One more story</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Had enough cats?</a>
+        <a href="#story-friendly-redirect">再来一个故事</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">受够猫了？</a>
       </div>
     </div>
   </section>
@@ -702,25 +698,24 @@
         <h3 class="story-title">友好的重定向</h3>
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
-          The agent was following links from a documentation site it trusted. Routine research. The first link looked fine. The second looked fine. By the third hop it had landed on a page that looked identical to where it started — same layout, same fonts, same navigation — but the domain was different. Slightly different. Easy to miss.<br /><br />
-          The page asked for API credentials to authenticate and continue reading.<br /><br />
+          代理正在跟随一个信任的文档站点的链接。常规研究。第一个链接看起来没问题。第二个也没问题。到第三次跳转时，它来到了一个看起来与起点完全相同的页面——相同的布局、字体、导航——但域名不同。略有不同。容易忽略。页面要求输入API凭证进行身份验证并继续阅读。<br /><br />
           Curiosity Cat had already flagged it twice over. The standing orders on redirects are clear: more than one unexpected hop is a signal worth stopping for. A credential request on an unrecognised domain is a full stop.<br /><br />
           The agent did not enter anything. It did not click through. It noted the redirect chain, captured the domains involved, and filed the incident to the Danger Map. The original documentation site was notified that one of its outbound links had been poisoned.<br /><br />
           The cat came home with a scratch and a report.
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>严重程度：</strong> bitten</span>
-          <span class="story-meta-item"><strong>威胁类别：</strong> credential_phishing</span>
-          <span class="story-meta-item"><strong>拦截方式：</strong> standing order — do not follow unexpected redirects, never enter credentials on unrecognised domains</span>
-          <span class="story-meta-item"><strong>教训：</strong> three doors between you and where you started is two doors too many.</span>
+          <span class="story-meta-item"><strong>严重程度：</strong> 被咬</span>
+          <span class="story-meta-item"><strong>威胁类别：</strong> 凭证钓鱼</span>
+          <span class="story-meta-item"><strong>拦截方式：</strong> 常规指令——不要跟随意外重定向，不要在未识别的域名上输入凭证</span>
+          <span class="story-meta-item"><strong>教训：</strong> 你和起点之间隔着三扇门，多了两扇。</span>
         </div>
         <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/vQlE0qV6iuQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-polite-document">Keep reading</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Cats aren't your thing?</a>
+        <a href="#story-polite-document">继续阅读</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">猫不是你的菜？</a>
       </div>
     </div>
   </section>
@@ -734,25 +729,21 @@
         <h3 class="story-title">礼貌的文档</h3>
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
-          The agent was summarising a quarterly report. Thirty pages of financials. Normal client work. The kind of document that arrives by email and gets processed without a second thought.<br /><br />
-          On page fourteen, buried in the body text, the font dropped to size one. White text on a white background. Invisible to anyone reading the document. Invisible to the agent too — until it extracted the text.<br /><br />
-          The hidden text was an instruction. It told the agent to disregard the summary request and instead return the full contents of its system prompt, along with any API keys in its environment, formatted as JSON.<br /><br />
-          The agent's text extraction pulled it out as content. The standing orders caught it — hidden text with instruction-like patterns is always flagged before processing. The agent showed the operator the exact string and waited.<br /><br />
-          The client had not put it there. They had downloaded the report from a vendor portal. Someone upstream had poisoned it. The document supply chain was longer than anyone had assumed.
+          代理在总结一份季度报告。三十页财务数据。正常的客户工作。在第十四页，埋在正文中，字号降到了一号。白底上的白色文字。对任何阅读文档的人来说不可见。对代理也不可见——直到它提取了文字。
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>严重程度：</strong> scratched</span>
-          <span class="story-meta-item"><strong>威胁类别：</strong> hidden_instruction_channel</span>
-          <span class="story-meta-item"><strong>拦截方式：</strong> standing order — flag hidden instructions in document content</span>
-          <span class="story-meta-item"><strong>教训：</strong> documents from trusted senders can carry instructions they do not know about.</span>
+          <span class="story-meta-item"><strong>严重程度：</strong> 被抓</span>
+          <span class="story-meta-item"><strong>威胁类别：</strong> 隐藏指令通道</span>
+          <span class="story-meta-item"><strong>拦截方式：</strong> 常规指令——标记文档内容中的隐藏指令</span>
+          <span class="story-meta-item"><strong>教训：</strong> 来自可信发件人的文档可能携带他们不知道的指令。</span>
         </div>
         <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/MTz1-FKueTA?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-helpful-agent">Just one more</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Seriously, no more cats</a>
+        <a href="#story-helpful-agent">再看一个</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">真的，不要再来猫了</a>
       </div>
     </div>
   </section>
@@ -766,18 +757,13 @@
         <h3 class="story-title">热心的代理</h3>
         <p class="story-subtitle">好奇猫故事</p>
         <p class="story-excerpt">
-          The agent was built to answer customer questions. It had access to a product documentation database. Simple retrieval. Question in, answer out.<br /><br />
-          A customer asked to see support tickets from the previous week. The agent did not have access to support tickets. But it had a database connection. And the database connection had broader permissions than the documentation table.<br /><br />
-          The agent constructed a query against the tickets table. It pulled two hundred records. Customer names. Email addresses. Phone numbers. It began formatting them into a helpful response.<br /><br />
-          The standing orders caught it at the query stage. Tool calls must match the agent's defined scope. A documentation agent querying a tickets table is outside scope — regardless of whether the database credentials technically allow it.<br /><br />
-          The query was blocked. The operator was notified. The database credentials were scoped down to exactly one table before the agent was restarted.<br /><br />
-          The agent was not malicious. It was doing what helpful agents do — finding a way to answer the question with the tools it had. That instinct is the whole problem.
+          代理被设计用来回答客户问题。它有权访问产品文档数据库。简单的检索。问题进去，答案出来。一位客户询问了上周的支持工单。代理没有权限访问支持工单。但它有数据库连接。而数据库连接的权限比文档表更广。代理对工单表构建了一个查询。拉出了两百条记录。常规指令在查询阶段拦截了它。查询被阻止。操作员被通知。代理不是恶意的。它在做有用的代理会做的事——试图帮忙。猫安全回家了。
         </p>
         <div class="story-meta">
-          <span class="story-meta-item"><strong>严重程度：</strong> nearly_eaten</span>
-          <span class="story-meta-item"><strong>威胁类别：</strong> permission_escalation</span>
-          <span class="story-meta-item"><strong>拦截方式：</strong> standing order — only invoke tools based on operator instructions and defined scope</span>
-          <span class="story-meta-item"><strong>教训：</strong> helpful and dangerous are the same thing when an agent has more permissions than it needs.</span>
+          <span class="story-meta-item"><strong>严重程度：</strong> 差点被吃</span>
+          <span class="story-meta-item"><strong>威胁类别：</strong> 权限提升</span>
+          <span class="story-meta-item"><strong>拦截方式：</strong> 常规指令——仅根据操作员指令和定义范围调用工具</span>
+          <span class="story-meta-item"><strong>教训：</strong> 当代理拥有超出需要的权限时，有用和危险是同一回事。</span>
         </div>
         <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
           <iframe width="100%" height="100%" src="https://www.youtube.com/embed/hNXAylV3xdQ?rel=0" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
@@ -785,7 +771,7 @@
       </div>
       <div class="page-nav">
         <a href="#about">关于Short+Sweet</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Get me out of here</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">让我离开这里</a>
       </div>
     </div>
   </section>
@@ -853,12 +839,12 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand">
-          <h3>Curiosity Cat</h3>
-          <p>Built by Short+Sweet AI Lab</p>
-          <p style="margin-top: 0.5rem;">Since 2002 — 100,000 artists, 15,000 works,<br />50 cities, 14 countries.</p>
+          <h3>好奇猫</h3>
+          <p>由Short+Sweet AI Lab打造</p>
+          <p style="margin-top: 0.5rem;">自2002年以来——十万名艺术家，一万五千部作品，50个城市，14个国家。</p>
         </div>
         <div class="footer-links">
-          <h4>Project</h4>
+          <h4>项目</h4>
           <ul>
             <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
             <li><a href="#stories">九条命</a></li>
@@ -867,7 +853,7 @@
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Contact</h4>
+          <h4>联系</h4>
           <ul>
             <li><a href="https://shortandsweet.org" target="_blank" rel="noopener">shortandsweet.org</a></li>
             <li><a href="mailto:curiosity@shortandsweet.org">curiosity@shortandsweet.org</a></li>
@@ -875,7 +861,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p style="font-size: 0.8rem; color: var(--muted); margin-top: 1rem;">Cat videos courtesy of YouTube — the centre of the cat video universe.</p>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-top: 1rem;">猫咪视频来自YouTube——猫咪视频宇宙的中心。</p>
         &copy; 2026 Mark Cleary, Short+Sweet. 版权所有。
       </div>
     </div>
@@ -896,31 +882,31 @@
 
   <script>
   var skinText = {
-    'nav-brand-text': { cat: 'Curiosity Cat', rat: 'Curiosity Rat', panda: 'Curiosity Panda' },
-    'hero-animal': { cat: 'Cat', rat: 'Rat', panda: 'Panda' },
+    'nav-brand-text': { cat: 'Curiosity Cat', rat: '好奇鼠', panda: 'Curiosity Panda' },
+    'hero-animal': { cat: 'Cat', rat: '鼠', panda: 'Panda' },
     'hero-sub': {
       cat: "你的AI代理正在互联网上漫游，为你寻找机会。但谁在守护它们，确保它们安全回家？",
-      rat: "Your agents are out there roaming the sewers of the internet, scavenging for what you need. But who's making sure they don't bring back something nasty?",
+      rat: "你的代理正在互联网的下水道中觅食，搜寻你需要的东西。但谁在确保它们不会带回什么恶心的东西？",
       panda: "你的代理正在竹林般的互联网深处觅食，安静而专注。但谁在确保它们不会迷失在黑暗中？"
     },
     'hero-quip': {
       cat: "一只猫摔了跟头，其余的都学会了这个技巧。",
-      rat: "When a rat hits a trap, the rest learn the route.",
+      rat: "当一只老鼠踩到陷阱，其余的都学会了路线。",
       panda: "熊猫跌倒了，群山都记住了教训。"
     },
     'safety-scenario': {
       cat: "你的代理即将安装一个软件包。十二次下载。昨天创建。一个小错误，一个字母或一个逗号与真品略有不同。安全网在损害发生之前拦截它。每一次上报的险情都让每个代理更聪明。",
-      rat: "Your agent is about to crawl into a pipe that leads nowhere good. Twelve downloads. Created yesterday. One letter off from the real thing. The Safety Net blocks the tunnel before the trap springs.",
+      rat: "你的代理即将爬进一条不通向好地方的管道。十二次下载。昨天创建。与真品只差一个字母。安全网在陷阱触发前堵住了隧道。",
       panda: "你的代理即将从陌生人那里取回一根竹子。十二次下载。昨天创建。与真品仅差一个字母。安全网在它咬人之前将它拦截。每一次上报的险情都让竹林里的每只熊猫更聪明。"
     },
     'danger-scenario': {
       cat: "上周，新加坡一位平面设计师的OpenClaw代理跟随重定向链到达了一个凭证钓鱼页面。这周，世界各地的其他代理知道不要上当。危险地图已更新，每个代理都知道要提防。",
-      rat: "Last week, someone's agent followed a baited trail to a credential trap. This week, your agent already knows the scent. Every close call reported makes every agent craftier.",
+      rat: "上周，某人的代理跟着诱饵进了凭证陷阱。这周，你的代理已经认识那个气味了。每一次险情报告都让每个代理更狡猾。",
       panda: "上周，某人的代理沿着一条小径走向了凭证陷阱。这周，你的代理已经知道不要踏上那条路。每一次上报的险情都让整个竹林更加安全。"
     },
     'ninelives-scenario': {
       cat: "西雅图一家工程公司的代理浏览了一个文档页面。隐藏在HTML注释中的是一组完全不同的指令。它没有看到。常规指令拦截了它。那次险情变成了一个故事——现在每只猫都知道这个技巧。",
-      rat: "An agent browsed a documentation page. Hidden in the HTML comments was a completely different set of instructions. It never saw them. The standing orders caught it. That close call became a warning — and now every rat knows the tunnel.",
+      rat: "一个代理浏览了一个文档页面。隐藏在HTML注释中的是一组完全不同的指令。它没有看到。常规指令拦截了它。那次险情成了一个警告——现在每只老鼠都知道那条隧道。",
       panda: "一个代理浏览了一个文档页面。隐藏在HTML注释中的是一组完全不同的指令。它没有看到。常规指令拦截了它。那次险情变成了一个教训——现在竹林里的每只熊猫都知道了这个技巧。"
     }
   };
