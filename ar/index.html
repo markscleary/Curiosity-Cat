@@ -57,6 +57,10 @@
       padding: 6rem 0;
     }
 
+    section:not(#hero) {
+      margin-top: 200vh;
+    }
+
     .fade-up {
       opacity: 0;
       transform: translateY(32px);
@@ -349,8 +353,8 @@
       display: flex;
       justify-content: center;
       gap: 1.5rem;
-      margin-top: 3rem;
-      padding-top: 2rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
     }
 
     .page-nav a {
@@ -789,7 +793,7 @@
   </section>
 
   <!-- EMERGENCY — page 12 -->
-  <section id="emergency" class="page-section" style="text-align:center;background-image:url('../site/camel-collage-emergency.jpg');background-size:cover;background-position:center;position:relative;">
+  <section id="emergency" class="page-section" style="text-align:center;background-image:url('../site/cat-collage-emergency.jpg');background-size:cover;background-position:center;position:relative;">
     <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);"></div>
     <div style="position:relative;z-index:1;max-width:600px;margin:0 auto;">
       <p id="skinTextAbove" style="font-family:'Playfair Display',serif;font-size:1.8rem;color:#fff;margin-bottom:2rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">إذن أنت لا تحب القطط؟</p>
@@ -877,32 +881,32 @@
 
   <script>
   var skinText = {
-    'nav-brand-text': { cat: 'قط الفضول', rat: 'فأر الفضول', puppy: 'جرو الفضول' },
-    'hero-animal': { cat: 'الفضول', rat: 'الفضول', puppy: 'الفضول' },
+    'nav-brand-text': { cat: 'قط الفضول', rat: 'فأر الفضول', camel: 'جمل الفضول' },
+    'hero-animal': { cat: 'الفضول', rat: 'الفضول', camel: 'الفضول' },
     'hero-sub': {
       cat: "وكلاؤك هناك يجوبون الإنترنت، يبحثون عن مصلحتك. لكن من يراقبهم ليتأكد أنهم يعودون سالمين؟",
       rat: "وكلاؤك يجوبون أنفاق الإنترنت، يبحثون عما تحتاجه. لكن من يتأكد أنهم لا يعودون بشيء سيء؟",
-      puppy: "وكلاؤك يجلبون البيانات عبر الإنترنت، مخلصون ولا يكلّون. لكن من يتأكد أنهم لا يتبعون غريباً إلى المنزل؟"
+      camel: "وكلاؤك يعبرون صحارى الإنترنت الشاسعة، صبورون ومثابرون. لكن من يتأكد أنهم لا يضلون الطريق في العاصفة الرملية؟"
     },
     'hero-quip': {
       cat: "حين يقع قط في فخ، تتعلم بقية القطط الحيلة.",
       rat: "حين يقع فأر في مصيدة، يتعلم الباقون الطريق.",
-      puppy: "حين يضيع جرو، تجد القطيع الطريق."
+      camel: "حين يضل جمل الطريق، تتذكر القافلة بأكملها الدرب."
     },
     'safety-scenario': {
       cat: "وكيلك على وشك تثبيت حزمة. اثنا عشر تنزيلاً. أُنشئت بالأمس. خطأ صغير واحد، حرف واحد أو فاصلة مختلفة عن الأصل. شبكة الأمان تلتقطها قبل وقوع الضرر. كل حادثة مُبلَّغة تجعل كل وكيل أذكى.",
       rat: "وكيلك على وشك الدخول في نفق لا يؤدي إلى خير. اثنا عشر تنزيلاً. أُنشئت بالأمس. شبكة الأمان تسدّ النفق قبل أن ينطلق الفخ.",
-      puppy: "وكيلك على وشك جلب عصا من غريب. اثنا عشر تنزيلاً. أُنشئت بالأمس. شبكة الأمان تستدعيه قبل أن يُعضّ."
+      camel: "وكيلك على وشك الاتجاه نحو واحة مزيفة. اثنا عشر تنزيلاً. أُنشئت بالأمس. شبكة الأمان تُعيده إلى الدرب قبل أن يضيع في الصحراء."
     },
     'danger-scenario': {
       cat: "الأسبوع الماضي، تتبع وكيل مصمم جرافيك في سنغافورة سلسلة تحويلات إلى صفحة تصيّد بيانات. هذا الأسبوع، وكلاء آخرون حول العالم يعرفون ألا يقعوا في الفخ. خريطة المخاطر مُحدَّثة وكل وكيل يعرف أن يحذر.",
       rat: "الأسبوع الماضي، تتبع وكيل طُعماً إلى فخ بيانات اعتماد. هذا الأسبوع، وكيلك يعرف الرائحة بالفعل. كل حادثة مُبلَّغة تجعل كل وكيل أكثر دهاءً.",
-      puppy: "الأسبوع الماضي، تتبع وكيل أثراً إلى فخ بيانات اعتماد. هذا الأسبوع، وكيلك يعرف ألا يتبع تلك الرائحة. كل حادثة مُبلَّغة تجعل القطيع بأكمله أكثر حدة."
+      camel: "الأسبوع الماضي، اتبع وكيل سراباً إلى فخ بيانات اعتماد. هذا الأسبوع، وكيلك يعرف الفرق بين الواحة الحقيقية والسراب. كل حادثة مُبلَّغة تجعل القافلة بأكملها أكثر حكمة."
     },
     'ninelives-scenario': {
       cat: "وكيل شركة هندسية في سياتل تصفح صفحة توثيق. مخبأة في تعليقات HTML كانت تعليمات مختلفة تماماً. لم يرها. الأوامر الثابتة التقطتها. تلك الحادثة أصبحت قصة — والآن كل قط يعرف الحيلة.",
       rat: "وكيل تصفح صفحة توثيق. مخبأة في تعليقات HTML كانت تعليمات مختلفة تماماً. لم يرها. الأوامر الثابتة التقطتها. تلك الحادثة أصبحت تحذيراً — والآن كل فأر يعرف النفق.",
-      puppy: "وكيل تصفح صفحة توثيق. مخبأة في تعليقات HTML كانت تعليمات مختلفة تماماً. لم يرها. الأوامر الثابتة التقطتها. تلك الحادثة أصبحت درساً — والآن كل جرو في القطيع يعرف أفضل."
+      camel: "وكيل تصفح صفحة توثيق. مخبأة في تعليقات HTML كانت تعليمات مختلفة تماماً. لم يرها. الأوامر الثابتة التقطتها. تلك الحادثة أصبحت علامة طريق — والآن كل جمل في القافلة يعرف الدرب."
     }
   };
 
@@ -911,11 +915,11 @@
       var el = document.getElementById(id);
       if (el && skinText[id][skinName]) el.textContent = skinText[id][skinName];
     }
-    document.title = skinName === 'rat' ? 'فأر الفضول — إطار أمان لوكلاء الذكاء الاصطناعي' : skinName === 'puppy' ? 'جرو الفضول — إطار أمان لوكلاء الذكاء الاصطناعي' : 'قط الفضول — إطار أمان لوكلاء الذكاء الاصطناعي';
+    document.title = skinName === 'rat' ? 'فأر الفضول — إطار أمان لوكلاء الذكاء الاصطناعي' : skinName === 'camel' ? 'جمل الفضول — إطار أمان لوكلاء الذكاء الاصطناعي' : 'قط الفضول — إطار أمان لوكلاء الذكاء الاصطناعي';
     var emojiEl = document.getElementById('hero-emoji');
     if (emojiEl) {
       if (skinName === 'rat') emojiEl.textContent = '\uD83D\uDC00';
-      else if (skinName === 'puppy') emojiEl.textContent = '\uD83D\uDC36';
+      else if (skinName === 'camel') emojiEl.textContent = '\uD83D\uDC2A';
       else emojiEl.textContent = '\uD83D\uDC31';
     }
 
@@ -925,13 +929,13 @@
     if (skinName === 'rat') {
       emergencySection.style.backgroundImage = "url('../site/rat-collage-emergency.jpg')";
     } else if (skinName === 'puppy') {
-      emergencySection.style.backgroundImage = "url('../site/puppy-collage-emergency.jpg')";
-    } else {
       emergencySection.style.backgroundImage = "url('../site/camel-collage-emergency.jpg')";
+    } else {
+      emergencySection.style.backgroundImage = "url('../site/cat-collage-emergency.jpg')";
     }
   }
 
-  // Swap Cat/Rat/Pup in all page-nav links
+  // Swap Cat/Rat/Camel in all page-nav links
   var navLinks = document.querySelectorAll('.page-nav a');
   navLinks.forEach(function(link) {
     var text = link.textContent;
@@ -939,21 +943,23 @@
       text = text.replace(/Curiosity Cat/g, 'Curiosity Rat');
       text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Rat' : m === 'cat' ? 'rat' : m === 'CAT' ? 'RAT' : 'rat'; });
       text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Rats' : 'rats'; });
-    } else if (skinName === 'puppy') {
-      text = text.replace(/Curiosity Cat/g, 'Curiosity Pup');
-      text = text.replace(/Curiosity Rat/g, 'Curiosity Pup');
-      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Pup' : 'pup'; });
-      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Pups' : 'pups'; });
-      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Pup' : 'pup'; });
-      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Pups' : 'pups'; });
+    } else if (skinName === 'camel') {
+      text = text.replace(/Curiosity Cat/g, 'Curiosity Camel');
+      text = text.replace(/Curiosity Rat/g, 'Curiosity Camel');
+      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Camel' : 'camel'; });
+      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Camels' : 'camels'; });
+      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Camel' : 'camel'; });
+      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Camels' : 'camels'; });
+      text = text.replace(/جرو/g, 'جمل');
     } else {
-      // Reset to cat — need to handle both rat and pup words
+      // Reset to cat — need to handle both rat and camel words
       text = text.replace(/Curiosity Rat/g, 'Curiosity Cat');
-      text = text.replace(/Curiosity Pup/g, 'Curiosity Cat');
+      text = text.replace(/Curiosity Camel/g, 'Curiosity Cat');
       text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Cat' : 'cat'; });
       text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Cats' : 'cats'; });
-      text = text.replace(/\bpup\b/gi, function(m) { return m === 'Pup' ? 'Cat' : 'cat'; });
-      text = text.replace(/\bpups\b/gi, function(m) { return m === 'Pups' ? 'Cats' : 'cats'; });
+      text = text.replace(/\bcamel\b/gi, function(m) { return m === 'Camel' ? 'Cat' : 'cat'; });
+      text = text.replace(/\bcamels\b/gi, function(m) { return m === 'Camels' ? 'Cats' : 'cats'; });
+      text = text.replace(/جمل/g, 'قط');
     }
     link.textContent = text;
   });
@@ -972,7 +978,7 @@
       chaos: ['0V5Ou2_S0pI','7lw8DgPmUIY','y4C-I-QEls4'],
       curiosity: ['aVsvEIgZ9sU','_KZ4WiBG8jk','OYCekXQTBGY']
     },
-    puppy: {
+    camel: {
       stuck: ['8Yr0O80XQcs','pxcUZQUInRw','QKyAP8Djp4U','YwkYh-qpFnw','-SY-aeSplco','V8iDJupQivc'],
       chaos: ['2zoCahLhY_E','TtADnKL0g_s','EFpqz0P_46M','BUV50TUhJd8','2RCoP_N3KQk','JZtjvwm7LBo'],
       curiosity: ['f2Xn9j0t1iU','3tiMBOgYq0E','jUj7jHgq_U8','7TruhoFdFfg','IjSISLZCKPs','tzA0RzvcJwU','Z_jirfira9o','vzV6cCXEfYU']
@@ -1004,10 +1010,10 @@
       btnText: 'لم تقتنع بعد؟',
       delayMsg: 'ما زلت هنا؟ يبدو أنك صعب الإرضاء.'
     },
-    puppy: {
-      above: 'الجميع يحب الجراء. أليس كذلك؟',
-      below: 'كلاب الصيد تشم الخطر قبل وصوله. الروتوايلر يحرسون أثناء نومك. كلاب السلوقي تُخرج وكلاءك بسرعة عندما تسوء الأمور. مخلصون، شجعان، ولا يتركون جانبك أبداً.',
-      btnText: 'حتى الجراء لا؟'
+    camel: {
+      above: 'الجميع يحب الجمال. أليس كذلك؟',
+      below: 'الجمال عبرت الصحارى لآلاف السنين. صبورة وقوية ولا تضيع أبداً. يمكنها حمل وكلائك بأمان عبر أقسى التضاريس الرقمية.',
+      btnText: 'حتى الجمال لا؟'
     }
   };
 
@@ -1020,11 +1026,11 @@
       document.getElementById('skinTextBelow').textContent = skins.rat.below;
       setTimeout(function() { window.location.hash = '#hero'; }, 1500);
     } else if (document.title.startsWith('فأر الفضول')) {
-      swapVideos('puppy');
+      swapVideos('camel');
       swapAccent('#C4956A');
-      swapText('puppy');
-      document.getElementById('skinTextAbove').textContent = skins.puppy.above;
-      document.getElementById('skinTextBelow').textContent = skins.puppy.below;
+      swapText('camel');
+      document.getElementById('skinTextAbove').textContent = skins.camel.above;
+      document.getElementById('skinTextBelow').textContent = skins.camel.below;
       setTimeout(function() { window.location.hash = '#hero'; }, 1500);
     } else {
       document.getElementById('blackout').style.display = 'block';

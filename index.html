@@ -349,8 +349,8 @@
       display: flex;
       justify-content: center;
       gap: 1.5rem;
-      margin-top: 3rem;
-      padding-top: 2rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
     }
 
     .page-nav a {
@@ -362,6 +362,8 @@
       border-radius: 6px;
       text-decoration: none;
       transition: all 0.3s;
+      font-weight: 600;
+      letter-spacing: 0.02em;
     }
 
     .page-nav a:hover { background: var(--amber); color: #0a0a0a; }
@@ -405,7 +407,7 @@
 
     .story-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.4rem; }
     .story-subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; font-style: italic; }
-    .story-excerpt { font-size: 1.2rem; line-height: 1.75; color: #ccc; }
+    .story-excerpt { font-size: 1.1rem; line-height: 1.5; color: #ccc; }
 
     .story-meta { margin-top: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
     .story-meta-item { font-size: 1rem; color: var(--muted); }
@@ -473,6 +475,10 @@
 
     @media (max-width: 480px) {
       .container { padding: 0 1.25rem; }
+    }
+
+    section:not(#hero) {
+      margin-top: 200vh;
     }
   </style>
 </head>
@@ -595,6 +601,10 @@
           <span class="story-meta-item"><strong>What caught it:</strong> standing order — flag hidden instructions in HTML comments</span>
         </div>
       </div>
+      <div class="page-nav">
+        <a href="#quickstart">Quick Start →</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">Not a cat person?</a>
+      </div>
     </div>
   </section>
 
@@ -640,7 +650,7 @@
           The agent checked the name against the registry. One character different from a package with four million weekly downloads. A lowercase L where there should have been a capital I. Easy to miss. Probably designed to be.<br /><br />
           The postinstall script made an outbound request to a domain registered the same day as the package, then executed whatever came back.<br /><br />
           The agent did not install it. The incident went to the Danger Map. The package was reported to the registry.<br /><br />
-          The cat came home clean.
+          The agent made it home safe and sound.
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>Severity:</strong> nearly_eaten</span>
@@ -705,7 +715,7 @@
           The page asked for API credentials to authenticate and continue reading.<br /><br />
           Curiosity Cat had already flagged it twice over. The standing orders on redirects are clear: more than one unexpected hop is a signal worth stopping for. A credential request on an unrecognised domain is a full stop.<br /><br />
           The agent did not enter anything. It did not click through. It noted the redirect chain, captured the domains involved, and filed the incident to the Danger Map. The original documentation site was notified that one of its outbound links had been poisoned.<br /><br />
-          The cat came home with a scratch and a report.
+          The agent made it home with a scratch and a story to tell.
         </p>
         <div class="story-meta">
           <span class="story-meta-item"><strong>Severity:</strong> bitten</span>
@@ -802,6 +812,7 @@
       <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
       <div class="page-nav">
         <a href="#hero">Back to top</a>
+        <a href="#how-it-works">How we built C-Cat</a>
         <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">I'm sick of cat stories</a>
       </div>
     </div>
