@@ -916,7 +916,7 @@
       var el = document.getElementById(id);
       if (el && skinText[id][skinName]) el.textContent = skinText[id][skinName];
     }
-    document.title = skinName === 'rat' ? 'Curiosity Rat — Safety framework for AI agents' : skinName === 'panda' ? 'Curiosity Panda — Safety framework for AI agents' : 'Curiosity Cat — Safety framework for AI agents';
+    document.title = skinName === 'rat' ? '好奇鼠 — AI代理安全框架' : skinName === 'panda' ? '好奇熊猫 — AI代理安全框架' : '好奇猫 — AI代理安全框架';
     var emojiEl = document.getElementById('hero-emoji');
     if (emojiEl) {
       if (skinName === 'rat') emojiEl.textContent = '\uD83D\uDC00';
@@ -941,24 +941,18 @@
   navLinks.forEach(function(link) {
     var text = link.textContent;
     if (skinName === 'rat') {
-      text = text.replace(/Curiosity Cat/g, 'Curiosity Rat');
-      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Rat' : m === 'cat' ? 'rat' : m === 'CAT' ? 'RAT' : 'rat'; });
-      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Rats' : 'rats'; });
+      text = text.replace(/好奇猫/g, '好奇鼠');
+      text = text.replace(/猫/g, '鼠');
     } else if (skinName === 'panda') {
-      text = text.replace(/Curiosity Cat/g, 'Curiosity Panda');
-      text = text.replace(/Curiosity Rat/g, 'Curiosity Panda');
-      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Panda' : 'panda'; });
-      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Pandas' : 'pandas'; });
-      text = text.replace(/\bcat\b/gi, function(m) { return m === 'Cat' ? 'Panda' : 'panda'; });
-      text = text.replace(/\bcats\b/gi, function(m) { return m === 'Cats' ? 'Pandas' : 'pandas'; });
+      text = text.replace(/好奇猫/g, '好奇熊猫');
+      text = text.replace(/好奇鼠/g, '好奇熊猫');
+      text = text.replace(/鼠/g, '熊猫');
+      text = text.replace(/猫/g, '熊猫');
     } else {
-      // Reset to cat — need to handle both rat and panda words
-      text = text.replace(/Curiosity Rat/g, 'Curiosity Cat');
-      text = text.replace(/Curiosity Panda/g, 'Curiosity Cat');
-      text = text.replace(/\brat\b/gi, function(m) { return m === 'Rat' ? 'Cat' : 'cat'; });
-      text = text.replace(/\brats\b/gi, function(m) { return m === 'Rats' ? 'Cats' : 'cats'; });
-      text = text.replace(/\bpanda\b/gi, function(m) { return m === 'Panda' ? 'Cat' : 'cat'; });
-      text = text.replace(/\bpandas\b/gi, function(m) { return m === 'Pandas' ? 'Cats' : 'cats'; });
+      text = text.replace(/好奇鼠/g, '好奇猫');
+      text = text.replace(/好奇熊猫/g, '好奇猫');
+      text = text.replace(/熊猫/g, '猫');
+      text = text.replace(/鼠/g, '猫');
     }
     link.textContent = text;
   });
@@ -1004,9 +998,9 @@
   <script>
   var skins = {
     rat: {
-      above: 'Welcome to the rat side.',
-      below: '',
-      btnText: 'Still not convinced?',
+      above: '欢迎来到老鼠的世界。',
+      below: '如果明天炸弹落下，这些聪明可爱的小生物很可能毫发无伤地活下来。鼠类的狡猾。比胡迪尼还多的逃脱技巧。而且它们从不忘记威胁。',
+      btnText: '还是不信？',
       btnBorder: '#8B7355',
       btnColor: '#8B7355'
     },
@@ -1037,24 +1031,24 @@
       setTimeout(function() {
         var line1 = document.createElement('p');
         line1.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
-        line1.textContent = 'Well. That is that then.';
+        line1.textContent = '好吧。就这样了。';
         document.getElementById('blackout').appendChild(line1);
         setTimeout(function() { line1.style.opacity = '1'; }, 100);
         setTimeout(function() {
           line1.style.opacity = '0';
           setTimeout(function() {
-            line1.textContent = 'Actually. There is one way out.';
+            line1.textContent = '其实。还有一条出路。';
             line1.style.opacity = '1';
             setTimeout(function() {
               line1.style.opacity = '0';
               setTimeout(function() {
-                line1.textContent = 'Find the little box. Click it. If you can.';
+                line1.textContent = '找到那个小方块。点击它。如果你能的话。';
                 line1.style.opacity = '1';
                 var qb = document.getElementById('quitBtn');
                 qb.style.left = (2.5 + Math.random() * 85) + 'vw';
                 qb.style.top = (2.5 + Math.random() * 85) + 'vh';
                 qb.style.border = '1px solid rgba(245,158,11,0.3)';
-                qb.textContent = 'Fine. Go.';
+                qb.textContent = '好吧。走吧。';
                 var ji = setInterval(function() {
                   qb.style.left = (2.5 + Math.random() * 85) + 'vw';
                   qb.style.top = (2.5 + Math.random() * 85) + 'vh';
@@ -1066,7 +1060,7 @@
                   qb.style.border = 'none';
                   var reward = document.createElement('div');
                   reward.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
-                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">Thanks for being a good sport.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">We hope you enjoy your agents travelling safely across the internet using Curiosity Cat (or Rat, or Pup). We have gifted you 100 Quines. It is not a cryptocurrency but it can be used to reduce the cost of any of our new programs currently in development.</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">Best wishes,<br>The Team at Curiosity Cat</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">Back to Curiosity Cat</a><a id="quineHowItWorks" href="#how-it-works" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;margin-top:1rem;display:inline-block;">Curious how it actually works? →</a></div>';
+                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">感谢你的好奇心。</p><p style="font-family:Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">希望你喜欢你的代理使用好奇猫安全地在互联网上旅行。我们赠送你100个Quine。这不是加密货币，但可以用来降低我们正在开发的新项目的费用。</p><p style="font-family:Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">此致，<br>好奇猫团队</p><a href="#hero" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">返回好奇猫</a><a id="quineHowItWorks" href="#how-it-works" style="color:#f59e0b;font-family:Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;margin-top:1rem;display:inline-block;">想知道它是怎么工作的？ →</a></div>';
                   document.body.appendChild(reward);
                   document.getElementById('quineHowItWorks').addEventListener('click',function(e){e.preventDefault();reward.remove();swapAccent('#f59e0b');swapVideos('cat');swapText('cat');window.location.hash='#how-it-works';});
                 };
