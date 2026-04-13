@@ -1012,14 +1012,14 @@
   };
 
   document.getElementById('emergencyBtn').addEventListener('click', function() {
-    if (document.title.includes('Cat')) {
+    if (document.title.startsWith('قط الفضول')) {
       swapVideos('rat');
       swapAccent('#8B7355');
       swapText('rat');
       document.getElementById('skinTextAbove').textContent = skins.rat.above;
       document.getElementById('skinTextBelow').textContent = skins.rat.below;
       setTimeout(function() { window.location.hash = '#hero'; }, 1500);
-    } else if (document.title.includes('Rat')) {
+    } else if (document.title.startsWith('فأر الفضول')) {
       swapVideos('puppy');
       swapAccent('#C4956A');
       swapText('puppy');
