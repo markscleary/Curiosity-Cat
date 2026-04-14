@@ -319,7 +319,7 @@
       border: none;
       border-radius: 6px;
       padding: 0.6rem 1.2rem;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Source Sans 3', sans-serif;
       font-size: 1.1rem;
       font-weight: 700;
       cursor: pointer;
@@ -366,10 +366,11 @@
 
     .page-nav a {
       font-family: 'Source Sans 3', sans-serif;
-      font-size: 1rem;
+      font-size: 1.05rem;
       color: var(--amber);
       border: 1px solid var(--amber);
-      padding: 0.6rem 1.4rem;
+      background: rgba(245, 158, 11, 0.08);
+      padding: 0.7rem 1.6rem;
       border-radius: 6px;
       text-decoration: none;
       transition: all 0.3s;
@@ -669,7 +670,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-open-door">القصة التالية</a>
+        <a href="#story-open-door">← القصة التالية</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">لست من عشاق القطط؟</a>
       </div>
     </div>
@@ -697,7 +698,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-friendly-redirect">القصة التالية</a>
+        <a href="#story-friendly-redirect">← القصة التالية</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">هل اكتفيت؟</a>
       </div>
     </div>
@@ -726,7 +727,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-polite-document">القصة التالية</a>
+        <a href="#story-polite-document">← القصة التالية</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">القطط ليست مجالك؟</a>
       </div>
     </div>
@@ -754,7 +755,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-helpful-agent">القصة التالية</a>
+        <a href="#story-helpful-agent">← القصة التالية</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">جدياً، لا مزيد من القطط</a>
       </div>
     </div>
@@ -784,7 +785,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#about">عن Short+Sweet</a>
+        <a href="#stories">المزيد من الميدان →</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">أخرجني من هنا. الآن.</a>
       </div>
     </div>
@@ -802,8 +803,9 @@
       <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">أداة للرواد الأوائل. لحماية وكلاء الذكاء الاصطناعي وتأمينهم.</p>
       <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Short+Sweet تعرف على المزيد عن →</a></p>
       <div class="page-nav">
-        <a href="#hero">العودة للأعلى</a>
-        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">سئمت من قصص القطط</a>
+        <a href="https://shortandsweet.org" target="_blank">الصفحة الرئيسية Short+Sweet →</a>
+        <a href="#how-it-works">كيف بنينا C-Cat →</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">!أكره القطط</a>
       </div>
     </div>
   </section>
@@ -843,11 +845,53 @@
         <p style="margin-bottom:2rem;color:var(--amber);font-style:italic;">هكذا انتهى الأمر بشركة مسرح واحدة تبني شبكة أمان لوكلاء الذكاء الاصطناعي. شيء قاد إلى آخر.</p>
       </div>
       <div class="page-nav">
-        <a href="#hero">العودة للأعلى</a>
-        <a href="https://shortandsweet.org" target="_blank">ماذا نفعل في عملنا اليومي →</a>
+        <a href="#integration">دليل التكامل →</a>
+        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">!أكره القطط</a>
       </div>
     </div>
   </section>
+
+  <!-- دليل التكامل -->
+  <section id="integration" class="page-section">
+<div style="max-width:720px;margin:0 auto;padding-right:2rem;border-right:2px solid rgba(245,158,11,0.2);">
+<h2 class="section-title" style="margin-bottom:2rem;">دليل التكامل</h2>
+<div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ddd;line-height:1.7;">
+
+<p style="margin-bottom:2rem;">يعمل قط الفضول مع أي إطار عمل للوكلاء. الحد الأدنى للتثبيت هو نسخ الأوامر الدائمة إلى موجه النظام الخاص بوكيلك. يغطي هذا الدليل أنماط التكامل الخاصة بكل إطار عمل.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">عام (أي إطار عمل)</p>
+<p style="margin-bottom:2rem;">انسخ محتويات standing-orders/general-safety.md إلى موجه النظام الخاص بوكيلك. أضف أوامر دائمة خاصة بالدور إذا كان ذلك ينطبق. هذا كل شيء. وكيلك الآن يعمل وفق بروتوكولات أمان قط الفضول.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Claude Code</p>
+<p style="margin-bottom:2rem;">أضف الأوامر الدائمة العامة إلى ملف CLAUDE.md في جذر المشروع. يقرأ Claude Code هذا الملف عند بدء الجلسة ويعامل محتوياته كتعليمات دائمة.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Nanobot / OpenClaw</p>
+<p style="margin-bottom:2rem;">أضف الأوامر الدائمة إلى ملف IDENTITY.md أو SOUL.md الخاص بوكيلك. يتم قراءتها عند تهيئة الوكيل وتستمر عبر الجلسات.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">LangChain</p>
+<p style="margin-bottom:2rem;">ضمّن الأوامر الدائمة في رسالة النظام عند تهيئة نموذج المحادثة أو الوكيل. قواعد استدعاء الأدوات مهمة بشكل خاص للوكلاء الذين يستخدمون أدوات.</p>
+
+<p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2.5rem 0;padding:1.5rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">وكلاء الذكاء الاصطناعي مستكشفون بأصدق معنى للكلمة.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">CrewAI</p>
+<p style="margin-bottom:2rem;">أضف الأوامر الدائمة إلى حقل القصة الخلفية أو رسالة النظام لكل وكيل.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">AutoGPT / وكلاء مستقلون مماثلون</p>
+<p style="margin-bottom:2rem;">الوكلاء المستقلون يستفيدون أكثر من قط الفضول لأنهم يتخذون قرارات غير مراقبة حول ما يجلبونه وينفذونه. أضف الأوامر الدائمة إلى الموجه الأساسي للوكيل.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">إعدادات مخصصة</p>
+<p style="margin-bottom:2rem;">إذا كان إطار عمل وكيلك يستخدم موجه نظام أو تعليمات أساسية — فهذا هو المكان الذي توضع فيه الأوامر الدائمة. قط الفضول نص عادي. يعمل في أي مكان يقبل التعليمات بلغة طبيعية.</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">سياسات النطاق</p>
+<p style="margin-bottom:2rem;">للمشغلين الذين يريدون فرض السياسات برمجياً، انسخ policies/scope-policy-template.json وخصصه لبيئتك.</p>
+
+</div>
+<div class="page-nav">
+<a href="#how-it-works">← كيف يعمل</a>
+<a href="#hero">← العودة للأعلى</a>
+</div>
+</div>
+</section>
 
   <!-- FOOTER -->
   <footer>

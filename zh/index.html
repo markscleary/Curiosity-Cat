@@ -319,7 +319,7 @@
       border: none;
       border-radius: 6px;
       padding: 0.6rem 1.2rem;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Source Sans 3', sans-serif;
       font-size: 1.1rem;
       font-weight: 700;
       cursor: pointer;
@@ -366,13 +366,14 @@
 
     .page-nav a {
       font-family: 'Source Sans 3', sans-serif;
-      font-size: 1rem;
+      font-size: 1.05rem;
       color: var(--amber);
       border: 1px solid var(--amber);
-      padding: 0.6rem 1.4rem;
+      padding: 0.7rem 1.6rem;
       border-radius: 6px;
       text-decoration: none;
       transition: all 0.3s;
+      background: rgba(245, 158, 11, 0.08);
     }
 
     .page-nav a:hover { background: var(--amber); color: #0a0a0a; }
@@ -667,7 +668,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-open-door">下一个故事</a>
+        <a href="#story-open-door">← 下一个故事</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">你不喜欢猫？</a>
       </div>
     </div>
@@ -696,7 +697,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-friendly-redirect">再来一个故事</a>
+        <a href="#story-friendly-redirect">← 下一个故事</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">受够猫了？</a>
       </div>
     </div>
@@ -725,7 +726,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-polite-document">继续阅读</a>
+        <a href="#story-polite-document">← 下一个故事</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">猫不是你的菜？</a>
       </div>
     </div>
@@ -753,7 +754,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#story-helpful-agent">再看一个</a>
+        <a href="#story-helpful-agent">← 下一个故事</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">真的，不要再来猫了</a>
       </div>
     </div>
@@ -781,7 +782,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#about">关于Short+Sweet</a>
+        <a href="#stories">更多实战报告 →</a>
         <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">让我离开这里</a>
       </div>
     </div>
@@ -798,8 +799,9 @@
       <p style="line-height: 1.8; color: var(--amber); margin-bottom: 1.2rem; font-weight: 600;">为早期采用者打造的工具。保护你的AI代理安全无虞。</p>
       <p style="line-height: 1.8; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">了解更多关于Short+Sweet →</a></p>
       <div class="page-nav">
-        <a href="#hero">返回顶部</a>
-        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">受够了猫的故事</a>
+        <a href="https://shortandsweet.org" target="_blank">Short+Sweet 主页 →</a>
+        <a href="#how-it-works">我们如何建造 C-Cat →</a>
+        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">我讨厌猫！</a>
       </div>
     </div>
   </section>
@@ -839,11 +841,53 @@
         <p style="margin-bottom:2rem;color:var(--amber);font-style:italic;">这就是一家剧团最终为AI代理建造安全网的故事。一件事导致了另一件事。</p>
       </div>
       <div class="page-nav">
-        <a href="#hero">返回顶部</a>
-        <a href="https://shortandsweet.org" target="_blank">了解我们的日常工作 →</a>
+        <a href="#integration">集成指南 →</a>
+        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">我讨厌猫！</a>
       </div>
     </div>
   </section>
+
+  <!-- 集成指南 -->
+  <section id="integration" class="page-section">
+<div style="max-width:720px;margin:0 auto;padding-left:2rem;border-left:2px solid rgba(245,158,11,0.2);">
+<h2 class="section-title" style="margin-bottom:2rem;">集成指南</h2>
+<div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ddd;line-height:1.7;">
+
+<p style="margin-bottom:2rem;">好奇猫适用于任何智能体框架。最简安装方式是将常规安全指令复制到智能体的系统提示中。本指南涵盖各框架的具体集成方式。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">通用（任何框架）</p>
+<p style="margin-bottom:2rem;">将 standing-orders/general-safety.md 的内容复制到智能体的系统提示中。如适用，添加角色特定的常规指令。完成。你的智能体现在已在好奇猫安全协议下运行。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Claude Code</p>
+<p style="margin-bottom:2rem;">将通用安全指令添加到项目根目录的 CLAUDE.md 文件中。Claude Code 在会话开始时读取该文件，并将其内容视为常规指令。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Nanobot / OpenClaw</p>
+<p style="margin-bottom:2rem;">将常规指令添加到智能体的 IDENTITY.md 或 SOUL.md 文件中。这些文件在智能体初始化时被读取，并在会话间持续生效。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">LangChain</p>
+<p style="margin-bottom:2rem;">在初始化聊天模型或智能体时，将常规指令包含在系统消息中。工具调用规则对使用工具的智能体尤为重要。</p>
+
+<p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2.5rem 0;padding:1.5rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">AI 智能体是最真实意义上的探索者。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">CrewAI</p>
+<p style="margin-bottom:2rem;">将常规指令添加到每个智能体的背景故事或系统消息字段中。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">AutoGPT / 类似自主智能体</p>
+<p style="margin-bottom:2rem;">自主智能体从好奇猫获益最多，因为它们会自行决定获取、下载和执行什么内容。将常规指令添加到智能体的基础提示中。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">自定义设置</p>
+<p style="margin-bottom:2rem;">如果你的智能体框架使用系统提示或基础指令——那就是放置常规指令的地方。好奇猫是纯文本。它适用于任何接受自然语言指令的地方。</p>
+
+<p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">范围策略</p>
+<p style="margin-bottom:2rem;">对于需要机器可读策略执行的运营者，复制 policies/scope-policy-template.json 并根据你的环境进行自定义。</p>
+
+</div>
+<div class="page-nav">
+<a href="#how-it-works">← 工作原理</a>
+<a href="#hero">← 返回顶部</a>
+</div>
+</div>
+</section>
 
   <!-- FOOTER -->
   <footer>
