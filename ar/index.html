@@ -358,25 +358,35 @@
 
     .page-nav {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       gap: 1.5rem;
       margin-top: 1.5rem;
       padding-top: 1rem;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .page-nav a {
       font-family: 'Source Sans 3', sans-serif;
       font-size: 1.05rem;
-      color: var(--amber);
-      border: 1px solid var(--amber);
-      background: rgba(245, 158, 11, 0.08);
+      font-weight: 700;
+      color: #0a0a0a;
+      background: var(--amber);
+      border: none;
       padding: 0.7rem 1.6rem;
       border-radius: 6px;
       text-decoration: none;
       transition: all 0.3s;
     }
 
-    .page-nav a:hover { background: var(--amber); color: #0a0a0a; }
+    .page-nav a:hover { background: #fbbf24; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245, 158, 11, 0.35); }
+
+    .page-nav a.escape {
+      background: #0a0a0a;
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
 
     .story-page {
       max-width: 720px;
@@ -515,11 +525,11 @@
         <p class="hero-quip" id="hero-quip"><em>حين يقع قط في فخ، تتعلم بقية القطط الحيلة.</em></p>
         <div class="hero-ctas">
           <a href="#quickstart" class="btn btn-primary">ابدأ الآن</a>
-          <a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener" class="btn btn-secondary">GitHub شاهد على</a>
-          <a href="#adventure" class="cta-btn cta-primary">مستوى المخاطرة</a>
+          <a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener" class="btn btn-primary">GitHub شاهد على</a>
+          <a href="#adventure" class="btn btn-primary">مستوى المخاطرة</a>
         </div>
-        <div style="margin-top: 3rem; display: flex; justify-content: center;">
-          <div style="width: 100%; max-width: 560px; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 2px solid rgba(245, 158, 11, 0.4);">
+        <div style="margin-top: 3rem; display: flex; justify-content: flex-start;">
+          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 2px solid rgba(245, 158, 11, 0.4);">
             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/paWE-GvDO1c" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
           </div>
         </div>
@@ -634,15 +644,15 @@
         <span class="comment">(الخطوة ٢ (اختياري# — استخدم CLI لبناء إعداد كامل</span>
       </div>
       <div class="install-options fade-up delay-3">
-        <span class="install-pill">npx curiosity-cat init</span>
-        <span class="install-pill">pip install curiosity-cat</span>
+        <span class="install-pill">← npx curiosity-cat init</span>
+        <span class="install-pill" style="background:#0a0a0a;color:#f5f5f0;">pip install curiosity-cat</span>
       </div>
       <p class="fade-up delay-4">
-        <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener" class="qs-link">اقرأ دليل التكامل &rarr;</a>
+        <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md" target="_blank" rel="noopener" class="qs-link">دليل التكامل →</a>
       </p>
       <div class="page-nav">
         <a href="#story-helpful-stranger">قصة قط الفضول →</a>
-        <a href="#emergency" style="border-color: #ff4444; color: #ff4444;">لست من محبي القطط؟</a>
+        <a href="#emergency" class="escape">لست من محبي القطط؟</a>
       </div>
     </div>
   </section>
@@ -671,7 +681,7 @@
       </div>
       <div class="page-nav">
         <a href="#story-open-door">← القصة التالية</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">لست من عشاق القطط؟</a>
+        <a href="#emergency" class="escape">لست من عشاق القطط؟</a>
       </div>
     </div>
   </section>
@@ -699,7 +709,7 @@
       </div>
       <div class="page-nav">
         <a href="#story-friendly-redirect">← القصة التالية</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">هل اكتفيت؟</a>
+        <a href="#emergency" class="escape">هل اكتفيت؟</a>
       </div>
     </div>
   </section>
@@ -728,7 +738,7 @@
       </div>
       <div class="page-nav">
         <a href="#story-polite-document">← القصة التالية</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">القطط ليست مجالك؟</a>
+        <a href="#emergency" class="escape">القطط ليست مجالك؟</a>
       </div>
     </div>
   </section>
@@ -756,7 +766,7 @@
       </div>
       <div class="page-nav">
         <a href="#story-helpful-agent">← القصة التالية</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">جدياً، لا مزيد من القطط</a>
+        <a href="#emergency" class="escape">جدياً، لا مزيد من القطط</a>
       </div>
     </div>
   </section>
@@ -786,7 +796,7 @@
       </div>
       <div class="page-nav">
         <a href="#stories">المزيد من الميدان →</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">أخرجني من هنا. الآن.</a>
+        <a href="#emergency" class="escape">أخرجني من هنا. الآن.</a>
       </div>
     </div>
   </section>
@@ -805,7 +815,7 @@
       <div class="page-nav">
         <a href="https://shortandsweet.org" target="_blank">الصفحة الرئيسية Short+Sweet →</a>
         <a href="#how-it-works">كيف بنينا C-Cat →</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">!أكره القطط</a>
+        <a href="#emergency" class="escape">!أكره القطط</a>
       </div>
     </div>
   </section>
@@ -846,7 +856,7 @@
       </div>
       <div class="page-nav">
         <a href="#integration">دليل التكامل →</a>
-        <a href="#emergency" style="border-color:#ff4444;color:#ff4444;">!أكره القطط</a>
+        <a href="#emergency" class="escape">!أكره القطط</a>
       </div>
     </div>
   </section>
@@ -988,7 +998,7 @@
   if (emergencySection) {
     if (skinName === 'rat') {
       emergencySection.style.backgroundImage = "url('../site/rat-collage-emergency.jpg')";
-    } else if (skinName === 'puppy') {
+    } else if (skinName === 'camel') {
       emergencySection.style.backgroundImage = "url('../site/camel-collage-emergency.jpg')";
     } else {
       emergencySection.style.backgroundImage = "url('../site/cat-collage-emergency.jpg')";
