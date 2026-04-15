@@ -516,6 +516,35 @@
     section:not(#hero) {
       margin-top: 200vh;
     }
+
+    .mobile-lang {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-lang {
+        display: flex;
+        position: fixed;
+        top: 0;
+        right: 1.25rem;
+        z-index: 101;
+        gap: 1rem;
+        height: 100%;
+        align-items: center;
+        max-height: 56px;
+      }
+      .mobile-lang a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        transition: color 0.2s;
+      }
+      .mobile-lang a:hover {
+        color: var(--amber);
+      }
+    }
   </style>
 </head>
 <body>
@@ -534,6 +563,11 @@
       <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
   </nav>
+  <div class="mobile-lang">
+    <a href="ar/">عربي</a>
+    <a href="zh/">中文</a>
+    <a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a>
+  </div>
 
   <!-- HERO — page 1 -->
   <section id="hero">
