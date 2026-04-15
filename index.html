@@ -361,6 +361,7 @@
       max-width: 720px;
       margin-left: auto;
       margin-right: auto;
+      flex-wrap: wrap;
     }
 
     .page-nav a {
@@ -375,6 +376,8 @@
       transition: all 0.3s;
       font-weight: 700;
       letter-spacing: 0.02em;
+      min-width: 0;
+      white-space: nowrap;
     }
 
     .page-nav a:hover { background: #fbbf24; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245, 158, 11, 0.35); }
@@ -527,7 +530,7 @@
         <p class="hero-quip" id="hero-quip"><em>When a cat falls flat, the rest learn the trick.</em></p>
         <div class="hero-ctas">
           <a href="#layers" class="btn btn-primary">Get Started</a>
-          <a href="#how-it-works" class="btn btn-primary">How It Works</a>
+          <a href="#overview" class="btn btn-primary">How It Works</a>
           <a href="#adventure" class="btn btn-primary">Risk Appetite</a>
         </div>
         <div style="margin-top: 1.5rem; display: flex; justify-content: flex-start;">
@@ -839,7 +842,7 @@
       <p style="font-size: 1.1rem; line-height: 1.5; color: var(--text);"><a href="https://shortandsweet.org" style="color: var(--amber);">Learn more about Short+Sweet →</a></p>
       <div class="page-nav">
         <a href="https://shortandsweet.org" target="_blank">Short+Sweet Home →</a>
-        <a href="#how-it-works">How we built C-Cat →</a>
+        <a href="#overview">How we built C-Cat — the technical story →</a>
         <a href="#emergency" class="escape">I hate cats!</a>
       </div>
     </div>
@@ -880,16 +883,39 @@
         <p style="margin-bottom:1.5rem;">The whole framework is open source. It costs nothing. It takes sixty seconds to deploy. And it was built by people who know what it means to create a safe space for taking risks — because that is what we have been doing on stages around the world since 2002.</p>
       </div>
       <div class="page-nav">
-        <a href="#why">Why This Exists →</a>
+        <a href="#why">The full technical story →</a>
         <a href="#emergency" class="escape">I hate cats!</a>
       </div>
     </div>
   </section>
 
+  <!-- OVERVIEW -->
+  <section id="overview" class="page-section">
+<div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
+<h2 class="section-title" style="margin-bottom:0.5rem;">How It Works</h2>
+<p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A text file, a shared map and stories that stick. The whole framework in two minutes.</p>
+<div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
+<p style="margin-bottom:1.2rem;">Curiosity Cat is three things working together.</p>
+<p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">The Safety Net</strong> is a set of standing orders — plain text rules you paste into your agent's system prompt. No SDK. No server. No dependencies. Your agent reads them and follows them. That is the whole install. It takes sixty seconds.</p>
+<p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">The Danger Map</strong> is shared intelligence. When one agent has a close call, every other agent learns from it. Anonymised, structured, privacy by design. The network effect is the moat.</p>
+<p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">Nine Lives</strong> are the stories. Real close calls told plainly. Security lessons that stick because they read like stories, not CVE numbers.</p>
+<p style="margin-bottom:1.2rem;">It works with any agent framework that accepts a system prompt — which is all of them. OpenClaw, Nanobot, LangChain, CrewAI, AutoGen, Claude Code, or anything custom.</p>
+<p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2rem 0;padding:1.2rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">Curiosity Cat provides close calls, not death notices.</p>
+<p style="margin-bottom:1.2rem;">Want the full technical detail? There are 10 pages ahead. Each one is short.</p>
+</div>
+<div class="page-nav">
+<a href="#layers">← Back to Architecture</a>
+<a href="#why">The full story — 1 of 10 →</a>
+<a href="#hero" class="escape">Home</a>
+</div>
+</div>
+</section>
+
   <!-- WHY THIS EXISTS -->
   <section id="why" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">Why This Exists</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">Why This Exists</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Two bad options and no middle ground — until now.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">In the coming years, millions of people will work alongside AI agents. Many of those people will not be engineers. They will be teachers, artists, small business owners, students and freelancers — people who are drawn to agents because agents can help them do things they could not do alone.</p>
   <p style="margin-bottom:1.2rem;">Those people deserve to explore safely.</p>
@@ -898,8 +924,9 @@
   <p style="margin-bottom:1.2rem;">Curiosity Cat exists to change that.</p>
   </div>
   <div class="page-nav">
-  <a href="#how-it-works">← How It Works</a>
-  <a href="#whofrom" class="escape">Where it comes from →</a>
+  <a href="#overview">← Overview</a>
+  <a href="#whofrom">Where it comes from — 2 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -907,7 +934,8 @@
   <!-- WHERE THIS COMES FROM -->
   <section id="whofrom" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">Where This Comes From</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">Where This Comes From</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A theatre company that has spent 25 years making risk survivable.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">Curiosity Cat is built by Short+Sweet International — a performing arts organisation that has spent 25 years creating spaces where people can take creative risks and still be safe.</p>
   <p style="margin-bottom:1.2rem;">That might sound unlikely. A theatre company building agent security. But the problem is the same problem S+S has always solved.</p>
@@ -917,8 +945,9 @@
   <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2rem 0;padding:1.2rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">Everyone should be able to explore. Nobody should have to face the dangers alone.</p>
   </div>
   <div class="page-nav">
-  <a href="#why">← Why This Exists</a>
-  <a href="#theproduct" class="escape">The Product →</a>
+  <a href="#why">← Why this exists</a>
+  <a href="#theproduct">What we built — 3 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -926,7 +955,8 @@
   <!-- THE PRODUCT -->
   <section id="theproduct" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">The Product</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">The Product</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A portable safety framework that sits alongside any agent system.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">Curiosity Cat is a portable safety framework for AI agents that interact with external content.</p>
   <p style="margin-bottom:1.2rem;">It sits alongside existing agent systems and helps operators inspect, filter, quarantine and report risky external inputs before those inputs are trusted, stored or acted on. It is not tied to any single provider, platform or operating system.</p>
@@ -940,8 +970,9 @@
   <p style="margin-bottom:1.2rem;padding-left:1rem;">5. Turn real incidents into understandable lessons that improve judgement and community awareness</p>
   </div>
   <div class="page-nav">
-  <a href="#whofrom">← Where It Comes From</a>
-  <a href="#safetylayer" class="escape">Safety Net Detail →</a>
+  <a href="#whofrom">← Where it comes from</a>
+  <a href="#safetylayer">Inside the Safety Net — 4 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -949,7 +980,8 @@
   <!-- SAFETY NET DETAIL -->
   <section id="safetylayer" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">The Safety Net — In Detail</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">The Safety Net — In Detail</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Scope policies, standing orders, quarantine and four policy modes.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">The foundation layer is local. It runs on the operator's own system and provides immediate protection without depending on anything external.</p>
   <p style="margin-bottom:1.2rem;">Curiosity Cat applies operator-defined rules to external content before that content is used by an agent. Depending on policy, content may be allowed, logged, flagged, quarantined or blocked.</p>
@@ -968,8 +1000,9 @@
   <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2rem 0;padding:1.2rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">Different agents need different settings. A research assistant browsing academic papers does not need the same controls as an agent executing code from unknown repositories.</p>
   </div>
   <div class="page-nav">
-  <a href="#theproduct">← The Product</a>
-  <a href="#dangerdetail" class="escape">Danger Map Detail →</a>
+  <a href="#theproduct">← The product</a>
+  <a href="#dangerdetail">Inside the Danger Map — 5 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -977,7 +1010,8 @@
   <!-- DANGER MAP DETAIL -->
   <section id="dangerdetail" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">The Danger Map — In Detail</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">The Danger Map — In Detail</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Shared threat intelligence built on privacy, trust and corroboration.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">Each Curiosity Cat installation can optionally submit sanitised incident reports to a community intelligence layer called the Danger Map. One operator's close call becomes useful knowledge for everyone.</p>
   <p style="margin-bottom:1.2rem;">The Danger Map answers practical questions: Has this domain been associated with prompt injection? Has this MCP endpoint been reported as unsafe? Has this file pattern caused trouble elsewhere?</p>
@@ -994,8 +1028,9 @@
   <p style="margin-bottom:1.2rem;padding-left:1rem;">Node reputation — established installations carry more weight than new ones</p>
   </div>
   <div class="page-nav">
-  <a href="#safetylayer">← Safety Net Detail</a>
-  <a href="#straycats" class="escape">Stray Cats →</a>
+  <a href="#safetylayer">← Safety Net detail</a>
+  <a href="#straycats">Our secret agents — 6 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -1003,7 +1038,8 @@
   <!-- STRAY CATS -->
   <section id="straycats" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">Stray Cats</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">Stray Cats</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Automated agents that go looking for trouble so yours don't have to.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">Curiosity Cat does not rely only on community reports.</p>
   <p style="margin-bottom:1.2rem;">S+S deploys its own automated exploration agents — Stray Cats — that deliberately wander the most dangerous parts of the web, interact with unknown MCP servers, click suspicious links and trigger traps. They carry fake credentials and dummy API keys. They are designed to get scratched so that real cats do not have to.</p>
@@ -1011,8 +1047,9 @@
   <p style="margin-bottom:1.2rem;">Stray Cats also generate Stories — the most vivid close calls come from agents that went looking for trouble on purpose.</p>
   </div>
   <div class="page-nav">
-  <a href="#dangerdetail">← Danger Map Detail</a>
-  <a href="#thequine" class="escape">The Quine →</a>
+  <a href="#dangerdetail">← Danger Map detail</a>
+  <a href="#thequine">A new kind of credential — 7 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -1020,7 +1057,8 @@
   <!-- THE QUINE -->
   <section id="thequine" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">The Quine</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">The Quine</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Not a token. Not a coin. A verified record of contribution that builds trust and reputation.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">Curiosity Cat is the launch vehicle for The Quine — a non-financial creative credential developed by S+S for the agent ecosystem.</p>
   <p style="margin-bottom:1.2rem;">A Quine is not a token, a coin or a payment. It is a verified record of contribution — a number in a ledger that proves you showed up and did something worth recognising.</p>
@@ -1036,7 +1074,8 @@
   </div>
   <div class="page-nav">
   <a href="#straycats">← Stray Cats</a>
-  <a href="#whoisitfor" class="escape">Who Is It For →</a>
+  <a href="#whoisitfor">People who run 24/7 AI agents — 8 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -1044,7 +1083,8 @@
   <!-- WHO IS IT FOR -->
   <section id="whoisitfor" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">Who This Is For</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">Who This Is For</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">From solo developers to enterprise teams — and a free tier for framework providers.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;padding-left:1rem;">Individuals experimenting with personal agents who want basic protection without complexity</p>
   <p style="margin-bottom:1.2rem;padding-left:1rem;">Open-source developers building agent tools who want safer defaults</p>
@@ -1059,7 +1099,8 @@
   </div>
   <div class="page-nav">
   <a href="#thequine">← The Quine</a>
-  <a href="#biggerpicture" class="escape">The Bigger Picture →</a>
+  <a href="#biggerpicture">2026 and beyond — 9 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -1067,7 +1108,8 @@
   <!-- THE BIGGER PICTURE -->
   <section id="biggerpicture" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
-  <h2 class="section-title" style="margin-bottom:2rem;">The Bigger Picture</h2>
+  <h2 class="section-title" style="margin-bottom:0.5rem;">The Bigger Picture</h2>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A new kind of threat intelligence for a world where agents browse differently from humans.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
   <p style="margin-bottom:1.2rem;">AI is changing what work means. In the coming years, millions of people will be displaced from traditional employment. Many of them will struggle not just economically but existentially — losing the thing that told them who they are.</p>
   <p style="margin-bottom:1.2rem;">Short+Sweet has always believed that creative participation can provide meaning, community and identity. For 25 years it has built systems where anyone can step onto a stage and tell a story — 10 minutes at a time.</p>
@@ -1077,8 +1119,9 @@
   <p style="margin-bottom:1.2rem;">Agents browse the web differently from humans. They encounter different attack vectors. They are vulnerable to different tricks. The intelligence that Curiosity Cat gathers will reveal patterns that traditional security tools cannot see.</p>
   </div>
   <div class="page-nav">
-  <a href="#whoisitfor">← Who Is It For</a>
-  <a href="#integration" class="escape">Integration Guide →</a>
+  <a href="#whoisitfor">← Who is it for</a>
+  <a href="#integration">Integration Guide — 10 of 10 →</a>
+  <a href="#hero" class="escape">Home</a>
   </div>
   </div>
   </section>
@@ -1119,8 +1162,9 @@
 
 </div>
 <div class="page-nav">
-<a href="#how-it-works">← How It Works</a>
-<a href="#hero" class="escape">← Back to top</a>
+<a href="#biggerpicture">← The bigger picture</a>
+<a href="#hero">Back to the beginning →</a>
+<a href="#hero" class="escape">Home</a>
 </div>
 </div>
 </section>
