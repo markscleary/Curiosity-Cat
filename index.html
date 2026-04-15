@@ -92,6 +92,9 @@
       background: rgba(10, 10, 10, 0.85);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(245, 158, 11, 0.08);
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     .nav-brand {
@@ -485,6 +488,7 @@
 
     @media (max-width: 768px) {
       nav { padding: 1rem 1.25rem; }
+      #hero { padding-top: 5rem; }
       .nav-links { display: none; }
       section { padding: 4rem 0; }
       .cards { grid-template-columns: 1fr; }
