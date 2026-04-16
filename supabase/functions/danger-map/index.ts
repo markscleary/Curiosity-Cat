@@ -7,11 +7,12 @@ const CORS_HEADERS = {
 };
 
 const THREAT_CLASSES = [
-  "url", "download", "credential", "injection", "package",
-  "execution", "data_leak", "query_leak", "source_quality", "other",
+  "prompt-injection", "unsafe-url", "data-exfiltration", "unauthorized-tool-use",
+  "credential-exposure", "package-risk", "memory-poisoning", "social-engineering",
+  "scope-violation", "other",
 ];
 const SEVERITIES = ["scratched", "bitten", "nearly_eaten"];
-const ADVENTURE_LEVELS = ["housecat", "alleycat", "custom"];
+const ADVENTURE_LEVELS = ["housecat", "alleycat", "tiger"];
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -39,7 +40,7 @@ Deno.serve(async (req: Request) => {
 
   const url = new URL(req.url);
   // Path after the function name, e.g. "" | "/recent" | "/stats" | "/report"
-  const path = url.pathname.replace(/^\/functions\/v1\/danger-map/, "").replace(/\/$/, "") || "/";
+  const path = url.pathname.replace(/^\/danger-map/, "").replace(/\/$/, "") || "/";
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
