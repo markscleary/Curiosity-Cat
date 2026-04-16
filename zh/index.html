@@ -932,10 +932,212 @@
 </div>
 <div class="page-nav">
 <a href="#how-it-works">← 工作原理</a>
+<a href="#faq">常见问题 →</a>
 <a href="#hero">← 返回顶部</a>
 </div>
 </div>
 </section>
+
+  <!-- FAQ -->
+  <section class="page-section" id="faq">
+    <div class="container" style="max-width:720px;margin:0 auto;">
+      <h2 class="section-title" style="margin-bottom:2rem;">常见问题</h2>
+      <style>
+        details.faq-item { border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom:0; }
+        details.faq-item summary {
+          font-family: 'Noto Sans SC', sans-serif;
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--amber);
+          padding: 1.1rem 0;
+          cursor: pointer;
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+        }
+        details.faq-item summary::-webkit-details-marker { display: none; }
+        details.faq-item summary::after {
+          content: '+';
+          font-size: 1.4rem;
+          font-weight: 300;
+          flex-shrink: 0;
+          transition: transform 0.2s;
+        }
+        details.faq-item[open] summary::after { content: '−'; }
+        details.faq-item .faq-answer {
+          font-family: 'Noto Sans SC', sans-serif;
+          font-size: 1.05rem;
+          color: #ddd;
+          line-height: 1.7;
+          padding-bottom: 1.2rem;
+        }
+      </style>
+
+      <details class="faq-item">
+        <summary>什么是好奇猫？</summary>
+        <div class="faq-answer">专为在互联网上探索的AI代理设计的安全框架。它帮助你的代理在信任、存储或执行外部输入之前，对危险的外部输入进行检查、过滤、隔离和上报。最简安装方式是将一个文本文件复制到代理的系统提示词中——只需六十秒。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>它是如何工作的？</summary>
+        <div class="faq-answer">三层架构。安全网是一组常规指令——代理遵循的纯文本规则。危险地图是共享威胁情报——当一个代理遭遇险情时，所有其他代理都能从中学习。九条命是故事——用朴实的语言讲述真实险情，让人们记住教训。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>支持哪些框架？</summary>
+        <div class="faq-answer">任何接受系统提示词的框架。OpenClaw、Nanobot、LangChain、CrewAI、AutoGen、Claude Code，或任何自定义框架。常规指令是纯文本。只要你的代理能读取指令，就能使用好奇猫。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>费用是多少？</summary>
+        <div class="faq-answer">核心框架免费且开源。个人使用、开源项目和代理框架提供商无需付费。面向团队和企业的付费版本（含私有危险地图实例、自定义策略包和可审计决策记录）正在规划中。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>它能防范什么？</summary>
+        <div class="faq-answer">隐藏在网页、HTML注释、CSS隐藏文本和文档元数据中的提示词注入。伪装成合法包的恶意下载。通过伪造身份验证页面进行的凭证钓鱼。通过泄露内部信息的搜索查询造成的数据外泄。代理使用超出定义范围的工具导致的权限提升。欺骗性重定向链。通过损坏的外部内容进行的记忆投毒。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>它只是一个系统提示词吗？</summary>
+        <div class="faq-answer">最简安装是添加系统提示词——仅此一项就能提供有效保护。完整框架还包括范围策略、文件隔离、域名信任控制、针对不同代理类型的策略包，以及共享危险地图情报层。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>对性能有什么影响？</summary>
+        <div class="faq-answer">没有影响。常规指令在代理启动时读取一次——不会增加操作延迟。隔离和上报仅在检测到可疑内容时发生，而那正是你希望代理放慢脚步的时候。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>它与护栏或内容过滤器有何不同？</summary>
+        <div class="faq-answer">护栏过滤代理说什么。好奇猫保护代理做什么——去哪里、下载什么、信任什么、上报什么。它是一个操作安全层，而不是内容审核工具。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>谁开发了它？</summary>
+        <div class="faq-answer">Short+Sweet International——一家表演艺术机构，25年来在15个国家为创意冒险创造安全空间。同样的理念在这里适用：给代理设定边界，然后让它们自由探索。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>为什么是一家剧团？</summary>
+        <div class="faq-answer">因为问题是一样的。25年来，S+S帮助初次登台的艺术家在舞台上冒险并安然度过。现在部署代理的人处于同样的位置——充满热情、面临风险、边做边学。他们需要一个帮助他们安全探索的系统，而不是阻止他们探索的系统。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>什么是"Quine"？</summary>
+        <div class="faq-answer">一种非金融性创意积分。不是代币，不是硬币，不是付款。一份经过验证的贡献记录——账本上的一个数字，证明你出现过并做了值得认可的事情。运营者通过提交经过验证的险情报告、贡献故事、开发框架适配器和翻译文档来获得Quine积分。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>什么是"流浪猫"？</summary>
+        <div class="faq-answer">S+S部署的自动化探索代理，故意在网络的危险区域游荡，与未知的MCP服务器交互，点击可疑链接并触发陷阱。它们携带虚假凭证和模拟API密钥，被设计为代替真实代理受到伤害。它们的发现反馈给危险地图。</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>有哪些语言版本？</summary>
+        <div class="faq-answer">发布时支持英语、阿拉伯语和普通话中文。目前没有任何代理安全产品提供阿拉伯语版本。随着社区贡献翻译，将陆续添加更多语言。</div>
+      </details>
+
+      <details class="faq-item" style="border-bottom:none;">
+        <summary>如何参与贡献？</summary>
+        <div class="faq-answer">欢迎贡献框架适配器、策略包、翻译、故事和威胁报告。详情请参阅GitHub上的CONTRIBUTING.md。贡献可获得Quine积分。</div>
+      </details>
+
+      <div class="page-nav">
+        <a href="#integration">← 集成指南</a>
+        <a href="#signup">订阅更新 →</a>
+        <a href="#hero" class="escape">首页</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNUP -->
+  <section class="page-section" id="signup">
+    <div class="container" style="max-width:560px;margin:0 auto;text-align:center;">
+      <h2 class="section-title" style="margin-bottom:1rem;">保持关注</h2>
+      <p style="font-family:'Noto Sans SC',sans-serif;font-size:1.1rem;color:#aaa;margin-bottom:2.5rem;">获取新策略包、框架适配器和危险地图洞察的更新。无垃圾邮件。随时退订。</p>
+
+      <form id="signup-form" style="display:flex;flex-direction:column;gap:1rem;max-width:420px;margin:0 auto;">
+        <input
+          type="email"
+          id="signup-email"
+          name="email"
+          placeholder="your@email.com"
+          required
+          autocomplete="email"
+          style="
+            background:#111;
+            border:1px solid rgba(255,255,255,0.15);
+            border-radius:6px;
+            padding:0.85rem 1.2rem;
+            font-family:'Noto Sans SC',sans-serif;
+            font-size:1.05rem;
+            color:#fff;
+            outline:none;
+            transition:border-color 0.2s;
+            width:100%;
+            box-sizing:border-box;
+          "
+          onfocus="this.style.borderColor='var(--amber)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
+        />
+        <button type="submit" class="btn-primary" style="font-size:1.05rem;padding:0.85rem 2rem;cursor:pointer;border:none;border-radius:6px;font-family:'Noto Sans SC',sans-serif;font-weight:700;">
+          订阅更新
+        </button>
+      </form>
+
+      <div id="signup-message" style="display:none;font-family:'Noto Sans SC',sans-serif;font-size:1.05rem;margin-top:1.5rem;padding:1rem 1.5rem;border-radius:6px;"></div>
+
+      <script>
+        (function () {
+          var form = document.getElementById('signup-form');
+          var msgEl = document.getElementById('signup-message');
+
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = document.getElementById('signup-email').value.trim();
+            var btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = '发送中…';
+
+            fetch('https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/signup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: email, source: 'website', language: 'zh' })
+            })
+            .then(function (res) {
+              if (res.ok) {
+                form.style.display = 'none';
+                msgEl.style.display = 'block';
+                msgEl.style.background = 'rgba(34,197,94,0.12)';
+                msgEl.style.color = '#86efac';
+                msgEl.style.border = '1px solid rgba(34,197,94,0.25)';
+                msgEl.textContent = '已订阅。有值得分享的内容时，我们会联系你。';
+              } else {
+                return res.json().then(function (data) { throw new Error(data.message || '出现了问题。'); });
+              }
+            })
+            .catch(function (err) {
+              msgEl.style.display = 'block';
+              msgEl.style.background = 'rgba(239,68,68,0.1)';
+              msgEl.style.color = '#fca5a5';
+              msgEl.style.border = '1px solid rgba(239,68,68,0.2)';
+              msgEl.textContent = err.message || '出现了问题，请重试。';
+              btn.disabled = false;
+              btn.textContent = '订阅更新';
+            });
+          });
+        })();
+      </script>
+
+      <div class="page-nav" style="justify-content:center;margin-top:2.5rem;">
+        <a href="#faq">← 常见问题</a>
+        <a href="#hero" class="escape">返回顶部</a>
+      </div>
+    </div>
+  </section>
 
   <!-- FOOTER -->
   <footer>

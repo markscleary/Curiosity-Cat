@@ -931,10 +931,214 @@
 </div>
 <div class="page-nav">
 <a href="#how-it-works">← كيف يعمل</a>
+<a href="#faq">الأسئلة الشائعة →</a>
 <a href="#hero">← العودة للأعلى</a>
 </div>
 </div>
 </section>
+
+  <!-- FAQ -->
+  <section class="page-section" id="faq">
+    <div class="container" style="max-width:720px;margin:0 auto;">
+      <h2 class="section-title" style="margin-bottom:2rem;">الأسئلة الشائعة</h2>
+      <style>
+        details.faq-item { border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom:0; }
+        details.faq-item summary {
+          font-family: 'Cairo', sans-serif;
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--amber);
+          padding: 1.1rem 0;
+          cursor: pointer;
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+        }
+        details.faq-item summary::-webkit-details-marker { display: none; }
+        details.faq-item summary::after {
+          content: '+';
+          font-size: 1.4rem;
+          font-weight: 300;
+          flex-shrink: 0;
+          transition: transform 0.2s;
+        }
+        details.faq-item[open] summary::after { content: '−'; }
+        details.faq-item .faq-answer {
+          font-family: 'Cairo', sans-serif;
+          font-size: 1.05rem;
+          color: #ddd;
+          line-height: 1.7;
+          padding-bottom: 1.2rem;
+        }
+      </style>
+
+      <details class="faq-item">
+        <summary>ما هو قط الفضول؟</summary>
+        <div class="faq-answer">إطار أمان لوكلاء الذكاء الاصطناعي الذين يستكشفون الإنترنت. يساعد وكلاءك على فحص المدخلات الخارجية الخطرة وتصفيتها وعزلها والإبلاغ عنها قبل الوثوق بها أو تخزينها أو التصرف بناءً عليها. الحد الأدنى للتثبيت هو نسخ ملف نصي في موجّه نظام وكيلك — ويستغرق ذلك ستين ثانية.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>كيف يعمل؟</summary>
+        <div class="faq-answer">ثلاث طبقات. شبكة الأمان هي مجموعة من الأوامر الثابتة — قواعد نصية بسيطة يتبعها وكيلك. خريطة المخاطر هي ذكاء تهديدات مشترك — عندما يتعرض وكيل واحد لموقف خطر، تتعلم جميع الوكلاء الأخرى منه. تسع أرواح هي القصص — حوادث حقيقية تُروى ببساطة لكي يتذكر الناس الدروس.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>ما الأطر التي يدعمها؟</summary>
+        <div class="faq-answer">أي إطار يقبل موجّه نظام. OpenClaw وNanobot وLangChain وCrewAI وAutoGen وClaude Code أو أي إطار مخصص. الأوامر الثابتة هي نص عادي. إذا كان وكيلك يمكنه قراءة التعليمات، فيمكنه استخدام قط الفضول.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>كم يكلف؟</summary>
+        <div class="faq-answer">الإطار الأساسي مجاني ومفتوح المصدر. الاستخدام الشخصي والمشاريع مفتوحة المصدر ومزوّدو أطر الوكلاء لا يدفعون شيئاً. مستويات الفرق والمؤسسات مع نسخ خاصة من خريطة المخاطر وحزم سياسات مخصصة ومسارات قرارات قابلة للتدقيق مخطط لها.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>ما الذي يحمي منه؟</summary>
+        <div class="faq-answer">حقن موجّهات مخفية في صفحات الويب وتعليقات HTML والنصوص المخفية بـCSS وبيانات المستندات الوصفية. التنزيلات الضارة المتنكّرة في شكل حزم شرعية. التصيد الاحتيالي للبيانات عبر صفحات مصادقة مزيفة. تسريب البيانات عبر استعلامات البحث التي تكشف معلومات داخلية. تصعيد الصلاحيات حيث تستخدم الوكلاء أدوات خارج نطاقها المحدد. سلاسل التحويل المضللة. تسميم الذاكرة عبر المحتوى الخارجي الفاسد.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>هل هو مجرد موجّه نظام؟</summary>
+        <div class="faq-answer">الحد الأدنى للتثبيت هو إضافة موجّه نظام — وهذا وحده يوفر حماية فعّالة. يشمل الإطار الكامل سياسات النطاق وعزل الملفات وضوابط ثقة النطاقات وحزم السياسات لأنواع مختلفة من الوكلاء وطبقة ذكاء خريطة المخاطر المشتركة.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>ما تأثيره على الأداء؟</summary>
+        <div class="faq-answer">لا شيء. الأوامر الثابتة تُقرأ مرة واحدة عند بدء الوكيل — ولا تضيف أي تأخير للعمليات. العزل والإبلاغ يحدثان فقط عند اكتشاف شيء مشبوه، وهو بالضبط الوقت الذي تريد فيه أن يتباطأ وكيلك.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>كيف يختلف عن حواجز الحماية أو مرشّحات المحتوى؟</summary>
+        <div class="faq-answer">حواجز الحماية تصفّي ما يقوله الوكيل. قط الفضول يحمي ما يفعله الوكيل — أين يذهب وما يحمّله وما يثق به وما يُبلّغ عنه. إنه طبقة أمان تشغيلية وليس أداة لتصفية المحتوى.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>من بناه؟</summary>
+        <div class="faq-answer">Short+Sweet International — منظمة للفنون المسرحية أمضت 25 عاماً في خلق مساحات آمنة للمخاطرة الإبداعية عبر 15 دولة. تنطبق نفس الفلسفة: أعطِ الناس حدوداً ثم دعهم يستكشفون.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>لماذا شركة مسرح؟</summary>
+        <div class="faq-answer">لأن المشكلة واحدة. خلال 25 عاماً ساعدت S+S الفنانين الجدد على المخاطرة على خشبة المسرح والنجاة من التجربة. الأشخاص الذين ينشرون وكلاء الآن في نفس الوضع — متحمسون ومعرّضون للخطر ويتعلمون أثناء العمل. يحتاجون نظاماً يساعدهم على البقاء أثناء الاستكشاف، وليس نظاماً يوقف استكشافهم.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>ما هو "الكوين"؟</summary>
+        <div class="faq-answer">وثيقة إبداعية غير مالية. ليست رمزاً ولا عملة ولا دفعة. سجل موثّق للمساهمة — رقم في سجل يثبت أنك حضرت وفعلت شيئاً يستحق التقدير. يكسب المشغّلون كوينات عبر الإبلاغ عن حوادث موثّقة وتقديم قصص والمساهمة في محوّلات الأطر وترجمة التوثيق.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>ما هي "القطط الضالة"؟</summary>
+        <div class="faq-answer">وكلاء استكشاف آلية تنشرها S+S تتجول عمداً في أجزاء خطرة من الويب وتتفاعل مع خوادم MCP غير معروفة وتنقر على روابط مشبوهة وتُشغّل الفخاخ. تحمل بيانات اعتماد مزيفة ومفاتيح API وهمية. صُمّمت لتُخدَش حتى لا تضطر الوكلاء الحقيقية. نتائجها تغذّي خريطة المخاطر.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>بأي لغات يتوفر؟</summary>
+        <div class="faq-answer">الإنجليزية والعربية والصينية المندرين منذ الإطلاق. لا يوجد حالياً منتج أمان وكلاء باللغة العربية. تُضاف لغات إضافية مع مساهمات المجتمع في الترجمة.</div>
+      </details>
+
+      <details class="faq-item" style="border-bottom:none;">
+        <summary>كيف أساهم؟</summary>
+        <div class="faq-answer">محوّلات الأطر وحزم السياسات والترجمات والقصص وتقارير التهديدات كلها مرحّب بها. راجع CONTRIBUTING.md على GitHub للتفاصيل. المساهمات تكسب كوينات.</div>
+      </details>
+
+      <div class="page-nav">
+        <a href="#integration">← دليل التكامل</a>
+        <a href="#signup">سجّل →</a>
+        <a href="#hero" class="escape">الرئيسية</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNUP -->
+  <section class="page-section" id="signup">
+    <div class="container" style="max-width:560px;margin:0 auto;text-align:center;">
+      <h2 class="section-title" style="margin-bottom:1rem;">ابقَ على اطّلاع</h2>
+      <p style="font-family:'Cairo',sans-serif;font-size:1.1rem;color:#aaa;margin-bottom:2.5rem;">تحديثات حول حزم السياسات الجديدة ومحوّلات الأطر ورؤى خريطة المخاطر. لا إزعاج. إلغاء الاشتراك في أي وقت.</p>
+
+      <form id="signup-form" style="display:flex;flex-direction:column;gap:1rem;max-width:420px;margin:0 auto;">
+        <input
+          type="email"
+          id="signup-email"
+          name="email"
+          placeholder="your@email.com"
+          required
+          autocomplete="email"
+          style="
+            background:#111;
+            border:1px solid rgba(255,255,255,0.15);
+            border-radius:6px;
+            padding:0.85rem 1.2rem;
+            font-family:'Cairo',sans-serif;
+            font-size:1.05rem;
+            color:#fff;
+            outline:none;
+            transition:border-color 0.2s;
+            width:100%;
+            box-sizing:border-box;
+            direction:ltr;
+            text-align:left;
+          "
+          onfocus="this.style.borderColor='var(--amber)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
+        />
+        <button type="submit" class="btn-primary" style="font-size:1.05rem;padding:0.85rem 2rem;cursor:pointer;border:none;border-radius:6px;font-family:'Cairo',sans-serif;font-weight:700;">
+          أبقني على اطّلاع
+        </button>
+      </form>
+
+      <div id="signup-message" style="display:none;font-family:'Cairo',sans-serif;font-size:1.05rem;margin-top:1.5rem;padding:1rem 1.5rem;border-radius:6px;"></div>
+
+      <script>
+        (function () {
+          var form = document.getElementById('signup-form');
+          var msgEl = document.getElementById('signup-message');
+
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = document.getElementById('signup-email').value.trim();
+            var btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'جارٍ الإرسال…';
+
+            fetch('https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/signup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: email, source: 'website', language: 'ar' })
+            })
+            .then(function (res) {
+              if (res.ok) {
+                form.style.display = 'none';
+                msgEl.style.display = 'block';
+                msgEl.style.background = 'rgba(34,197,94,0.12)';
+                msgEl.style.color = '#86efac';
+                msgEl.style.border = '1px solid rgba(34,197,94,0.25)';
+                msgEl.textContent = 'تم التسجيل. سنتواصل معك حين يكون هناك ما يستحق قوله.';
+              } else {
+                return res.json().then(function (data) { throw new Error(data.message || 'حدث خطأ ما.'); });
+              }
+            })
+            .catch(function (err) {
+              msgEl.style.display = 'block';
+              msgEl.style.background = 'rgba(239,68,68,0.1)';
+              msgEl.style.color = '#fca5a5';
+              msgEl.style.border = '1px solid rgba(239,68,68,0.2)';
+              msgEl.textContent = err.message || 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+              btn.disabled = false;
+              btn.textContent = 'أبقني على اطّلاع';
+            });
+          });
+        })();
+      </script>
+
+      <div class="page-nav" style="justify-content:center;margin-top:2.5rem;">
+        <a href="#faq">← الأسئلة الشائعة</a>
+        <a href="#hero" class="escape">العودة للأعلى</a>
+      </div>
+    </div>
+  </section>
 
   <!-- FOOTER -->
   <footer>

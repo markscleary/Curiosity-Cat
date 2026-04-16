@@ -1,6 +1,6 @@
 {
   "name": "curiosity-cat",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI agent safety framework — standing orders, danger maps, and stories that teach cats to land on their feet",
   "author": "Mark Cleary, Short+Sweet International",
   "license": "MIT",
