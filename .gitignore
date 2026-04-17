@@ -12,3 +12,7 @@ dist/
 build/
 *.egg-info/
 __pycache__/
+*.pyc
+
+# Docs build
+site/

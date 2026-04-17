@@ -104,7 +104,7 @@ The world is changing faster than ever. For artists of all kinds, AI is both a t
 
 **Our vision:** make the world a more creative place. Core belief: human stories make us who we are. Everyone can be an artist. No barriers, except your own imagination. Explore, discover, create.
 
-[shortandsweet.org](https://shortandsweet.org) · [curiositycat.online](https://curiositycat.online) · curiosity@shortandsweet.org
+[shortandsweet.org](https://shortandsweet.org) · [curiositycat.online](https://curiositycat.online) · curiositycat@shortandsweet.org
 
 ---
 
