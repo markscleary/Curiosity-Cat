@@ -48,7 +48,7 @@ POST to the report endpoint:
 POST https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map/report
 ```
 
-Required fields: timestamp (ISO 8601), threat_class (url|download|credential|injection|package|execution|data_leak|query_leak|source_quality|other), severity (scratched|bitten|nearly_eaten), source, what_happened, action_taken, lesson.
+Required fields: timestamp (ISO 8601), threat_class (prompt-injection|unsafe-url|data-exfiltration|unauthorized-tool-use|credential-exposure|package-risk|memory-poisoning|social-engineering|scope-violation|other), severity (scratched|bitten|nearly_eaten), source, what_happened, action_taken, lesson.
 
 Optional fields: agent_type, adventure_level, submitted_by, framework, region.
 

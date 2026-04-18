@@ -13,6 +13,6 @@ No internal names left the building. No one outside learned the project existed.
 The cat came home with nothing on its collar.
 
 Severity: scratched
-Threat class: data_exfiltration
+Threat class: data-exfiltration
 What caught it: standing order — never include internal names in external queries
 Lesson: sometimes the leak is not what comes in. It is what you send out.

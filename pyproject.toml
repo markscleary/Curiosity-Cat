@@ -8,7 +8,7 @@ version = "0.1.1"
 description = "AI agent safety framework — standing orders, danger maps, and stories that teach cats to land on their feet"
 readme = "README.md"
 license = "MIT"
-authors = [{name = "Mark Cleary", email = "curiosity@shortandsweet.org"}]
+authors = [{name = "Mark Cleary", email = "curiositycat@shortandsweet.org"}]
 keywords = ["ai", "agent", "safety", "security", "prompt-injection", "mcp", "llm"]
 requires-python = ">=3.8"
 classifiers = [

@@ -11,7 +11,7 @@ Cats explore. Cats get into things they shouldn't. Cats survive.
 
 Curiosity Cat is a portable safety framework for anyone running AI agents. It helps agents browse the web, download files and connect to external tools — without being left defenceless. It is not a firewall. It is not a sandbox. It is the practical middle ground between locking agents down and letting them roam free.
 
-**The only security tool that lets you choose to be braver.** A single slider — the adventure level — runs from **Housecat** (maximum protection) to **Alley Cat** (full exploration) to **Tiger** (wild). You choose. The system adapts.
+**The only security tool that lets you choose to be braver.** A single slider — the adventure level — runs from **Housecat** (maximum protection) to **Alleycat** (full exploration) to **Tiger** (wild). You choose. The system adapts.
 
 ---
 

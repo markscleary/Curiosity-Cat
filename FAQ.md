@@ -10,7 +10,7 @@ Three layers. The Safety Net is a set of standing orders — plain text rules yo
 
 ## What frameworks does it support?
 
-Anything that accepts a system prompt. OpenClaw, Nanobot, LangChain, CrewAI, AutoGen, Claude Code, or anything custom. The standing orders are plain text. If your agent can read instructions, it can use Curiosity Cat.
+Anything that accepts a system prompt. Claude Code, Nanobot, OpenClaw, LangChain, CrewAI, AutoGen, or anything custom. The standing orders are plain text. If your agent can read instructions, it can use Curiosity Cat.
 
 ## What does it cost?
 
