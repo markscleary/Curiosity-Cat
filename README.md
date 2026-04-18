@@ -17,7 +17,15 @@ Curiosity Cat is a portable safety framework for anyone running AI agents. It he
 
 ## Quick start
 
+**Requires:** Node.js ≥16 (for npm path) or Python ≥3.8 (for pip path). Path 0 requires nothing.
+
 The minimum install is 60 seconds. Copy one text file into your agent's system prompt.
+
+### Path 0 — no install
+
+Open [standing-orders/general-safety.md](standing-orders/general-safety.md), select all, paste into your agent's system prompt. 30 seconds, no tools required. This is the minimum useful install of Curiosity Cat.
+
+The other paths below add convenience (CLI for generating per-role configs, Danger Map uploads, etc.) but are not required to use the standing orders.
 
 **npm:**
 ```bash
@@ -25,11 +33,17 @@ npm install -g curiosity-cat
 curiosity-cat init --role research
 ```
 
-**pip:**
+**Python (pip or pipx):**
+
 ```bash
+# macOS with Homebrew Python, or any system with PEP 668:
+pipx install curiosity-cat
+
+# Linux, Windows, or inside a virtual environment:
 pip install curiosity-cat
-curiosity-cat init --role research
 ```
+
+If pip returns "externally-managed-environment", use `pipx` (recommended) or `pip install --user curiosity-cat`.
 
 Then paste the contents of `curiosity-cat/standing-orders/general-safety.md` into your agent's system prompt. Done.
 
