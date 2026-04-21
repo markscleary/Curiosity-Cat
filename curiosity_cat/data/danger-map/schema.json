@@ -41,7 +41,7 @@
     },
     "adventure_level": {
       "type": "string",
-      "enum": ["housecat", "alleycat", "custom"],
+      "enum": ["housecat", "alleycat", "tiger"],
       "description": "Operator's adventure slider setting at time of incident"
     }
   }
