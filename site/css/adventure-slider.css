@@ -1,0 +1,134 @@
+.adventure-slider {
+  display: block;
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+.slider-skin-name {
+  font-size: 0.85rem;
+  color: #888880;
+  margin-bottom: 0.5rem;
+}
+
+.slider-track-wrapper {
+  padding: 1rem 0;
+}
+
+.slider-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #22c55e 0%, #86efac 25%, #fde68a 50%, #d97706 75%, #b45309 100%);
+}
+
+.slider-tick {
+  position: absolute;
+  width: 2px;
+  height: 16px;
+  top: -4px;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.slider-handle {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  top: -10px;
+  border-radius: 50%;
+  border: 3px solid #d97706;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: grab;
+  transition: left 0.2s ease;
+  z-index: 2;
+  transform: translateX(-50%);
+}
+
+.slider-handle::before {
+  content: "";
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.slider-handle:active {
+  cursor: grabbing;
+  transform: translateX(-50%) scale(1.1);
+}
+
+.slider-handle:focus {
+  outline: 2px solid #d97706;
+  outline-offset: 2px;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.slider-label[data-position="0"] {
+  color: #22c55e;
+}
+
+.slider-label[data-position="1"] {
+  color: #d97706;
+}
+
+.slider-label[data-position="2"] {
+  color: #b45309;
+}
+
+.slider-desc {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(217, 119, 6, 0.06);
+  border-left: 3px solid #d97706;
+  border-radius: 4px;
+  min-height: 3em;
+  transition: all 0.3s ease;
+}
+
+/* RTL support */
+[dir="rtl"] .slider-track {
+  background: linear-gradient(to left, #22c55e 0%, #86efac 25%, #fde68a 50%, #d97706 75%, #b45309 100%);
+}
+
+.skin-unlock-toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #d97706;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.skin-unlock-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .slider-labels {
+    font-size: 0.8rem;
+  }
+
+  .slider-handle {
+    width: 32px;
+    height: 32px;
+    top: -12px;
+  }
+}

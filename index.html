@@ -546,6 +546,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="site/css/adventure-slider.css">
 </head>
 <body>
 
@@ -596,20 +597,22 @@
       <p class="section-label fade-up">Risk Appetite</p>
       <h2 class="section-title fade-up delay-1">The only security tool that lets you<br />choose to be braver.</h2>
       <p class="section-body fade-up delay-2">Not all agents live the same life. Configure your risk profile once — the framework does the rest.</p>
-      <div class="slider-wrapper fade-up delay-3">
-        <div class="slider-track">
-          <div class="slider-handle"></div>
+      <div class="adventure-slider fade-up delay-3" data-lang="en" aria-label="Adventure level selector">
+        <div class="slider-skin-name" id="slider-skin-name"></div>
+        <div class="slider-track-wrapper">
+          <div class="slider-track">
+            <div class="slider-tick" data-position="0" style="left: 0%"></div>
+            <div class="slider-tick" data-position="1" style="left: 50%"></div>
+            <div class="slider-tick" data-position="2" style="left: 100%"></div>
+            <div class="slider-handle" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0" aria-label="Adventure level"></div>
+          </div>
         </div>
-        <p class="slider-coming-soon">Interactive slider — coming soon</p>
         <div class="slider-labels">
-          <span class="slider-label left">Housecat</span>
-          <span class="slider-label right">Alley Cat</span>
+          <span class="slider-label" data-position="0"></span>
+          <span class="slider-label" data-position="1"></span>
+          <span class="slider-label" data-position="2"></span>
         </div>
-        <div class="slider-desc">
-          <span>Strict quarantine. Standing orders enforced. Nothing leaves the yard.</span>
-          <span>Calculated risks accepted. Braver exploration. Still comes home.</span>
-        </div>
-        <p class="slider-note">Every cat has standing orders. The brave ones just have bigger territory.</p>
+        <div class="slider-desc" id="slider-desc"></div>
       </div>
       <div class="page-nav">
         <a href="#hero">← Home</a>
@@ -1647,5 +1650,8 @@
   });
   </script>
 
+  <script src="site/js/skins.js" defer></script>
+  <script src="site/js/skin-unlocker.js" defer></script>
+  <script src="site/js/adventure-slider.js" defer></script>
 </body>
 </html>
