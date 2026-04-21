@@ -1,0 +1,76 @@
+/**
+ * Curiosity Cat — Slider supplement styles
+ * Adds: .skin-picker, .skin-btn, .slider-video, .adventure-slider position:relative
+ * Does NOT duplicate .slider-track, .slider-handle, .slider-labels, .slider-desc
+ * (those live in site/css/adventure-slider.css)
+ */
+
+.adventure-slider {
+  position: relative;
+}
+
+/* ── VIDEO DIV ─────────────────────────────────────────────────────────── */
+
+.slider-video {
+  display: none;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(245, 158, 11, 0.25);
+}
+
+.slider-video:has(video) {
+  display: block;
+}
+
+/* ── SKIN PICKER ───────────────────────────────────────────────────────── */
+
+.skin-picker {
+  display: none;
+  flex-direction: row;
+  gap: 0.5rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+}
+
+[dir="rtl"] .skin-picker {
+  right: auto;
+  left: 0;
+}
+
+.skin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.skin-btn:hover {
+  border-color: var(--amber, #f59e0b);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.skin-btn.active {
+  border-color: var(--amber, #f59e0b);
+  background: rgba(245, 158, 11, 0.15);
+}
+
+/* ── RTL TRACK GRADIENT (supplement for ar pages without [dir]) ────────── */
+
+.adventure-slider[data-lang="ar"] .slider-track {
+  background: linear-gradient(to left, #22c55e 0%, #86efac 25%, #fde68a 50%, #d97706 75%, #b45309 100%);
+}

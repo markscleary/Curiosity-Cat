@@ -527,6 +527,8 @@
     }
 
   </style>
+  <link rel="stylesheet" href="/site/css/adventure-slider.css">
+  <link rel="stylesheet" href="/assets/slider.css">
 </head>
 <body>
 
@@ -541,12 +543,16 @@
       <li><a href="#about">من نحن</a></li>
       <li><a href="../" style="font-size:0.85rem;">English</a></li>
       <li><a href="../zh/" style="font-size:0.85rem;">中文</a></li>
+      <li><a href="../hi/" style="font-size:0.85rem;">हिन्दी</a></li>
+      <li><a href="../ta/" style="font-size:0.85rem;">தமிழ்</a></li>
       <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
   </nav>
   <div class="mobile-lang">
     <a href="../">English</a>
     <a href="../zh/">中文</a>
+    <a href="../hi/">हिन्दी</a>
+    <a href="../ta/">தமிழ்</a>
   </div>
 
   <!-- HERO — page 1 -->
@@ -576,20 +582,22 @@
       <p class="section-label fade-up">مستوى المخاطرة</p>
       <h2 class="section-title fade-up delay-1">أداة الأمان الوحيدة التي تتيح لك<br />اختيار أن تكون أكثر جرأة.</h2>
       <p class="section-body fade-up delay-2">ليس كل الوكلاء يعيشون الحياة نفسها. اضبط ملف المخاطرة مرة واحدة — والإطار يتولى الباقي.</p>
-      <div class="slider-wrapper fade-up delay-3">
-        <div class="slider-track">
-          <div class="slider-handle"></div>
+      <div class="adventure-slider fade-up delay-3" data-lang="ar" aria-label="محدد مستوى المغامرة">
+        <div class="slider-skin-name" id="slider-skin-name"></div>
+        <div class="slider-track-wrapper">
+          <div class="slider-track">
+            <div class="slider-tick" data-position="0" style="left: 0%"></div>
+            <div class="slider-tick" data-position="1" style="left: 50%"></div>
+            <div class="slider-tick" data-position="2" style="left: 100%"></div>
+            <div class="slider-handle" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0" aria-label="مستوى المغامرة"></div>
+          </div>
         </div>
-        <p class="slider-coming-soon">شريط تفاعلي — قريباً</p>
         <div class="slider-labels">
-          <span class="slider-label left">قط المنزل</span>
-          <span class="slider-label right">قط الشوارع</span>
+          <span class="slider-label" data-position="0"></span>
+          <span class="slider-label" data-position="1"></span>
+          <span class="slider-label" data-position="2"></span>
         </div>
-        <div class="slider-desc">
-          <span>حجر صارم. أوامر ثابتة مُنفذة. لا شيء يغادر الساحة.</span>
-          <span>مخاطر محسوبة مقبولة. استكشاف أكثر جرأة. ولا يزال يعود إلى المنزل.</span>
-        </div>
-        <p class="slider-note">لكل قط أوامر ثابتة. الشجعان منهم لديهم مساحة أكبر.</p>
+        <div class="slider-desc" id="slider-desc"></div>
       </div>
       <div class="page-nav">
         <a href="#hero">← الصفحة الرئيسية</a>
@@ -1036,7 +1044,7 @@
 
       <details class="faq-item">
         <summary>بأي لغات يتوفر؟</summary>
-        <div class="faq-answer">الإنجليزية والعربية والصينية المندرين منذ الإطلاق. لا يوجد حالياً منتج أمان وكلاء باللغة العربية. تُضاف لغات إضافية مع مساهمات المجتمع في الترجمة.</div>
+        <div class="faq-answer">الإنجليزية والعربية والصينية المندرين والهندية والتاميلية منذ الإطلاق. تُضاف لغات إضافية مع مساهمات المجتمع في الترجمة.</div>
       </details>
 
       <details class="faq-item" style="border-bottom:none;">
@@ -1386,5 +1394,6 @@
   });
   </script>
 
+  <script src="/assets/slider.js" defer></script>
 </body>
 </html>

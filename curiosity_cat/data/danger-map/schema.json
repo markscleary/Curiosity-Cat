@@ -11,7 +11,7 @@
     },
     "threat_class": {
       "type": "string",
-      "enum": ["url", "download", "credential", "injection", "package", "execution", "data_leak", "query_leak", "source_quality", "other"],
+      "enum": ["prompt-injection", "unsafe-url", "data-exfiltration", "unauthorized-tool-use", "credential-exposure", "package-risk", "memory-poisoning", "social-engineering", "scope-violation", "other"],
       "description": "Category of threat detected"
     },
     "severity": {

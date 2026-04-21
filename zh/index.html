@@ -526,6 +526,8 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/site/css/adventure-slider.css">
+  <link rel="stylesheet" href="/assets/slider.css">
 </head>
 <body>
 
@@ -538,15 +540,19 @@
       <li><a href="#quickstart">快速开始</a></li>
       <li><a href="#stories">九条命</a></li>
       <li><a href="#about">关于我们</a></li>
-      <li><a href="./" style="font-size:0.85rem;">中文</a></li>
+      <li><a href="./" style="font-size:0.85rem;font-weight:700;color:var(--amber);">中文</a></li>
       <li><a href="../" style="font-size:0.85rem;">English</a></li>
-      <li><a href="../ar/" style="font-size:0.85rem;">عربي</a></li>
+      <li><a href="../ar/" style="font-size:0.85rem;">عربية</a></li>
+      <li><a href="../hi/" style="font-size:0.85rem;">हिन्दी</a></li>
+      <li><a href="../ta/" style="font-size:0.85rem;">தமிழ்</a></li>
       <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
   </nav>
   <div class="mobile-lang">
     <a href="../">English</a>
-    <a href="../ar/">عربي</a>
+    <a href="../ar/">عربية</a>
+    <a href="../hi/">हिन्दी</a>
+    <a href="../ta/">தமிழ்</a>
   </div>
 
   <!-- HERO — page 1 -->
@@ -576,20 +582,22 @@
       <p class="section-label fade-up">风险偏好</p>
       <h2 class="section-title fade-up delay-1">唯一一个让你主动选择"更大胆探索"的安全工具。</h2>
       <p class="section-body fade-up delay-2">不是所有代理都过着同样的生活。设置一次风险配置——框架会完成剩下的工作。</p>
-      <div class="slider-wrapper fade-up delay-3">
-        <div class="slider-track">
-          <div class="slider-handle"></div>
+      <div class="adventure-slider fade-up delay-3" data-lang="zh" aria-label="冒险等级选择器">
+        <div class="slider-skin-name" id="slider-skin-name"></div>
+        <div class="slider-track-wrapper">
+          <div class="slider-track">
+            <div class="slider-tick" data-position="0" style="left: 0%"></div>
+            <div class="slider-tick" data-position="1" style="left: 50%"></div>
+            <div class="slider-tick" data-position="2" style="left: 100%"></div>
+            <div class="slider-handle" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0" aria-label="冒险等级"></div>
+          </div>
         </div>
-        <p class="slider-coming-soon">互动滑块——即将推出</p>
         <div class="slider-labels">
-          <span class="slider-label left">家猫</span>
-          <span class="slider-label right">街猫</span>
+          <span class="slider-label" data-position="0"></span>
+          <span class="slider-label" data-position="1"></span>
+          <span class="slider-label" data-position="2"></span>
         </div>
-        <div class="slider-desc">
-          <span>严格隔离。常规指令执行。什么都不能离开院子。</span>
-          <span>接受有计算的风险。更大胆的探索。仍然安全回家。</span>
-        </div>
-        <p class="slider-note">每只猫都有常规指令。勇敢的猫只是领地更大。</p>
+        <div class="slider-desc" id="slider-desc"></div>
       </div>
       <div class="page-nav">
         <a href="#hero">← 首页</a>
@@ -1037,7 +1045,7 @@
 
       <details class="faq-item">
         <summary>有哪些语言版本？</summary>
-        <div class="faq-answer">发布时支持英语、阿拉伯语和普通话中文。目前没有任何代理安全产品提供阿拉伯语版本。随着社区贡献翻译，将陆续添加更多语言。</div>
+        <div class="faq-answer">发布时支持英语、阿拉伯语、普通话中文、印地语和泰米尔语。随着社区贡献翻译，将陆续添加更多语言。</div>
       </details>
 
       <details class="faq-item" style="border-bottom:none;">
@@ -1378,5 +1386,6 @@
   });
   </script>
 
+  <script src="/assets/slider.js" defer></script>
 </body>
 </html>
