@@ -16,6 +16,7 @@ __pycache__/
 
 # Large binary assets in site/ excluded; JS/CSS tracked
 site/*.jpg
+!site/*-collage-emergency.jpg
 site/*.jpeg
 site/*.png
 site/*.gif
