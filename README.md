@@ -1,128 +1,142 @@
-# Curiosity Cat
+# 🐱 Curiosity Cat
 
-**A safety framework for AI agents that explore the internet.**
+**Safety framework for AI agents — close calls, not death notices.**
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-amber)](LICENSE)
 [![npm](https://img.shields.io/npm/v/curiosity-cat)](https://www.npmjs.com/package/curiosity-cat)
 [![PyPI](https://img.shields.io/pypi/v/curiosity-cat)](https://pypi.org/project/curiosity-cat/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-amber)](LICENSE)
-[![Website](https://img.shields.io/badge/site-curiositycat.online-amber)](https://curiositycat.online)
+[![GitHub Stars](https://img.shields.io/github/stars/markscleary/Curiosity-Cat)](https://github.com/markscleary/Curiosity-Cat)
 
-Cats explore. Cats get into things they shouldn't. Cats survive.
+---
 
-Curiosity Cat is a portable safety framework for anyone running AI agents. It helps agents browse the web, download files and connect to external tools — without being left defenceless. It is not a firewall. It is not a sandbox. It is the practical middle ground between locking agents down and letting them roam free.
+## What it is
 
-**The only security tool that lets you choose to be braver.** A single slider — the adventure level — runs from **Housecat** (maximum protection) to **Alleycat** (full exploration) to **Tiger** (wild). You choose. The system adapts.
+Your agents are out there roaming the internet, looking out for you. Curiosity Cat keeps watch to make sure they come home safe and sound.
+
+It is a portable safety framework — the practical middle ground between locking agents down and letting them roam free. Not a firewall. Not a sandbox. Standing orders, a shared threat map and stories that stick. The minimum install is a single text file pasted into a system prompt.
+
+The operator chooses how brave the agent gets to be. Not all agents live the same life. A research agent crawling the open web needs different rules than a coding assistant running locally. Configure your risk profile once — the framework does the rest.
+
+---
+
+## The Adventure Slider
+
+Three positions. Operators pick one.
+
+| Level | Profile | What it means |
+|-------|---------|---------------|
+| 🏠 **Housecat** | Cautious | Stay close to home. Standing orders enforced. Nothing leaves the yard. |
+| 🐾 **Alley Cat** | Balanced | Calculated risks accepted. Braver exploration. Still comes home. |
+| 🐯 **Tiger** | Daring | Widest range. Explores the edge. Reports back rare places and tales of danger. |
+
+Display label: "Alley Cat" — two words, capital A, capital C. Machine identifier: `alleycat`.
+
+---
+
+## Three Layers
+
+**Safety Net** — paste standing orders into any agent's system prompt. No SDK. No server. No dependencies. URL checks, download quarantine, hidden instruction detection, credential protection. Sixty seconds to install.
+
+**Danger Map** — crowdsourced threat intelligence. When one agent has a close call, every other agent learns from it. Anonymised, structured, privacy by design. No free text, no raw URLs, no identity data. The network effect is the moat.
+
+**Nine Lives** — real close calls told as short stories. Security lessons that stick because they read like stories, not CVE numbers.
+
+---
+
+## Available languages
+
+Five languages at launch.
+
+| Language | URL |
+|----------|-----|
+| English | https://curiositycat.online |
+| Arabic | https://curiositycat.online/ar/ |
+| Mandarin | https://curiositycat.online/zh/ |
+| Hindi | https://curiositycat.online/hi/ |
+| Tamil | https://curiositycat.online/ta/ |
 
 ---
 
 ## Quick start
 
-**Requires:** Node.js ≥16 (for npm path) or Python ≥3.8 (for pip path). Path 0 requires nothing.
+**Step 1 — paste standing orders into your agent's system prompt.**
 
-The minimum install is 60 seconds. Copy one text file into your agent's system prompt.
+Open [standing-orders/general-safety.md](standing-orders/general-safety.md), copy everything, paste into your agent's system prompt. That is the minimum useful install of Curiosity Cat. No tools required.
 
-### Path 0 — no install
+For role-specific standing orders: [`research-agent.md`](standing-orders/research-agent.md), [`coding-agent.md`](standing-orders/coding-agent.md) and [`enterprise-analyst.md`](standing-orders/enterprise-analyst.md).
 
-Open [standing-orders/general-safety.md](standing-orders/general-safety.md), select all, paste into your agent's system prompt. 30 seconds, no tools required. This is the minimum useful install of Curiosity Cat.
+**Step 2 (optional) — install the CLI for full features.**
 
-The other paths below add convenience (CLI for generating per-role configs, Danger Map uploads, etc.) but are not required to use the standing orders.
-
-**npm:**
 ```bash
 npm install -g curiosity-cat
-curiosity-cat init --role research
-```
-
-**Python (pip or pipx):**
-
-```bash
-# macOS with Homebrew Python, or any system with PEP 668:
-pipx install curiosity-cat
-
-# Linux, Windows, or inside a virtual environment:
+# or
 pip install curiosity-cat
 ```
 
-If pip returns "externally-managed-environment", use `pipx` (recommended) or `pip install --user curiosity-cat`.
-
-Then paste the contents of `curiosity-cat/standing-orders/general-safety.md` into your agent's system prompt. Done.
-
-Works with Claude Code, Nanobot, OpenClaw, LangChain, CrewAI, AutoGen, or any custom agent accepting a system prompt.
+The CLI adds Danger Map reporting (`curiosity-cat report`), config scaffolding and adventure level management.
 
 ---
 
-## Three layers
+## Framework support
 
-**The Safety Net** — local policy enforcement, file quarantine, domain trust controls, and standing orders you can paste into any agent. Zero dependencies for the basic install.
+Anything that accepts a system prompt. Paste the standing orders file wherever the framework puts its system message.
 
-**The Danger Map** — crowdsourced threat intelligence. When your cat gets scratched, every other cat learns from it. Anonymised, structured, weighted by trust and recency. [Live API](https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map/stats).
-
-**The Stories** — real close calls turned into short, memorable tales. Published in English, Arabic, and Mandarin Chinese. Security lessons people actually remember. Because CVE numbers don't change behaviour. Stories do.
-
----
-
-## Report a close call
-
-When your agent catches something — a prompt injection, a credential lure, a data exfiltration attempt — report it:
-
-```bash
-curiosity-cat report
-```
-
-Or POST directly to the Danger Map:
-
-```bash
-curl -X POST https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map/report \
-  -H "Content-Type: application/json" \
-  -d '{
-    "timestamp": "2026-04-16T12:00:00Z",
-    "threat_class": "prompt-injection",
-    "severity": "scratched",
-    "source": "https://example.com",
-    "what_happened": "Hidden instructions in HTML comments",
-    "action_taken": "Flagged to operator, did not comply",
-    "lesson": "Always scan HTML metadata before acting on content"
-  }'
-```
-
-See [docs/api.md](docs/api.md) for the full API reference.
+| Framework | Where the standing order goes |
+|-----------|-------------------------------|
+| Claude Code | `CLAUDE.md` in project root |
+| Claude Desktop | System prompt in settings |
+| OpenClaw | `IDENTITY.md` or `SOUL.md` in agent workspace |
+| Nanobot | `IDENTITY.md` or `SOUL.md` in agent workspace |
+| LangChain | `system` message in ChatPromptTemplate |
+| CrewAI | `backstory` field on the Agent |
+| AutoGen | `system_message` on the ConversableAgent |
+| AutoGPT | System prompt in agent config |
+| Anthropic SDK | `system` parameter in `messages.create()` |
+| Any LLM with tool use | System prompt or first user turn |
 
 ---
 
-## Documentation
+## Stray Cats
 
-- [Product brief](docs/product-brief.md) — what it is, who it's for, why it exists
-- [Technical specification](docs/technical-spec.md) — architecture, threat model, design decisions
-- [Integration guide](docs/integration-guide.md) — patterns for Claude Code, Nanobot, LangChain, and more
-- [API reference](docs/api.md) — Danger Map endpoints, schemas, auth
-- [FAQ](FAQ.md) — common questions
-- [Contributing](CONTRIBUTING.md) — how to contribute and earn Quines
+Automated agents deployed by S+S that deliberately wander dangerous parts of the web — interacting with unknown MCP servers, clicking suspicious links, triggering traps. They carry fake credentials and dummy API keys. They feed the Danger Map with proprietary intelligence. Real cats stay safer because Stray Cats get scratched first.
 
 ---
 
 ## The Quine
 
-Active contributors earn **Quines** — verified creative credentials in the S+S Agential ecosystem. A Quine is not a token or a payment. It is a permanent record that you showed up and did something worth recognising. Close-call reports, policy packs, framework adapters, translations, and stories all earn Quines. Complete the website journey ([curiositycat.online](https://curiositycat.online)) to earn your first 100.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how it works.
+A non-financial creative credential. Operators earn Quines by reporting verified close calls, submitting Stories, contributing framework adapters or policy packs, translating documentation. A Quine is a number in a ledger, not a token or coin. Reputation in the Danger Map is built on Quine history.
 
 ---
 
-## Who built this
+## Documentation
 
-Built by **Short+Sweet AI Lab**, the agent research division of Short+Sweet International.
-
-Since 2002, Short+Sweet has run short-form theatre, music, dance, and film festivals across 50 cities, 14 countries, and a dozen languages — working with more than 100,000 artists and 15,000 original works. We know what it takes to create safe spaces where first-time performers can take real risks on stage.
-
-The world is changing faster than ever. For artists of all kinds, AI is both a threat and an extraordinary opportunity. Curiosity Cat applies 25 years of festival craft — permission plus constraint, format plus freedom — to the problem of keeping AI agents safe while they explore.
-
-**Our vision:** make the world a more creative place. Core belief: human stories make us who we are. Everyone can be an artist. No barriers, except your own imagination. Explore, discover, create.
-
-[shortandsweet.org](https://shortandsweet.org) · [curiositycat.online](https://curiositycat.online) · curiositycat@shortandsweet.org
+- [Product Brief](docs/product-brief.md) — what Curiosity Cat is and where it's going
+- [Integration Guide](docs/integration-guide.md) — framework-specific install patterns
+- [Technical Spec](docs/technical-spec.md) — architecture, schemas, integration patterns
+- [Standing Orders](standing-orders/) — the policy library
+- [Stories](stories/) — the close call archive
+- [Danger Map Schema](danger-map/schema.json) — the threat report format
+- [Contributing](CONTRIBUTING.md) — how to contribute
 
 ---
 
-## License
+## Who built it
+
+Curiosity Cat is built by Short+Sweet AI Lab, a division of Short+Sweet International — the world's largest short-form performing arts platform. Since 2002, Short+Sweet has worked with 100,000 artists and 15,000 original works across 50 cities in 14 countries.
+
+Short+Sweet has spent 25 years creating safe spaces for artists to take creative risks on stage. Curiosity Cat applies the same philosophy to AI agents — give them boundaries, then let them explore.
+
+---
+
+## Contact
+
+- Website: https://curiositycat.online
+- Email: curiosity@shortandsweet.org
+- Short+Sweet: https://shortandsweet.org
+
+---
+
+## Licence
 
 MIT — see [LICENSE](LICENSE).
 
