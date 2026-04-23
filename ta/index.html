@@ -455,7 +455,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/site/css/adventure-slider.css">
+  <link rel="stylesheet" href="../site/css/adventure-slider.css">
   <link rel="stylesheet" href="/assets/slider.css">
 </head>
 <body>
@@ -469,17 +469,18 @@
       <li><a href="#quickstart">விரைவான தொடக்கம்</a></li>
       <li><a href="#stories">ஒன்பது உயிர்கள்</a></li>
       <li><a href="#about">பற்றி</a></li>
-      <li><a href="./" style="font-size:0.85rem;font-weight:700;color:var(--amber);">தமிழ்</a></li>
+      <li><a href="./" style="font-size:0.85rem;font-weight:700;color:var(--amber);" class="lang-active" aria-current="page">தமிழ்</a></li>
       <li><a href="../" style="font-size:0.85rem;">English</a></li>
-      <li><a href="../ar/" style="font-size:0.85rem;">عربية</a></li>
+      <li><a href="../ar/" style="font-size:0.85rem;">العربية</a></li>
       <li><a href="../zh/" style="font-size:0.85rem;">中文</a></li>
       <li><a href="../hi/" style="font-size:0.85rem;">हिन्दी</a></li>
       <li><a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
   </nav>
   <div class="mobile-lang">
+    <a href="./" class="lang-active" aria-current="page">தமிழ்</a>
     <a href="../">English</a>
-    <a href="../ar/">عربية</a>
+    <a href="../ar/">العربية</a>
     <a href="../zh/">中文</a>
     <a href="../hi/">हिन्दी</a>
   </div>
@@ -890,6 +891,8 @@
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
   </script>
 
-  <script src="/assets/slider.js" defer></script>
+  <script src="../site/js/skins.js" defer></script>
+  <script src="../site/js/skin-unlocker.js" defer></script>
+  <script src="../site/js/adventure-slider.js" defer></script>
 </body>
 </html>
