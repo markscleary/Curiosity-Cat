@@ -54,7 +54,7 @@ window.CC_SKINS = {
       unlockMessage: "New skin unlocked: Primate",
       positions: [
         { label: "Marmoset", color: "#22c55e", desc: "Treetops only. Small territory. Predictable." },
-        { label: "Macaque", color: "#d97706", desc: "Streets and temples. Takes what's offered. Street-smart." },
+        { label: "Macaque", color: "#d97706", desc: "Streets and temples. Takes what is offered. Street-smart." },
         { label: "Gorilla", color: "#b45309", desc: "Deep forest. Sets its own path. What it finds, no one else does." }
       ]
     },
