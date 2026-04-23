@@ -137,6 +137,8 @@
   left: 1rem;
 }
 
+.lang-active { pointer-events: none; opacity: 0.8; }
+
 @media (max-width: 640px) {
   .slider-labels {
     font-size: 0.8rem;
