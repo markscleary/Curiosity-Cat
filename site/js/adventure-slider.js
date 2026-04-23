@@ -91,6 +91,7 @@
         bubbles: true,
         detail: { level: pos, skin: currentSkin, lang: lang }
       }));
+      document.dispatchEvent(new CustomEvent('ccat:position-change', { detail: { position: pos, skin: currentSkin } }));
     }
 
     function pctFromEvent(e, track) {
@@ -173,6 +174,7 @@
     });
 
     render();
+    document.dispatchEvent(new CustomEvent('ccat:skin-change', { detail: { skin: currentSkin } }));
 
     // Store reference for setSkin
     el._sliderLang = lang;
@@ -202,6 +204,7 @@
       if (el._sliderSetSkin) el._sliderSetSkin(skinName);
     });
     window.dispatchEvent(new CustomEvent('skin-change', { detail: { skin: skinName } }));
+    document.dispatchEvent(new CustomEvent('ccat:skin-change', { detail: { skin: skinName } }));
   };
 
   if (document.readyState === 'loading') {

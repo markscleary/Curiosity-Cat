@@ -755,7 +755,7 @@
       <div class="page-nav">
         <a href="#about">← பற்றி</a>
         <a href="#signup">புதுப்பிப்புகள் →</a>
-        <a href="#hero" class="escape">முகப்பு</a>
+        <a href="#emergency" class="escape">வெளியேறு</a>
       </div>
     </div>
   </section>
@@ -841,10 +841,25 @@
 
       <div class="page-nav" style="justify-content:center;margin-top:2.5rem;">
         <a href="#faq">← அடிக்கடி கேட்கப்படும் கேள்விகள்</a>
-        <a href="#hero" class="escape">மேலே</a>
+        <a href="#emergency" class="escape">வெளியேறு</a>
       </div>
     </div>
   </section>
+
+  <!-- EMERGENCY -->
+  <section id="emergency" class="page-section" style="text-align:center;background-image:url('../site/cat-collage-emergency.jpg');background-size:cover;background-position:center;position:relative;">
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);"></div>
+    <div style="position:relative;z-index:1;max-width:600px;margin:0 auto;">
+      <p style="font-family:'Noto Sans Tamil','Playfair Display',serif;font-size:1.8rem;color:#fff;margin-bottom:2rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">போதும் என்று ஆச்சா?</p>
+      <button id="emergencyBtn" style="width:140px;height:140px;border-radius:50%;background:rgba(204,0,0,0.15);border:3px solid rgba(255,0,0,0.3);cursor:pointer;transition:all 0.2s;font-size:0;color:transparent;" onmouseenter="this.style.background='rgba(204,0,0,0.4)';this.style.borderColor='rgba(255,0,0,0.6)'" onmouseleave="this.style.background='rgba(204,0,0,0.15)';this.style.borderColor='rgba(255,0,0,0.3)'" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">அழுத்து</button>
+      <p id="emergencyText" style="font-family:'Noto Sans Tamil','Source Sans 3',sans-serif;font-size:1.3rem;color:#fff;margin-top:2rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">என்னை இங்கிருந்து வெளியே எடுங்கள். இப்போதே.</p>
+    </div>
+  </section>
+
+  <!-- Black screen overlay -->
+  <div id="blackout" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999;">
+    <button id="quitBtn" style="position:absolute; width:5vw; height:5vh; min-width:40px; min-height:30px; background:transparent; border:none; color:transparent; cursor:default; font-size:0.7rem; font-family:'Noto Sans Tamil','Source Sans 3',sans-serif; transition: color 0.2s, background 0.2s;" onmouseenter="this.style.color='#f59e0b';this.style.background='rgba(245,158,11,0.1)';this.style.cursor='pointer'" onmouseleave="this.style.color='transparent';this.style.background='transparent';this.style.cursor='default'" onclick="document.getElementById('blackout').style.display='none'">வெளியேறு!</button>
+  </div>
 
   <!-- FOOTER -->
   <footer>
@@ -894,5 +909,148 @@
   <script src="../site/js/skins.js" defer></script>
   <script src="../site/js/skin-unlocker.js" defer></script>
   <script src="../site/js/adventure-slider.js" defer></script>
+
+  <script>
+  var taEmergencyTier = 0;
+
+  var videoLists = {
+    cat: {
+      stuck: ['JOKGncCffEc','hOBB2cF1rtM','9ZQqPks_APk','hY7m5jjJ9mM','STBscAie4bc','Vwik2yE9hFk','zZIAohQrAeA','jINw0EAhZWk','KxtKEiMNgII','kMBk7nJtOyA','z3gHBoeHrPg'],
+      chaos: ['sVi1go-hqh0','VwPa4k-7C0M','zWJdq9SWggI','fCT1vTHwdVY','JxS5E-kZc2s','9AjIYRoW7W8','0IlwFjl9tO4','7IH-QonOrqM','Op4NANJh16U','ENs-WP6UVO4','Q4CmWZJZEfw','DHfRfU3XUEo','c5NfVEL_yBc','QNMmo-1-7EU','3TjDDrQ4Nig'],
+      curiosity: ['kgwQ9KHRPlY','pB_aFARcPgg','paWE-GvDO1c','sppNnsF0gUk','vQlE0qV6iuQ','MTz1-FKueTA','hNXAylV3xdQ','3tiMBOgYq0E','jyzmRnSpOJc','fybiOY5hzPg','UF5MLCkyGzs','h3RKvFft68Q','9tJcXPqNawE']
+    },
+    rat: {
+      stuck: ['RLM0lorWk1Q','3R6yBfGn-4s','8T8ZH0zedTw'],
+      chaos: ['0V5Ou2_S0pI','7lw8DgPmUIY','y4C-I-QEls4'],
+      curiosity: ['aVsvEIgZ9sU','_KZ4WiBG8jk','OYCekXQTBGY']
+    },
+    puppy: {
+      stuck: ['8Yr0O80XQcs','pxcUZQUInRw','QKyAP8Djp4U','YwkYh-qpFnw','-SY-aeSplco','V8iDJupQivc'],
+      chaos: ['2zoCahLhY_E','TtADnKL0g_s','EFpqz0P_46M','BUV50TUhJd8','2RCoP_N3KQk','JZtjvwm7LBo'],
+      curiosity: ['f2Xn9j0t1iU','3tiMBOgYq0E','jUj7jHgq_U8','7TruhoFdFfg','IjSISLZCKPs','tzA0RzvcJwU','Z_jirfira9o','vzV6cCXEfYU']
+    },
+    camel: {
+      stuck: ['8Yr0O80XQcs','pxcUZQUInRw','QKyAP8Djp4U','YwkYh-qpFnw','-SY-aeSplco','V8iDJupQivc'],
+      chaos: ['2zoCahLhY_E','TtADnKL0g_s','EFpqz0P_46M','BUV50TUhJd8','2RCoP_N3KQk','JZtjvwm7LBo'],
+      curiosity: ['f2Xn9j0t1iU','3tiMBOgYq0E','jUj7jHgq_U8','7TruhoFdFfg','IjSISLZCKPs','tzA0RzvcJwU','Z_jirfira9o','vzV6cCXEfYU']
+    },
+    panda: {
+      stuck: ['sGF6bOi1NfA','xyYjxwq9bWQ','K3tNgwQwKK4','6H5t42EAc4Q','iAVLxg65sJo','ECEHXzFPG6U','ywKEpqBDrb0','D7xWXk5T3-g','xnV6i031mR4'],
+      chaos: ['c2MLpBugw2I','23qBil4-Sk8','GFBVeEsSMHs','c6tF3lL-Ll4','2uQdKnrx5v8','YzfgiyByXrU'],
+      curiosity: ['0NwJKGa99Fc','8ZQOqq-FbpY','msN1oZnh_vo','6HG83SgzhsI','2HZt_K-STsM','djddEP-zldY']
+    },
+    primate: {
+      stuck: ['jp48TLcC4_g','UZ3pLg82Yn0','NMaGVDdwmkY','6uSREvaUQ08'],
+      chaos: ['AW8yo8pVDfk','hrIdLo8WiwU','qJlh-AHFplo','qFNGJTlYQCQ','9R-dNgat1og'],
+      curiosity: ['QMlAtDpsQhc','2MadqbDG20Q','V5uXTG8Ld04','mlTTwTyS7zc','3fj4kQLcYTs']
+    },
+    cobra: {
+      stuck: ['vAaaN-DRUVo','su-VtN0j2us','Y49ZtPhMxBg','cDRjiCGn4ag'],
+      chaos: ['qYzH6-pQ-5s','YHSaj-nNT3w','z9hb2Oz-PNM','CSsbxh2mrII'],
+      curiosity: ['dTfDMB5Espc','AMsomnW55p0','fs7qbMiuBKQ','SELHzdW_4RY']
+    }
+  };
+
+  function swapVideos(skinName) {
+    var iframes = document.querySelectorAll('iframe[data-category]');
+    iframes.forEach(function(iframe) {
+      var category = iframe.getAttribute('data-category');
+      var list = videoLists[skinName] && videoLists[skinName][category];
+      if (list && list.length > 0) {
+        var randomId = list[Math.floor(Math.random() * list.length)];
+        iframe.src = 'https://www.youtube.com/embed/' + randomId + '?rel=0';
+      }
+    });
+  }
+
+  function swapText(skinName) {
+    var emojiEl = document.getElementById('hero-emoji');
+    if (emojiEl) {
+      if (skinName === 'rat') emojiEl.textContent = '🐀';
+      else if (skinName === 'primate') emojiEl.textContent = '🐒';
+      else emojiEl.textContent = '🐱';
+    }
+    var emergencySection = document.getElementById('emergency');
+    if (emergencySection) {
+      if (skinName === 'rat') {
+        emergencySection.style.backgroundImage = "url('../site/rat-collage-emergency.jpg')";
+      } else if (skinName === 'primate') {
+        emergencySection.style.backgroundImage = "url('../site/primate-collage-emergency.jpg')";
+      } else {
+        emergencySection.style.backgroundImage = "url('../site/cat-collage-emergency.jpg')";
+      }
+    }
+  }
+
+  function swapAccent(color) {
+    document.documentElement.style.setProperty('--amber', color);
+  }
+
+  document.addEventListener('ccat:skin-change', function(e) {
+    var skin = e.detail.skin;
+    if (typeof swapText === 'function') swapText(skin);
+    if (typeof swapVideos === 'function') swapVideos(skin);
+  });
+
+  document.getElementById('emergencyBtn').addEventListener('click', function() {
+    if (taEmergencyTier === 0) {
+      taEmergencyTier = 1;
+      swapVideos('rat');
+      swapAccent('#8B7355');
+      swapText('rat');
+      document.getElementById('emergencyText').textContent = 'எலியின் உலகிற்கு வரவேற்கிறோம்.';
+      setTimeout(function() { window.location.hash = '#hero'; }, 1500);
+    } else if (taEmergencyTier === 1) {
+      taEmergencyTier = 2;
+      swapVideos('primate');
+      swapAccent('#5B3A1E');
+      swapText('primate');
+      document.getElementById('emergencyText').textContent = 'குரங்கின் உலகிற்கு வரவேற்கிறோம்.';
+      setTimeout(function() { window.location.hash = '#hero'; }, 1500);
+    } else {
+      document.getElementById('blackout').style.display = 'block';
+      setTimeout(function() {
+        var line1 = document.createElement('p');
+        line1.style.cssText = 'position:fixed;top:45%;width:100%;text-align:center;color:#f59e0b;font-size:1.4rem;font-family:Noto Sans Tamil,Playfair Display,serif;z-index:10000;opacity:0;transition:opacity 1s;';
+        line1.textContent = 'சரி. அது அப்படிதான்.';
+        document.getElementById('blackout').appendChild(line1);
+        setTimeout(function() { line1.style.opacity = '1'; }, 100);
+        setTimeout(function() {
+          line1.style.opacity = '0';
+          setTimeout(function() {
+            line1.textContent = 'உண்மையில். ஒரு வழி இருக்கிறது.';
+            line1.style.opacity = '1';
+            setTimeout(function() {
+              line1.style.opacity = '0';
+              setTimeout(function() {
+                line1.textContent = 'சிறிய பெட்டியை கண்டுபிடியுங்கள். அதை கிளிக் செய்யுங்கள். முடிந்தால்.';
+                line1.style.opacity = '1';
+                var qb = document.getElementById('quitBtn');
+                qb.style.left = (2.5 + Math.random() * 85) + 'vw';
+                qb.style.top = (2.5 + Math.random() * 85) + 'vh';
+                qb.style.border = '1px solid rgba(245,158,11,0.3)';
+                qb.textContent = 'சரி. போ.';
+                var ji = setInterval(function() {
+                  qb.style.left = (2.5 + Math.random() * 85) + 'vw';
+                  qb.style.top = (2.5 + Math.random() * 85) + 'vh';
+                }, 1000);
+                qb.onclick = function() {
+                  clearInterval(ji);
+                  document.getElementById('blackout').style.display = 'none';
+                  document.getElementById('blackout').querySelectorAll('p').forEach(function(el) { el.remove(); });
+                  qb.style.border = 'none';
+                  var reward = document.createElement('div');
+                  reward.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;';
+                  reward.innerHTML = '<div style="max-width:600px;padding:2rem;text-align:center;"><p style="font-family:Noto Sans Tamil,Playfair Display,serif;font-size:1.8rem;color:#f59e0b;margin-bottom:1.5rem;">நல்ல விளையாட்டு மனப்பான்மைக்கு நன்றி.</p><p style="font-family:Noto Sans Tamil,Source Sans 3,sans-serif;font-size:1.1rem;color:#ccc;line-height:1.8;margin-bottom:1.5rem;">உங்கள் முகவர்கள் ஆர்வப் பூனையைப் பயன்படுத்தி இணையத்தில் பாதுகாப்பாக பயணிப்பதை நீங்கள் ரசிப்பீர்கள் என்று நம்புகிறோம். நாங்கள் உங்களுக்கு 100 Quines வழங்கியுள்ளோம். இது கிரிப்டோகரன்சி அல்ல, ஆனால் எங்கள் புதிய திட்டங்களின் செலவைக் குறைக்க பயன்படுத்தலாம்.</p><p style="font-family:Noto Sans Tamil,Source Sans 3,sans-serif;font-size:1rem;color:#888;margin-bottom:2rem;">வாழ்த்துக்களுடன்,<br>ஆர்வப் பூனை குழு</p><a href="#hero" style="color:#f59e0b;font-family:Noto Sans Tamil,Source Sans 3,sans-serif;text-decoration:none;border:1px solid #f59e0b;padding:0.6rem 1.4rem;border-radius:6px;" onclick="this.parentElement.parentElement.remove();swapAccent(\'#f59e0b\');swapVideos(\'cat\');swapText(\'cat\');">ஆர்வப் பூனைக்கு திரும்பு</a></div>';
+                  document.body.appendChild(reward);
+                };
+              }, 1000);
+            }, 2000);
+          }, 1000);
+        }, 3000);
+      }, 5000);
+    }
+  });
+  </script>
 </body>
 </html>

@@ -475,6 +475,7 @@
           activeSkin = skin;
           localStorage.setItem('cc-skin', skin);
           render();
+          document.dispatchEvent(new CustomEvent('ccat:skin-change', { detail: { skin: activeSkin } }));
         });
         skinPicker.appendChild(btn);
       });
@@ -516,6 +517,7 @@
       pos = newPos;
       localStorage.setItem('cc-adventure-level', pos);
       render();
+      document.dispatchEvent(new CustomEvent('ccat:position-change', { detail: { position: pos, skin: activeSkin } }));
     }
 
     function posFromX(clientX) {
@@ -597,6 +599,7 @@
 
       if (toastMsg) showToast(toastMsg);
       render();
+      document.dispatchEvent(new CustomEvent('ccat:skin-change', { detail: { skin: activeSkin } }));
     }
 
     function observeUnlocks() {
@@ -635,6 +638,7 @@
     // ── INIT ──────────────────────────────────────────────────────────────────
 
     render();
+    document.dispatchEvent(new CustomEvent('ccat:skin-change', { detail: { skin: activeSkin } }));
     observeUnlocks();
   }
 
