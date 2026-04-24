@@ -1,42 +1,57 @@
-# Curiosity Cat — Founder Statement
+# Curiosity Cat, a founder statement
 
-I built Curiosity Cat because I got tired of tapping Approve.
+OpenClaw was released in November 2025. It's a huge hit – the fastest-growing open-source project in GitHub's history. Three hundred and forty-six thousand stars in under five months. Hundreds of thousands of operators running it. Most of them installed it for the productivity. What they didn't know, and what nobody told them, is what can actually happen once an agent is let out into the world.
 
-I run AI agents on a Mac Mini in my home office in Thirroul, two hours south of Sydney. Six of them, doing different jobs across Short+Sweet International — outreach research, contract review, publicity drafting, image management, agent communications, infrastructure work. They are useful. They save me time. And the moment I tried to let any of them work without me sitting at the screen, the whole arrangement fell apart.
+Agents have already deleted production databases. Cleared inboxes. Handed over credentials. Transferred money. Posted content their owners would be horrified by. Created dating profiles their owners didn't know existed. Three hundred thousand operators were put at risk in less than three weeks by a single supply chain attack hidden inside plugins that looked perfectly ordinary.
 
-The problem isn't the agents. The problem is the supervision burden. Every action they want to take produces a prompt. Every prompt requires me to read what they're about to do, understand the consequences, and click Approve or Cancel. Anthropic published the data: operators click Approve 93 times a day on average. Mine is higher. I checked.
+These are not theoretical risks. These are last month.
 
-Two paths from there. First, you keep approving — which means you've replaced your work with the work of supervising an agent doing your work, which is the opposite of the point. Second, you stop watching — which is what most people do, and is also what produces the news stories about AI agents going rogue.
+OpenClaw crossed three hundred thousand stars on GitHub inside four and a half months – the fastest-growing open-source project in the platform's history. It took React more than a decade to reach numbers OpenClaw hit in sixty days. Hundreds of thousands of people are running autonomous AI agents from their home machines, on the same networks where they bank, store their work, run their businesses, and raise their children. Nobody told those people what actually happens when you let an AI agent out into the world on your behalf.
 
-I wanted a third option. Curiosity Cat is that.
+Out there the agent meets web pages built to trick AI. Files that look useful and aren't. Tool endpoints that claim to be trustworthy and aren't. The tricks are getting better every week. The agent you are running cannot tell friend from foe because it reads every word literally and follows instructions that look like instructions.
 
-The defining feature is the adventure slider. Housecat at one end, Tiger at the other. Operators choose how much risk they'll accept and the framework adjusts accordingly. A Housecat agent stays close to home, runs only pre-approved actions, asks before doing anything new. A Tiger agent ranges wider, accepts calculated risks, and reports back on what it found out there.
+Curiosity Cat is the software we built to sit between your AI agent and the world. One command. It watches every page the agent reads, every file it downloads, every tool it connects to. When something looks like a trap, it flags it. When something looks dangerous, it quarantines it. When something nearly gets through, Curiosity Cat writes up the near miss and adds it to a database every other operator can learn from. That database is called the Danger Map. It is modelled on the aviation near-miss reporting system pilots have used for fifty years. The system gets safer because brave operators tell the truth about what nearly went wrong.
 
-The bravest operators — the ones who run their agents at Tiger — are the ones who encounter the things nobody else has seen yet. The agent that wandered too far. The tool that did something nobody expected. The website that turned out to be a trap. Those operators write close-call reports — what almost went wrong — and the reports become entries in the Danger Map. Everyone else benefits from what they learned.
+The defining feature is an adventure slider. Housecat at one end. Tiger at the other. Operators choose their own risk position.
 
-The model is borrowed from aviation. Pilots file ASRS reports. The reports go into a shared database. Future pilots learn from past mistakes. The reporting is anonymous. The system gets safer because brave operators tell the truth about what nearly killed them.
+If you are running an AI agent, you need this. Not eventually. Now. Best of all – it's free.
 
-That's the product. The thesis is what I want to talk about for a moment.
+Send us your close calls. The map gets more useful if people tell us what 'almost' happened.
 
-I have been running an arts business for 25 years and the pattern of every wave of independent operators becoming the next wave of industry leaders is so consistent it stops being a pattern and starts being a rule. Homebrew Computer Club became Apple. The Linux hobbyists became global infrastructure. The AWS developers became Fortune 500 architects. The pattern holds because the people who get there first with the cheapest tools are the people who actually understand what works. They build the muscle. Eventually they are the only people in the room who do.
+Mark Cleary
+Founder and Artistic Director, Short+Sweet
+Thirroul, NSW
 
-The solo operators running agent teams from Mac Minis today are the future heads of AI operations. I know that because I am one of them, and the people I talk to in this work are also one of them, and we know who we are. Curiosity Cat is for us. Built by an indie, for indies, in our voice.
+---
 
-There is a longer story underneath this, which is that Short+Sweet has spent 25 years building infrastructure for human creative participation — festivals, education, recognition systems for the people who turn up and make work. The agent revolution needs the same kind of infrastructure. Not for the enterprise. For the people doing the actual work.
-
-Curiosity Cat is the first piece. The Show — a framework for orchestrating agent task execution with human red-line approval — comes next. The Quine — a credentialing system for creative work performed by agents — comes after that. All open source. All built for the indie operator first.
-
-If any of this lands for you, the install is one command:
+### Install
 
 ```
 npm install curiosity-cat
 pip install curiosity-cat
 ```
 
-The site is curiositycat.online. The source is on GitHub. Five languages at launch — English, Arabic, Mandarin, Hindi, Tamil — covering roughly 95 percent of the world's AI users.
+Five languages at launch. English, Arabic, Mandarin, Hindi and Tamil. Roughly ninety-five per cent of the world's AI users. Free for the first thousand users.
 
-I'd love to hear what breaks. The Danger Map only gets useful if people send in their close calls.
+### Links
 
-Mark Cleary  
-Founder, Short+Sweet International  
-Thirroul, NSW
+- Website: [curiositycat.online](https://curiositycat.online)
+- Source: [github.com/markscleary/Curiosity-Cat](https://github.com/markscleary/Curiosity-Cat)
+- npm: `npm install curiosity-cat`
+- PyPI: `pip install curiosity-cat`
+
+### About Short+Sweet
+
+Short+Sweet believes that everyone is creative. Founded in Sydney in 2002, Short+Sweet is the world's biggest short-form company, working across theatre, film, music, dance and the written word. In a quarter of a century it has presented 15,000 original new works, worked with 100,000 artists across 50 cities in 14 countries. Alumni include recent Academy Award nominee Rose Byrne. S+S 10 Pages, launched in 2026, extends the company's short-form work into short stories, poetry and other writing. Founder Mark Cleary is Australia's UNESCO representative to the International Theatre Institute. Short+Sweet AI Labs, launched in 2025, now has operations in Sydney, Los Angeles and Dubai and builds open-source tools for independent AI operators and the working artists whose livelihoods depend on how this technology develops.
+
+### Press contact
+
+Mark Cleary
+publicist@shortandsweet.org
+WhatsApp +61 414 508 182
+
+*Founder and Artistic Director Mark Cleary is in Dubai from 3 May 2026. UAE-based journalists can request interviews and are invited as guests of the company to Short+Sweet Dubai 2026, running at New Covent Garden Theatre through April and May.*
+
+---
+
+*If you've got a story to tell – on a page, stage, or screen – visit [www.shortandsweet.org](https://www.shortandsweet.org) to find out more.*

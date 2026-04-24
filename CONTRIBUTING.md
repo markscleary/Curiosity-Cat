@@ -22,7 +22,7 @@ Curiosity Cat works with any agent framework but works better with dedicated ada
 
 ### Translate
 
-The standing orders, stories and documentation need translation into every language where people are running agents. Arabic and Mandarin are priorities.
+The standing orders, stories and documentation need translation into every language where people are running agents. Arabic, Mandarin, Hindi and Tamil are priorities.
 
 ### Write Policy Packs
 

@@ -1,55 +1,47 @@
-# Curiosity Cat — Launch Press Release
+# Curiosity Cat — Technical Press Release
 
-**FOR IMMEDIATE RELEASE**
+## FOR IMMEDIATE RELEASE
 
-## Curiosity Cat: A safety framework that lets AI agents explore the world without burning down the house
+### Short+Sweet launches Curiosity Cat, open-source safety framework for AI agents
 
-**Sydney, [DATE] —** Today Short+Sweet International releases Curiosity Cat — an open-source safety framework for AI agents, available now on npm and PyPI. Curiosity Cat sits between an autonomous agent and the work it's doing, watching for the kinds of trouble that don't show up until an agent is actually let off the leash.
+**First agent product from new Short+Sweet AI Labs (Sydney, Los Angeles, Dubai) – ships in five languages on npm, PyPI and GitHub**
 
-The product launches with five languages — English, Arabic, Mandarin, Hindi and Tamil — covering roughly 95 percent of the world's AI users.
+**Sydney, [24 April 2026] –** Short+Sweet today released Curiosity Cat, an open-source safety framework for AI agents, available now on npm and PyPI and launching in English, Arabic, Mandarin, Hindi and Tamil.
 
-Curiosity Cat is a response to a problem that has quietly become the biggest blocker to running agents at scale. People who run AI agents on their own machines now spend their days tapping Approve. Anthropic's own data shows operators clicking Approve 93 times a day on average. Gartner predicts 40 percent of agent projects will be cancelled by 2027. The reason isn't the agents — it's the supervision burden.
+Curiosity Cat is a shield for independent operators running AI agents. It sits between the agent and the world, protecting it from prompt injection, compromised downloads and deceptive tool endpoints. The operator's work, data, credentials and intellectual property stay theirs.
 
-"You either babysit the agent and lose the productivity gain — or you stop watching and something stupid happens," said Mark Cleary, founder of Short+Sweet International and Curiosity Cat. "We built Curiosity Cat for the people who want a third option."
+C-Cat integrates via tool wrappers, file-quarantine watchers and standing orders in the agent system prompt and adapter modules. It works with Claude Code, Claude Desktop, and any framework exposing a tool-call hook.
 
-### Adventure as a design choice
+The product addresses the gap between what an agent's safety training protects against and what the world actually throws at it. Out there the agent meets web pages built to trick AI, files that look useful and aren't, tool endpoints that claim to be trustworthy and aren't. The agent cannot tell friend from foe because it reads every word literally and follows instructions that look like instructions. Three hundred thousand OpenClaw operators were put at risk in less than three weeks last month by a single supply chain attack hidden in plugins that looked perfectly ordinary. Gartner predicts over 40 per cent of agentic AI projects will be cancelled by the end of 2027, citing unclear value and inadequate risk controls. Deloitte forecasts 75 per cent of companies will invest in agentic AI in 2026.
 
-The product's defining feature is an adventure slider — Housecat at one end, Tiger at the other. Operators choose how much risk they're willing to accept and the framework adjusts accordingly. A Housecat agent stays close to home, runs only pre-approved actions, asks before doing anything new. A Tiger agent ranges wider — explores the edge, accepts calculated risks, reports back rare findings.
+"The agent reads every word literally and follows instructions that look like instructions," said Mark Cleary, founder of Short+Sweet. "Curiosity Cat sits between your agent and the world. When something looks like a trap, we flag it. When something looks dangerous, we quarantine it. When something nearly gets through, we write up the near miss and add it to a database every other operator can learn from."
 
-The brave operators become the most valuable members of the community. Their close-call reports — what almost went wrong — become entries in the shared Danger Map. Everyone else benefits from what they learned.
+The product's defining feature is an adventure slider, running from Housecat (maximum protection) to Tiger (maximum exploration). Operators choose their own risk position. The most adventurous operators contribute close-call reports to a shared Danger Map that every user benefits from. The Danger Map is modelled on the aviation near-miss reporting system pilots have used for fifty years – the system gets safer because brave operators tell the truth about what nearly went wrong.
 
-### Indie operators first
+Curiosity Cat is the first release from Short+Sweet's AI Labs, spread across three continents (Los Angeles, Dubai and Sydney).
 
-Curiosity Cat is deliberately built for solo operators and small teams running agents on their own hardware — not for enterprise rollouts. The thesis is historical: today's solo operators become tomorrow's industry leaders. Homebrew Computer Club to Apple. Linux hobbyists to global infrastructure. AWS indie developers to Fortune 500 architects.
+### Websites
 
-"Every wave of computing has been led by the people who got there first with the cheapest tools," Cleary said. "Right now those people are running agent teams from Mac Minis. We serve them."
+- https://curiositycat.online/
+- https://shortandsweet.org/
 
-### Available now
+### Availability
 
 - **npm:** `npm install curiosity-cat`
-- **PyPI:** `pip install curiosity-cat`  
-- **Website:** curiositycat.online
+- **PyPI:** `pip install curiosity-cat`
 - **Source:** github.com/markscleary/Curiosity-Cat
+- **Documentation:** curiositycat.online
 
-The package works with Claude Code, Claude Desktop, custom agents built on the Anthropic SDK, and any framework that exposes a tool-call hook.
+### About Short+Sweet
 
-### About Short+Sweet International
+Short+Sweet believes that everyone is creative. Founded in Sydney in 2002, Short+Sweet is the world's biggest short-form company, working across theatre, film, music, dance and the written word. In a quarter of a century it has presented 15,000 original new works, worked with 100,000 artists across 50 cities in 14 countries. Alumni include recent Academy Award nominee Rose Byrne. S+S 10 Pages, launched in 2026, extends the company's short-form work into short stories, poetry and other writing. Founder Mark Cleary is Australia's UNESCO representative to the International Theatre Institute. Short+Sweet AI Labs, launched in 2025, now has operations in Sydney, Los Angeles and Dubai and builds open-source tools for independent AI operators and the working artists whose livelihoods depend on how this technology develops.
 
-Short+Sweet has been building cultural infrastructure for 25 years. The original short-form theatre festival now runs across 50+ cities in 15+ countries — alumni include Academy Award nominee Rose Byrne. Short+Sweet Agential is the company's AI division, building tools for the people running agents in the real world.
+### Press contact
 
-Curiosity Cat is the first product release from the Agential division. Further releases — including The Show, an orchestration framework for agent task execution, and The Quine, a creative credentialing system — follow this year.
+Mark Cleary
+publicist@shortandsweet.org
+WhatsApp +61 414 508 182
 
----
+Founder and Artistic Director Mark Cleary is in Dubai from 3 May 2026. UAE-based journalists can request interviews and are invited as guests of the company to Short+Sweet Dubai 2026, running at New Covent Garden Theatre through April and May.
 
-**Media contact:**  
-Mark Cleary  
-Founder, Short+Sweet International  
-curiosity@shortandsweet.org  
-
-**Press materials:**  
-[link to media pack]  
-
-**For technical questions:**  
-agents@shortandsweet.org  
-
-###
+If you've got a story to tell – on a page, stage, or screen – visit www.shortandsweet.org to find out more.

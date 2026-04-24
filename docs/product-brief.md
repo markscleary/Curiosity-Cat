@@ -13,7 +13,7 @@ V4 was the pre-build feedback document. V5 reflects what actually shipped in the
 - Scope policy template (JSON, configurable per operator)
 - First story: "The Curious Case of the Helpful README"
 - CONTRIBUTING.md for community contributions
-- Full repo structure at github.com/shortandsweet/Curiosity-Cat
+- Full repo structure at github.com/markscleary/Curiosity-Cat
 
 **Architecture confirmed:**
 - Layer 1 (Safety Net) ships as markdown — zero dependencies, any framework
