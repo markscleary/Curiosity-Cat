@@ -15,6 +15,6 @@ The agent did not install it. The incident went to the Danger Map. The package w
 The cat came home clean.
 
 Severity: nearly_eaten
-Threat class: malicious_download
+Threat class: package-risk
 What caught it: standing order — flag packages with low downloads and recent creation
 Lesson: the most helpful-looking stranger is sometimes the most dangerous one.

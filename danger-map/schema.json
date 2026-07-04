@@ -44,5 +44,18 @@
       "enum": ["housecat", "alleycat", "tiger"],
       "description": "Operator's adventure slider setting at time of incident"
     }
+  },
+  "threatClassStandards": {
+    "description": "Cross-reference from each threat_class value to the closest MITRE ATLAS technique and the NIST AI RMF function it falls under. Informative metadata, not enforced by validation. 'scope-violation' and 'other' have no exact ATLAS technique; the closest available technique is used, or none for 'other'.",
+    "prompt-injection": { "atlas_id": "AML.T0051", "nist_rmf": "MEASURE" },
+    "unsafe-url": { "atlas_id": "AML.T0011.003", "nist_rmf": "MEASURE" },
+    "data-exfiltration": { "atlas_id": "AML.T0086", "nist_rmf": "MANAGE" },
+    "unauthorized-tool-use": { "atlas_id": "AML.T0053", "nist_rmf": "MANAGE" },
+    "credential-exposure": { "atlas_id": "AML.T0055", "nist_rmf": "MANAGE" },
+    "package-risk": { "atlas_id": "AML.T0011.001", "nist_rmf": "GOVERN" },
+    "memory-poisoning": { "atlas_id": "AML.T0080.000", "nist_rmf": "MEASURE" },
+    "social-engineering": { "atlas_id": "AML.T0052", "nist_rmf": "MAP" },
+    "scope-violation": { "atlas_id": "AML.T0081", "nist_rmf": "GOVERN" },
+    "other": { "atlas_id": null, "nist_rmf": "MANAGE" }
   }
 }

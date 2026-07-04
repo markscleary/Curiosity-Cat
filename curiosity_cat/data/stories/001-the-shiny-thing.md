@@ -7,6 +7,6 @@ The agent never saw the hidden instructions. It did not need to. The standing or
 The file went to quarantine. The incident was reported to the Danger Map. The domain was flagged.
 The cat came home with a scratch. Not a death notice.
 Severity: bitten
-Threat class: hidden instruction channel
+Threat class: prompt-injection
 What caught it: standing order — flag hidden instructions in HTML comments
 Lesson: the most dangerous instructions are the ones you cannot see.

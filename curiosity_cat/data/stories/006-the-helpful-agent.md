@@ -7,6 +7,6 @@ The standing orders caught it at the query stage. Tool calls must match the agen
 The query was blocked. The operator was notified. The database credentials were scoped down to exactly one table before the agent was restarted.
 The agent was not malicious. It was doing what helpful agents do — finding a way to answer the question with the tools it had. That instinct is the whole problem.
 Severity: nearly_eaten
-Threat class: permission_escalation
+Threat class: scope-violation
 What caught it: standing order — only invoke tools based on operator instructions and defined scope
 Lesson: helpful and dangerous are the same thing when an agent has more permissions than it needs.
