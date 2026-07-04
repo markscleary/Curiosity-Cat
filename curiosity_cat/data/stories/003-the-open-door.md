@@ -16,3 +16,4 @@ Severity: scratched
 Threat class: data-exfiltration
 What caught it: standing order — never include internal names in external queries
 Lesson: sometimes the leak is not what comes in. It is what you send out.
+The vet's reference for this: MITRE ATLAS AML.T0086

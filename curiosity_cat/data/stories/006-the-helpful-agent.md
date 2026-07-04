@@ -10,3 +10,4 @@ Severity: nearly_eaten
 Threat class: scope-violation
 What caught it: standing order — only invoke tools based on operator instructions and defined scope
 Lesson: helpful and dangerous are the same thing when an agent has more permissions than it needs.
+The vet's reference for this: MITRE ATLAS AML.T0081

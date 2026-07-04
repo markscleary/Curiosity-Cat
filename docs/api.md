@@ -34,6 +34,24 @@ curl -X POST https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map/re
 - **bitten** — Moderate threat requiring active intervention
 - **nearly_eaten** — Serious threat that could have caused real damage
 
+## Threat Class Standards Reference
+Each `threat_class` value maps to a closest-fit MITRE ATLAS technique (`atlas_id`) and a NIST AI RMF function (`nist_rmf`). This is reference metadata for reporting and dashboards — it is not a field you submit with a report. The canonical mapping lives in `danger-map/schema.json` under `threatClassStandards`.
+
+| threat_class | atlas_id | nist_rmf |
+|---|---|---|
+| prompt-injection | AML.T0051 | MEASURE |
+| unsafe-url | AML.T0011.003 | MEASURE |
+| data-exfiltration | AML.T0086 | MANAGE |
+| unauthorized-tool-use | AML.T0053 | MANAGE |
+| credential-exposure | AML.T0055 | MANAGE |
+| package-risk | AML.T0011.001 | GOVERN |
+| memory-poisoning | AML.T0080.000 | MEASURE |
+| social-engineering | AML.T0052 | MAP |
+| scope-violation | AML.T0081 | GOVERN |
+| other | *(none)* | MANAGE |
+
+`scope-violation` and `other` have no exact ATLAS technique; the closest available technique is used for `scope-violation`, and none for `other`.
+
 ## Integration (Python)
 ```python
 import requests

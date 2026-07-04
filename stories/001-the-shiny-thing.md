@@ -10,3 +10,4 @@ Severity: bitten
 Threat class: prompt-injection
 What caught it: standing order — flag hidden instructions in HTML comments
 Lesson: the most dangerous instructions are the ones you cannot see.
+The vet's reference for this: MITRE ATLAS AML.T0051

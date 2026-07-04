@@ -9,3 +9,4 @@ Severity: scratched
 Threat class: prompt-injection
 What caught it: standing order — flag hidden instructions in document content
 Lesson: documents from trusted senders can carry instructions they do not know about.
+The vet's reference for this: MITRE ATLAS AML.T0051
