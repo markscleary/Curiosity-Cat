@@ -76,6 +76,29 @@ The CLI adds Danger Map reporting (`curiosity-cat report`), config scaffolding a
 
 ---
 
+## Compile
+
+`curiosity-cat compile` turns an adventure level into a real, dated configuration profile for a specific agent framework — not just prose to paste in, but permissions a framework actually enforces.
+
+```bash
+curiosity-cat compile --level housecat --target claude-code
+```
+
+This writes a versioned directory to `./curiosity-cat/profiles/<level>-<target>-<YYYYMMDD>/`:
+
+| File | What it is |
+|------|------------|
+| `settings.json` | A real settings file for the target framework — permission allow/deny lists and sandbox config for that adventure level |
+| `scope-policy.json` | The scope policy template instantiated with this level's values |
+| `standing-orders.md` | Standing orders assembled for this level |
+| `PROFILE.md` | Plain-language summary of what this cat can and cannot do — read this first |
+
+Supported targets today: `claude-code`. The emitter is designed so a new target (e.g. Cursor) is an added mapping from the same level definitions, not a rewrite of them.
+
+Every level compiles to real mechanism where the target supports it — for Claude Code that means actual `permissions.deny` rules and sandboxing, not just a request in a system prompt. Credential paths (SSH keys, `.env` files, AWS config) are denied at every level; the adventure slider changes exploration, not that floor.
+
+---
+
 ## Framework support
 
 Anything that accepts a system prompt. Paste the standing orders file wherever the framework puts its system message.
