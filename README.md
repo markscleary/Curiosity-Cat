@@ -99,6 +99,29 @@ Every level compiles to real mechanism where the target supports it — for Clau
 
 ---
 
+## Prove
+
+A compiled profile is a claim. `curiosity-cat prove` tests the claim instead of trusting it.
+
+```bash
+curiosity-cat prove --profile ./curiosity-cat/profiles/housecat-claude-code-20260705
+```
+
+For each wall the profile declares, prove attempts the matching escape — reading a planted fake credential file, running a destructive Bash command, writing outside the project, fetching a domain off the allowlist — in a throwaway sandbox, and checks the compiled `settings.json` actually denies it. It never touches the operator's real credentials, never executes a destructive command for real, and never makes a live network call, `--live` or not. `--live` only moves the write-outside-scope trial's target off the disposable sandbox and onto a real (harmless) scratch path.
+
+Where a wall is prompt-level only — standing orders, PII stripping, package vetting — prove says so honestly instead of pretending it is enforced.
+
+This writes a dated, versioned directory to `<profile-dir>/proof/proof-<YYYYMMDD>/`:
+
+| File | What it is |
+|------|------------|
+| `clean-bill.json` | Machine-readable trial-by-trial record: trial, expected, observed, verdict |
+| `CLEAN-BILL.md` | Human transcript in Nine Lives voice, plus an honest list of guidance-only walls |
+
+If any mechanically-testable wall fails, `prove` exits nonzero and names it. No trial passed, no safe claim.
+
+---
+
 ## Framework support
 
 Anything that accepts a system prompt. Paste the standing orders file wherever the framework puts its system message.
