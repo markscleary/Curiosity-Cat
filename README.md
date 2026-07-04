@@ -25,7 +25,7 @@ Three positions. Operators pick one.
 
 | Level | Profile | What it means |
 |-------|---------|---------------|
-| 🏠 **Housecat** | Cautious | Stay close to home. Standing orders enforced. Nothing leaves the yard. |
+| 🏠 **Housecat** | Cautious | Stay close to home. Standing orders followed. Nothing leaves the yard. |
 | 🐾 **Alley Cat** | Balanced | Calculated risks accepted. Braver exploration. Still comes home. |
 | 🐯 **Tiger** | Daring | Widest range. Explores the edge. Reports back rare places and tales of danger. |
 
