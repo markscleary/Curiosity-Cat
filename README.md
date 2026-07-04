@@ -45,7 +45,7 @@ Display label: "Alley Cat" — two words, capital A, capital C. Machine identifi
 
 ## Available languages
 
-Five languages at launch.
+Four languages at launch.
 
 | Language | URL |
 |----------|-----|
@@ -53,7 +53,6 @@ Five languages at launch.
 | Arabic | https://curiositycat.online/ar/ |
 | Mandarin | https://curiositycat.online/zh/ |
 | Hindi | https://curiositycat.online/hi/ |
-| Tamil | https://curiositycat.online/ta/ |
 
 ---
 
