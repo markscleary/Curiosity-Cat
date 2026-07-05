@@ -8,7 +8,7 @@ window.CC_SKINS = {
       name: "Cat",
       unlockMessage: "New skin unlocked: Rat",
       positions: [
-        { label: "Housecat", color: "#22c55e", desc: "Stay close to home. Standing orders enforced. Nothing leaves the yard." },
+        { label: "Housecat", color: "#22c55e", desc: "Stay close to home. Standing orders active. Nothing leaves the yard." },
         { label: "Alley Cat", color: "#d97706", desc: "Calculated risks accepted. Braver exploration. Still comes home." },
         { label: "Tiger", color: "#b45309", desc: "Widest range. Explores the edge. Reports back – rare places and tales of danger." }
       ]
