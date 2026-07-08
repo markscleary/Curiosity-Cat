@@ -87,4 +87,4 @@ def report_close_call(threat_class, severity, source, what_happened, action_take
               "profile_version": profile_version, **kwargs})
 ```
 
-Note: `curiosity_cat.core.report_close_call` (the engine's own consent-gated implementation) predates `grade`/`indicator`/`platform`/`platform_version`/`profile_version` and does not yet populate them — a submission built from its current `REQUIRED_REPORT_FIELDS` alone will be rejected by the edge function until a follow-up engine-side brief adds them.
+Note: `curiosity_cat.core.report_close_call` (the engine's own consent-gated implementation) now requires `grade`/`indicator`/`platform`/`platform_version`/`profile_version` as part of `REQUIRED_REPORT_FIELDS`, matching the edge function above. The only path that can populate and submit one of these events without a caller hand-building the payload is the Mouse Tray (`core.queue_close_call()` / `core.submit_approved()`, or `curiosity-cat tray`) — see the README's Mouse Tray section.

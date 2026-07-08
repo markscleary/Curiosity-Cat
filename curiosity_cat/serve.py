@@ -15,7 +15,8 @@ import sys
 
 from curiosity_cat import __version__, core
 
-METHODS = ("compile", "prove", "check", "report_close_call", "status")
+METHODS = ("compile", "prove", "check", "report_close_call",
+           "queue_close_call", "list_tray", "submit_approved", "vet", "status")
 
 
 def _handle_compile(params):
@@ -46,6 +47,42 @@ def _handle_report_close_call(params):
                                    api_key=params.get("api_key"))
 
 
+def _handle_queue_close_call(params):
+    event = params.get("event")
+    profile_dir = params.get("profile_dir")
+    if not isinstance(event, dict):
+        raise ValueError('params.event (object) is required')
+    if not profile_dir:
+        raise ValueError('params.profile_dir is required')
+    return core.queue_close_call(event, profile_dir)
+
+
+def _handle_list_tray(params):
+    profile_dir = params.get("profile_dir")
+    if not profile_dir:
+        raise ValueError('params.profile_dir is required')
+    return core.list_tray(profile_dir, status=params.get("status"))
+
+
+def _handle_submit_approved(params):
+    profile_dir = params.get("profile_dir")
+    ids = params.get("ids")
+    if not profile_dir:
+        raise ValueError('params.profile_dir is required')
+    if not isinstance(ids, list) or not ids:
+        raise ValueError('params.ids (non-empty array) is required')
+    return core.submit_approved(profile_dir, ids, api_key=params.get("api_key"))
+
+
+def _handle_vet(params):
+    profile_dir = params.get("profile_dir")
+    if not profile_dir:
+        raise ValueError('params.profile_dir is required')
+    return core.to_jsonable(core.vet(
+        profile_dir, recompile=bool(params.get("recompile", False)), observed=params.get("observed"),
+    ))
+
+
 def _handle_status(params):
     return {
         "engine": "ccat-engine",
@@ -61,6 +98,10 @@ DISPATCH = {
     "prove": _handle_prove,
     "check": _handle_check,
     "report_close_call": _handle_report_close_call,
+    "queue_close_call": _handle_queue_close_call,
+    "list_tray": _handle_list_tray,
+    "submit_approved": _handle_submit_approved,
+    "vet": _handle_vet,
     "status": _handle_status,
 }
 

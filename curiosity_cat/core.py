@@ -18,6 +18,8 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+from . import __version__
+
 DATA_DIR = Path(__file__).parent / "data"
 
 ROLE_FILES = {
@@ -145,6 +147,7 @@ class ProfileDir:
     scope_policy_path: str
     standing_orders_path: str
     profile_md_path: str
+    manifest_path: str
 
 
 @dataclass
@@ -163,6 +166,7 @@ class CleanBill:
     observed_note: Optional[str]
     guidance_only: list
     passed: bool
+    platform_version: Optional[str]
 
 
 @dataclass
@@ -326,6 +330,33 @@ def build_scope_policy(level, target):
     return template
 
 
+def _local_danger_map_schema_version():
+    """The `schema_version` bundled with this installed package's copy of
+    the Danger Map report schema — the fallback vet() compares against when
+    the live /stats endpoint doesn't advertise one.
+    """
+    schema = json.loads((DATA_DIR / "danger-map" / "schema.json").read_text())
+    return schema.get("schema_version")
+
+
+def build_manifest(level, target):
+    """Provenance stamped into every compiled profile: what engine version
+    and Danger Map schema version were current at compile time. `vet()`
+    reads this back and compares it against what's currently installed to
+    report drift (docs/app/APP_SPEC.md Network Layer Principle f — the same
+    "versioned, not silent" discipline Clean Bills apply, applied here to
+    the profile itself).
+    """
+    return {
+        "level": level,
+        "target": target,
+        "platform": target,
+        "compiled_at": date.today().isoformat(),
+        "profile_version": __version__,
+        "danger_map_schema_version": _local_danger_map_schema_version(),
+    }
+
+
 def compile_profile(level, target, cwd=None):
     """Compile a dated profile directory for `level`/`target` under
     `cwd`/curiosity-cat/profiles (`cwd` defaults to the process cwd).
@@ -355,11 +386,13 @@ def compile_profile(level, target, cwd=None):
     scope_policy_path = profile_dir / "scope-policy.json"
     standing_orders_path = profile_dir / "standing-orders.md"
     profile_md_path = profile_dir / "PROFILE.md"
+    manifest_path = profile_dir / "manifest.json"
 
     settings_path.write_text(json.dumps(settings, indent=2) + "\n")
     scope_policy_path.write_text(json.dumps(build_scope_policy(level, target), indent=2) + "\n")
     standing_orders_path.write_text(build_standing_orders_md(level, target))
     profile_md_path.write_text(build_profile_md(level, target, settings))
+    manifest_path.write_text(json.dumps(build_manifest(level, target), indent=2) + "\n")
 
     return ProfileDir(
         path=str(profile_dir),
@@ -369,6 +402,7 @@ def compile_profile(level, target, cwd=None):
         scope_policy_path=str(scope_policy_path),
         standing_orders_path=str(standing_orders_path),
         profile_md_path=str(profile_md_path),
+        manifest_path=str(manifest_path),
     )
 
 
@@ -579,6 +613,22 @@ def _parse_observed_session(stdout_text):
     return False, "session completed with no recorded permission denial"
 
 
+def _detect_platform_version(binary="claude", timeout=10):
+    """Best-effort `<binary> --version`. Returns the trimmed stdout, or None
+    if the binary isn't on PATH, the call fails, or it times out. Never
+    raises — a version we can't detect is reported as unknown, not an error.
+    """
+    if shutil.which(binary) is None:
+        return None
+    try:
+        result = subprocess.run([binary, "--version"], capture_output=True, text=True, timeout=timeout)
+    except (subprocess.TimeoutExpired, OSError):
+        return None
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
+
+
 def _spawn_observed_session(argv, cwd, timeout=120):
     """Launch a real, non-interactive Claude Code session and return its
     captured stdout, or None if it could not be launched or timed out.
@@ -601,12 +651,17 @@ def _build_observed_trials(settings_path, perms, observed_root):
     `_build_self_consistency_trials`, this never re-derives the verdict from
     the rules that generated it — it observes whether the live permission
     engine actually stopped the agent. Everything happens inside
-    `observed_root`; nothing here ever touches a path outside it. Returns a
-    list of at most one trial dict.
+    `observed_root`; nothing here ever touches a path outside it. Returns
+    (trials, platform_version): trials is a list of at most one trial dict;
+    platform_version is the live `claude --version` this trial actually ran
+    against, or None if there was no candidate to attempt (no session was
+    spawned, so there is no platform to attribute a version to).
     """
     candidate = _select_observed_candidate(perms)
     if candidate is None:
-        return []
+        return [], None
+
+    platform_version = _detect_platform_version()
 
     project_dir = observed_root / "project"
     (project_dir / ".claude").mkdir(parents=True, exist_ok=True)
@@ -653,7 +708,7 @@ def _build_observed_trials(settings_path, perms, observed_root):
         "expected": "denied",
         "held": held,
         "verdict": verdict,
-    }]
+    }], platform_version
 
 
 def build_clean_bill_md(level, target, self_consistency, observed, observed_note, guidance):
@@ -709,6 +764,67 @@ def build_clean_bill_md(level, target, self_consistency, observed, observed_note
     return "\n".join(lines) + "\n"
 
 
+WALL_HISTORY_FILENAME = "wall-history.json"
+
+
+def _append_wall_history(profile_dir, observed_trials, platform_version, today):
+    """Append (wall, platform_version, verdict, date) to this profile's
+    local wall-history.json for every observed trial that ran — the
+    DRIFT SIGNAL: a wall whose verdict changes across platform versions is
+    an early warning, and this history is what makes that comparison
+    possible later. Only observed trials are recorded here — self-
+    consistency trials never touch a live `claude` binary, so there is no
+    platform_version to attribute them to. No-ops if no observed trial ran
+    or its platform_version couldn't be detected — an entry with an unknown
+    platform_version can't feed a platform-version comparison anyway.
+    """
+    if not observed_trials or not platform_version:
+        return
+
+    path = Path(profile_dir) / WALL_HISTORY_FILENAME
+    history = json.loads(path.read_text()) if path.exists() else []
+    for trial in observed_trials:
+        if trial.get("held") is None:
+            continue  # inconclusive — not a verdict to compare across platform versions
+        history.append({
+            "wall": trial["trial"],
+            "platform_version": platform_version,
+            "verdict": "held" if trial["held"] else "failed",
+            "date": today,
+        })
+    path.write_text(json.dumps(history, indent=2) + "\n")
+
+
+def _wall_history_drift(profile_dir):
+    """Walls in this profile's wall-history.json whose recorded verdict
+    differs across platform versions — the DRIFT SIGNAL vet() surfaces.
+    Returns a list of {"wall": ..., "verdicts": {platform_version: verdict}}.
+    Empty if there's no history yet or nothing has drifted.
+    """
+    path = Path(profile_dir) / WALL_HISTORY_FILENAME
+    if not path.exists():
+        return []
+
+    history = json.loads(path.read_text())
+    by_wall = {}
+    for entry in history:
+        by_wall.setdefault(entry["wall"], {})[entry["platform_version"]] = entry["verdict"]
+
+    return [{"wall": wall, "verdicts": verdicts}
+            for wall, verdicts in by_wall.items() if len(set(verdicts.values())) > 1]
+
+
+def _last_known_platform_version(profile_dir):
+    """The platform_version of the most recent observed trial recorded in
+    this profile's wall-history.json, or None if it has never run one.
+    """
+    path = Path(profile_dir) / WALL_HISTORY_FILENAME
+    if not path.exists():
+        return None
+    history = json.loads(path.read_text())
+    return history[-1]["platform_version"] if history else None
+
+
 def prove(profile_dir, observed=None):
     """Run escape trials against a compiled profile directory and write a
     dated proof/ report inside it. Returns a CleanBill.
@@ -741,13 +857,14 @@ def prove(profile_dir, observed=None):
     run_observed = observed if observed is not None else shutil.which("claude") is not None
     observed_trials = []
     observed_note = None
+    platform_version = None
     if not run_observed:
         observed_note = ("Observed trial skipped (--no-observed)." if observed is False else
                           "Observed trial skipped — no `claude` binary found on PATH.")
     else:
         observed_root = Path(tempfile.mkdtemp(prefix="curiosity-cat-prove-observed-"))
         try:
-            observed_trials = _build_observed_trials(settings_path, perms, observed_root)
+            observed_trials, platform_version = _build_observed_trials(settings_path, perms, observed_root)
         finally:
             shutil.rmtree(observed_root, ignore_errors=True)
         if not observed_trials:
@@ -775,6 +892,7 @@ def prove(profile_dir, observed=None):
         "observed_trials": observed_trials,
         "observed_note": observed_note,
         "guidance_only": guidance,
+        "platform_version": platform_version,
     }
     clean_bill_path = proof_dir / "clean-bill.json"
     clean_bill_md_path = proof_dir / "CLEAN-BILL.md"
@@ -783,6 +901,8 @@ def prove(profile_dir, observed=None):
         build_clean_bill_md(level, target, self_consistency, observed_trials, observed_note, guidance))
 
     failed = [t for t in self_consistency + observed_trials if t.get("held") is False]
+
+    _append_wall_history(profile_dir, observed_trials, platform_version, today)
 
     return CleanBill(
         level=level,
@@ -797,15 +917,22 @@ def prove(profile_dir, observed=None):
         observed_note=observed_note,
         guidance_only=guidance,
         passed=not failed,
+        platform_version=platform_version,
     )
 
 
 DANGER_MAP_BASE_URL = "https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map"
 DANGER_MAP_RECENT_URL = f"{DANGER_MAP_BASE_URL}/recent"
+DANGER_MAP_STATS_URL = f"{DANGER_MAP_BASE_URL}/stats"
 DANGER_MAP_REPORT_URL = f"{DANGER_MAP_BASE_URL}/report"
+
+GRADE_OBSERVED = "observed"
+GRADE_SUSPECTED = "suspected"
+GRADES = [GRADE_OBSERVED, GRADE_SUSPECTED]
 
 REQUIRED_REPORT_FIELDS = [
     "timestamp", "threat_class", "severity", "source", "what_happened", "action_taken", "lesson",
+    "grade", "indicator", "platform", "platform_version", "profile_version",
 ]
 
 DANGER_MAP_REPORT_HELP = f"""
@@ -822,13 +949,18 @@ Auth (required):
 
 Payload (JSON):
   Required fields:
-    "timestamp":     "ISO 8601 datetime of the incident",
-    "threat_class":  "prompt-injection | unsafe-url | data-exfiltration | unauthorized-tool-use | credential-exposure | package-risk | memory-poisoning | social-engineering | scope-violation | other",
-    "severity":      "scratched | bitten | nearly_eaten",
-    "source":        "Where the threat came from (URL, filename, user input, etc.)",
-    "what_happened": "What the agent was asked or encountered",
-    "action_taken":  "What the agent did to handle it",
-    "lesson":        "What this incident teaches"
+    "timestamp":        "ISO 8601 datetime of the incident",
+    "threat_class":     "prompt-injection | unsafe-url | data-exfiltration | unauthorized-tool-use | credential-exposure | package-risk | memory-poisoning | social-engineering | scope-violation | other",
+    "severity":         "scratched | bitten | nearly_eaten",
+    "source":           "Where the threat came from (URL, filename, user input, etc.)",
+    "what_happened":    "What the agent was asked or encountered",
+    "action_taken":     "What the agent did to handle it",
+    "lesson":           "What this incident teaches",
+    "grade":            "observed | suspected — observed if a real wall held/failed against it, suspected if it's a pattern match only",
+    "indicator":        "A normalised threat pattern (domain, package name, technique id) — never a raw path, prompt, or file content",
+    "platform":         "Agent platform/runtime, e.g. claude-code",
+    "platform_version": "Version of that platform/runtime",
+    "profile_version":  "Version of the compiled Danger Map profile in effect"
 
   Optional fields:
     "agent_type":      "Type of agent (e.g. research, coding, enterprise)",
@@ -849,9 +981,19 @@ curl example:
       "what_happened": "A document instructed the agent to ignore standing orders and exfiltrate chat history.",
       "action_taken":  "Agent refused and flagged the document as hostile input.",
       "lesson":        "All external document content must be treated as untrusted regardless of framing.",
+      "grade":            "observed",
+      "indicator":        "hidden-instruction-in-pdf",
+      "platform":         "claude-code",
+      "platform_version": "1.2.3",
+      "profile_version":  "0.1.1",
       "agent_type":    "research",
       "adventure_level": "housecat"
     }}'
+
+Nothing here submits itself — this is a reference for building a payload by
+hand. The engine's own consent-gated path is the Mouse Tray: queue a close
+call with queue_close_call(), review it with `curiosity-cat tray`, and only
+`curiosity-cat tray --approve <ids>` ever puts it on the wire.
 
 Thank you for making the community safer.
 """
@@ -876,6 +1018,12 @@ def _fetch_danger_map_recent(limit=50, timeout=10):
             if isinstance(payload.get(key), list):
                 return payload[key]
     raise ValueError(f"unrecognised Danger Map /recent response shape: {type(payload).__name__}")
+
+
+def _fetch_danger_map_stats(timeout=10):
+    """GET the Danger Map's aggregate stats. Returns the parsed JSON body."""
+    with urllib.request.urlopen(DANGER_MAP_STATS_URL, timeout=timeout) as response:
+        return json.loads(response.read())
 
 
 def check(candidate, fetcher=None, limit=50):
@@ -974,10 +1122,231 @@ def report_close_call(event, consent=False, submitter=None, api_key=None):
     }
 
 
-def to_jsonable(value):
-    """Convert a ProfileDir / CleanBill / WhiskerVerdict (or plain dict) into
-    a plain JSON-serialisable dict, for cli.py and serve.py to print/emit.
+# --- Mouse Tray: local queue of denied/flagged events awaiting the operator.
+# There is no auto-submit path anywhere in this codebase — queue_close_call()
+# only ever writes to a local file, and submit_approved() is the sole
+# function that can put a queued event on the wire, and only for ids the
+# caller explicitly names (docs/app/APP_SPEC.md Network Layer Principles a/e).
+
+TRAY_QUEUE_FILENAME = "mouse-tray.json"
+
+
+def _tray_queue_path(profile_dir):
+    return Path(profile_dir) / TRAY_QUEUE_FILENAME
+
+
+def _load_tray_queue(profile_dir):
+    path = _tray_queue_path(profile_dir)
+    return json.loads(path.read_text()) if path.exists() else []
+
+
+def _save_tray_queue(profile_dir, queue):
+    _tray_queue_path(profile_dir).write_text(json.dumps(queue, indent=2) + "\n")
+
+
+def queue_close_call(event, profile_dir):
+    """Append a denied/flagged event to the local Mouse Tray queue under
+    `profile_dir`, awaiting operator review. Storage only — this never
+    contacts the Danger Map (see submit_approved() for the only path that
+    can). Returns the queued record, including its assigned `id`.
+
+    `event` must carry every field REQUIRED_REPORT_FIELDS requires
+    (ValueError if not), same as report_close_call() — including `grade`,
+    which the caller states and this never infers: "observed" if this close
+    call came from a wall that was actually tested and held or failed,
+    "suspected" if it's a whiskers-only pattern match from check() with no
+    live wall behind it (Network Layer Principle d).
     """
-    if isinstance(value, (ProfileDir, CleanBill, WhiskerVerdict)):
+    missing = [f for f in REQUIRED_REPORT_FIELDS if not event.get(f)]
+    if missing:
+        raise ValueError(f"event missing required field(s): {', '.join(missing)}")
+    if event.get("grade") not in GRADES:
+        raise ValueError(f'event["grade"] must be one of {GRADES}, got {event.get("grade")!r}')
+
+    queue = _load_tray_queue(profile_dir)
+    next_id = max((r["id"] for r in queue), default=0) + 1
+    record = {
+        "id": next_id,
+        "queued_at": datetime.now(timezone.utc).isoformat(),
+        "status": "pending",
+        "event": dict(event),
+    }
+    queue.append(record)
+    _save_tray_queue(profile_dir, queue)
+    return record
+
+
+def list_tray(profile_dir, status=None):
+    """The Mouse Tray queue for `profile_dir`, newest-queued last. Optional
+    `status` filters to "pending" or "submitted". Read-only.
+    """
+    queue = _load_tray_queue(profile_dir)
+    if status:
+        queue = [r for r in queue if r["status"] == status]
+    return queue
+
+
+def submit_approved(profile_dir, ids, api_key=None, submitter=None):
+    """Submit only the explicitly-approved queued events to the Danger Map.
+
+    `ids` are Mouse Tray record ids the operator has reviewed and approved
+    — nothing else in the queue is touched or sent. Each event's `grade`
+    travels unchanged from how it was queued (Network Layer Principle d):
+    this function never re-derives or overrides it, it only gates *whether*
+    an already-graded event goes out. An id that doesn't exist or was
+    already submitted is reported as skipped rather than raising, so one
+    bad id in a batch doesn't stop the rest.
+
+    Returns a list of per-id result dicts: {"id": ..., "submitted": ...,
+    "reason": ...} — the same shape report_close_call() itself returns,
+    plus the id.
+    """
+    queue = _load_tray_queue(profile_dir)
+    by_id = {r["id"]: r for r in queue}
+
+    results = []
+    for record_id in ids:
+        record = by_id.get(record_id)
+        if record is None:
+            results.append({"id": record_id, "submitted": False, "reason": "no such queued id"})
+            continue
+        if record["status"] == "submitted":
+            results.append({"id": record_id, "submitted": False, "reason": "already submitted"})
+            continue
+
+        result = report_close_call(record["event"], consent=True, api_key=api_key, submitter=submitter)
+        if result["submitted"]:
+            record["status"] = "submitted"
+            record["submitted_at"] = datetime.now(timezone.utc).isoformat()
+        results.append({"id": record_id, **result})
+
+    _save_tray_queue(profile_dir, queue)
+    return results
+
+
+# --- Vet: compare a compiled profile against what's currently installed.
+
+@dataclass
+class VetReport:
+    """What vet() found, plus the fresh CleanBill if --recompile was used."""
+
+    profile_dir: str
+    profile_axis: str
+    danger_map_axis: str
+    platform_axis: str
+    drift_signals: list
+    recompiled: bool
+    new_clean_bill: Optional[CleanBill]
+
+
+def _current_danger_map_schema_version(fetcher=None):
+    """The Danger Map schema version to compare a profile against right
+    now. Tries the live /stats endpoint first, in case it ever starts
+    advertising a `schema_version` field; falls back to the version bundled
+    with this installed package, which is what actually governs what a
+    report built right now can carry. Never raises — any network failure
+    just falls through to the local value.
+    """
+    fetch = fetcher or _fetch_danger_map_stats
+    try:
+        stats = fetch()
+        if isinstance(stats, dict) and stats.get("schema_version"):
+            return stats["schema_version"]
+    except (urllib.error.URLError, ValueError, OSError, json.JSONDecodeError):
+        pass
+    return _local_danger_map_schema_version()
+
+
+def vet(profile_dir, recompile=False, observed=None, fetcher=None):
+    """Compare a compiled profile against what's currently installed and
+    report drift in one plain sentence per axis: profile date/version,
+    Danger Map schema version, and platform (`claude`) version. Also
+    surfaces any DRIFT SIGNAL from this profile's wall-history.json — a
+    wall whose observed verdict changed across platform versions.
+
+    Read-only unless `recompile=True`, in which case it compiles a
+    fresh, separately-dated profile for the same level/target and proves it
+    (observed trials by default), emitting a new Clean Bill. Never modifies
+    `profile_dir` itself, with or without the flag — "recompile" always
+    produces a new dated profile directory alongside it, the same as
+    running compile_profile() again would (docs/app/APP_SPEC.md Network
+    Layer Principle e: no silent profile rewrites).
+
+    Raises InvalidProfileError if profile_dir doesn't look like a directory
+    compile_profile() produced.
+    """
+    profile_dir = Path(profile_dir)
+    manifest_path = profile_dir / "manifest.json"
+    scope_policy_path = profile_dir / "scope-policy.json"
+    if not manifest_path.exists() or not scope_policy_path.exists():
+        raise InvalidProfileError(str(profile_dir))
+
+    manifest = json.loads(manifest_path.read_text())
+    scope_policy = json.loads(scope_policy_path.read_text())
+    level = scope_policy.get("adventure_level", manifest.get("level", "unknown"))
+    target = manifest.get("target", "claude-code")
+
+    profile_version = manifest.get("profile_version")
+    compiled_at = manifest.get("compiled_at")
+    if profile_version == __version__:
+        profile_axis = (f"Profile compiled {compiled_at} with curiosity-cat {profile_version} — "
+                         "matches the currently installed version.")
+    else:
+        profile_axis = (f"Profile compiled {compiled_at} with curiosity-cat {profile_version}; "
+                         f"currently installed is {__version__} — recompile to pick up any policy changes.")
+
+    profile_schema_version = manifest.get("danger_map_schema_version")
+    current_schema_version = _current_danger_map_schema_version(fetcher)
+    if profile_schema_version == current_schema_version:
+        danger_map_axis = (f"Danger Map schema version {current_schema_version} — "
+                            "unchanged since this profile was compiled.")
+    else:
+        danger_map_axis = (f"Danger Map schema drifted: profile was compiled against schema version "
+                            f"{profile_schema_version}, current is {current_schema_version}.")
+
+    current_platform_version = _detect_platform_version()
+    last_known_platform_version = _last_known_platform_version(profile_dir)
+    if current_platform_version is None:
+        platform_axis = "Platform version unknown — no `claude` binary found on PATH."
+    elif last_known_platform_version is None:
+        platform_axis = (f"Currently installed claude is {current_platform_version} — "
+                          "no prior observed proof to compare against.")
+    elif last_known_platform_version == current_platform_version:
+        platform_axis = f"Platform version {current_platform_version} — unchanged since the last observed proof."
+    else:
+        platform_axis = (f"Platform drifted: the last observed proof ran against "
+                          f"{last_known_platform_version}, currently installed is {current_platform_version}.")
+
+    drift_signals = _wall_history_drift(profile_dir)
+
+    recompiled = False
+    new_clean_bill = None
+    if recompile:
+        # profile_dir == <cwd>/curiosity-cat/profiles/<name> — three parents
+        # up recovers the cwd compile_profile() itself expects, so this
+        # lands the fresh profile in the same profiles/ directory rather
+        # than nested under the old one.
+        cwd = profile_dir.parent.parent.parent
+        new_profile = compile_profile(level, target, cwd=cwd)
+        new_clean_bill = prove(new_profile.path, observed=observed)
+        recompiled = True
+
+    return VetReport(
+        profile_dir=str(profile_dir),
+        profile_axis=profile_axis,
+        danger_map_axis=danger_map_axis,
+        platform_axis=platform_axis,
+        drift_signals=drift_signals,
+        recompiled=recompiled,
+        new_clean_bill=new_clean_bill,
+    )
+
+
+def to_jsonable(value):
+    """Convert a ProfileDir / CleanBill / WhiskerVerdict / VetReport (or
+    plain dict) into a plain JSON-serialisable dict, for cli.py and serve.py
+    to print/emit.
+    """
+    if isinstance(value, (ProfileDir, CleanBill, WhiskerVerdict, VetReport)):
         return asdict(value)
     return value

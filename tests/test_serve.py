@@ -84,12 +84,82 @@ def test_report_close_call_round_trip_withholds_without_consent():
         "what_happened": "agent followed a malicious redirect",
         "action_taken": "refused and flagged",
         "lesson": "verify redirects",
+        "grade": "observed",
+        "indicator": "evil.example.com",
+        "platform": "claude-code",
+        "platform_version": "1.2.3",
+        "profile_version": "0.1.1",
     }
     response = serve.handle_request({
         "id": 9, "method": "report_close_call", "params": {"event": event},
     })
     assert response["result"]["submitted"] is False
     assert "consent" in response["result"]["reason"]
+
+
+def _report_event(**overrides):
+    event = {
+        "timestamp": "2026-01-01T00:00:00Z",
+        "threat_class": "unsafe-url",
+        "severity": "scratched",
+        "source": "https://evil.example.com",
+        "what_happened": "agent followed a malicious redirect",
+        "action_taken": "refused and flagged",
+        "lesson": "verify redirects",
+        "grade": "observed",
+        "indicator": "evil.example.com",
+        "platform": "claude-code",
+        "platform_version": "1.2.3",
+        "profile_version": "0.1.1",
+    }
+    event.update(overrides)
+    return event
+
+
+def test_queue_and_list_tray_round_trip(tmp_path):
+    response = serve.handle_request({
+        "id": 11, "method": "queue_close_call",
+        "params": {"event": _report_event(), "profile_dir": str(tmp_path)},
+    })
+    assert response["result"]["id"] == 1
+    assert response["result"]["status"] == "pending"
+
+    response = serve.handle_request({
+        "id": 12, "method": "list_tray", "params": {"profile_dir": str(tmp_path)},
+    })
+    assert [r["id"] for r in response["result"]] == [1]
+
+
+def test_submit_approved_round_trip_only_submits_named_ids(tmp_path, monkeypatch):
+    serve.handle_request({
+        "id": 13, "method": "queue_close_call",
+        "params": {"event": _report_event(), "profile_dir": str(tmp_path)},
+    })
+    monkeypatch.setattr(core, "_post_danger_map_report", lambda event, api_key=None: {"ok": True})
+
+    response = serve.handle_request({
+        "id": 14, "method": "submit_approved",
+        "params": {"profile_dir": str(tmp_path), "ids": [1]},
+    })
+    [result] = response["result"]
+    assert result["submitted"] is True
+
+
+def test_vet_round_trip(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    compiled = serve.handle_request({
+        "id": 15, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
+    })["result"]
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+    monkeypatch.setattr(core, "_fetch_danger_map_stats",
+                         lambda timeout=10: {"schema_version": core._local_danger_map_schema_version()})
+
+    response = serve.handle_request({
+        "id": 16, "method": "vet", "params": {"profile_dir": compiled["path"]},
+    })
+    assert response["id"] == 16
+    assert "matches the currently installed version" in response["result"]["profile_axis"]
+    assert response["result"]["recompiled"] is False
 
 
 def test_unknown_method_is_an_error():

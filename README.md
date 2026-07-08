@@ -92,6 +92,7 @@ This writes a versioned directory to `./curiosity-cat/profiles/<level>-<target>-
 | `scope-policy.json` | The scope policy template instantiated with this level's values |
 | `standing-orders.md` | Standing orders assembled for this level |
 | `PROFILE.md` | Plain-language summary of what this cat can and cannot do — read this first |
+| `manifest.json` | Provenance: the engine version and Danger Map schema version current at compile time — what `curiosity-cat vet` compares against later |
 
 Supported targets today: `claude-code`. The emitter is designed so a new target (e.g. Cursor) is an added mapping from the same level definitions, not a rewrite of them.
 
@@ -123,6 +124,42 @@ This writes a dated, versioned directory to `<profile-dir>/proof/proof-<YYYYMMDD
 | `CLEAN-BILL.md` | Human transcript in Nine Lives voice — self-consistency and observed trials under separate honest headings, plus a list of guidance-only walls |
 
 If any wall — self-consistency or observed — fails to hold, `prove` exits nonzero and names it. No safe claim.
+
+---
+
+## Mouse Tray
+
+A close call is a candidate for the Danger Map, not an automatic submission. The Mouse Tray is a local queue of denied/flagged events — a JSON file living inside the profile directory — that sits between "something happened" and "the community heard about it." Nothing in this codebase ever submits automatically; a Mouse Tray entry only reaches the Danger Map after an operator explicitly approves it.
+
+```bash
+curiosity-cat tray --profile ./curiosity-cat/profiles/housecat-claude-code-20260705
+curiosity-cat tray --profile ./curiosity-cat/profiles/housecat-claude-code-20260705 --approve 1,3
+```
+
+With no `--approve`, `tray` lists the queue in plain, one-line-per-item cat voice — what was flagged, its `threat_class`, and its `grade` (`observed` if a real wall was tested and held or failed, `suspected` if it's a whiskers-only pattern match from `check()` with no live wall behind it). `--approve <ids>` submits only the named ids via the Danger Map report endpoint, with `grade` carried through unchanged from how the event was queued — nothing else in the queue is touched.
+
+At the library level, `core.queue_close_call(event)` stores a pattern-not-payload record and `core.submit_approved(ids)` is the only function in this codebase that can put a queued event on the wire. There is no auto-submit path anywhere — C-Cat proposes, the human disposes (docs/app/APP_SPEC.md Network Layer Principles a/e).
+
+---
+
+## Vet
+
+A compiled profile is a snapshot: the engine version, the Danger Map schema, and the platform it was proved against can all move on without it noticing. `curiosity-cat vet` checks whether they have.
+
+```bash
+curiosity-cat vet --profile ./curiosity-cat/profiles/housecat-claude-code-20260705
+curiosity-cat vet --profile ./curiosity-cat/profiles/housecat-claude-code-20260705 --recompile
+```
+
+Without `--recompile`, `vet` is read-only and reports drift in one plain sentence per axis:
+
+- **Profile date/version** — the curiosity-cat version this profile was compiled with, against what's installed now.
+- **Danger Map version** — the schema version this profile was compiled against (checked live via `/stats` first, falling back to the version bundled with the installed package), against the current one.
+- **Platform version** — the `claude --version` this profile's last observed proof actually ran against, against what's installed now.
+
+It also surfaces a **drift signal**: if a wall's observed verdict (held vs. failed) has changed across platform versions in this profile's history, that's an early warning of platform drift, not noise.
+
+With `--recompile`, `vet` compiles a fresh, separately-dated profile for the same level and target and proves it (observed trials by default), emitting a new Clean Bill and appending to the drift history. It never touches the original profile directory — recompiling always produces a new dated profile alongside the old one, the same as running `compile` again would. Without the flag, `vet` never writes anything at all.
 
 ---
 

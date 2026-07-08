@@ -125,6 +125,96 @@ def test_report_prints_danger_map_instructions(capsys):
     assert '"threat_class"' in out
 
 
+def _make_report_event(**overrides):
+    event = {
+        "timestamp": "2026-01-01T00:00:00Z",
+        "threat_class": "unsafe-url",
+        "severity": "scratched",
+        "source": "https://evil.example.com",
+        "what_happened": "agent followed a malicious redirect",
+        "action_taken": "refused and flagged",
+        "lesson": "verify redirects",
+        "grade": "observed",
+        "indicator": "evil.example.com",
+        "platform": "claude-code",
+        "platform_version": "1.2.3",
+        "profile_version": "0.1.1",
+    }
+    event.update(overrides)
+    return event
+
+
+def test_tray_missing_profile_flag_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_tray(profile=None)
+    assert exc_info.value.code == 1
+    assert "Missing --profile" in capsys.readouterr().err
+
+
+def test_tray_lists_pending_items_in_cat_voice(tmp_path, capsys):
+    from curiosity_cat import core
+    core.queue_close_call(_make_report_event(), tmp_path)
+    capsys.readouterr()
+
+    cli.cmd_tray(profile=str(tmp_path))
+
+    out = capsys.readouterr().out
+    assert "Mouse Tray" in out
+    assert "evil.example.com" in out
+    assert "unsafe-url" in out
+    assert "tray --approve 1" in out
+
+
+def test_tray_approve_only_submits_named_ids(tmp_path, monkeypatch, capsys):
+    from curiosity_cat import core
+    core.queue_close_call(_make_report_event(indicator="one.example.com"), tmp_path)
+    core.queue_close_call(_make_report_event(indicator="two.example.com"), tmp_path)
+    monkeypatch.setattr(core, "_post_danger_map_report", lambda event, api_key=None: {"ok": True})
+    capsys.readouterr()
+
+    cli.cmd_tray(profile=str(tmp_path), approve="1")
+
+    out = capsys.readouterr().out
+    assert "[1] submitted" in out
+    statuses = {r["id"]: r["status"] for r in core.list_tray(tmp_path)}
+    assert statuses == {1: "submitted", 2: "pending"}
+
+
+def test_vet_missing_profile_flag_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_vet(profile=None)
+    assert exc_info.value.code == 1
+    assert "Missing --profile" in capsys.readouterr().err
+
+
+def test_vet_rejects_non_profile_directory(tmp_path, capsys):
+    not_a_profile = tmp_path / "nope"
+    not_a_profile.mkdir()
+
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_vet(profile=str(not_a_profile))
+    assert exc_info.value.code == 1
+    assert "does not look like a compiled profile directory" in capsys.readouterr().err
+
+
+def test_vet_prints_one_sentence_per_axis(tmp_path, monkeypatch, capsys):
+    from curiosity_cat import core
+    monkeypatch.chdir(tmp_path)
+    cli.cmd_compile(level="housecat", target="claude-code")
+    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+    monkeypatch.setattr(core, "_fetch_danger_map_stats",
+                         lambda timeout=10: {"schema_version": core._local_danger_map_schema_version()})
+    capsys.readouterr()
+
+    cli.cmd_vet(profile=str(profile_dir))
+
+    out = capsys.readouterr().out
+    assert "matches the currently installed version" in out
+    assert "unchanged since this profile was compiled" in out
+    assert "no `claude` binary" in out
+
+
 def test_stories_prints_latest_story(capsys):
     cli.cmd_stories()
     out = capsys.readouterr().out

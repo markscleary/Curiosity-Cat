@@ -96,6 +96,7 @@ def cmd_compile(level=None, target=None):
     print(f"  {rel}/scope-policy.json")
     print(f"  {rel}/standing-orders.md")
     print(f"  {rel}/PROFILE.md")
+    print(f"  {rel}/manifest.json")
     print(f'\nRead {rel}/PROFILE.md first — plain-language summary of what this cat can and cannot do.\n')
 
 
@@ -158,6 +159,89 @@ def cmd_check(candidate=None):
         print("\nNo matching Danger Map incidents found.")
 
 
+def _parse_ids(raw):
+    try:
+        return [int(part) for part in raw.split(",") if part.strip()]
+    except ValueError:
+        print(f'--approve expects comma-separated numeric ids, got "{raw}"', file=sys.stderr)
+        sys.exit(1)
+
+
+def cmd_tray(profile=None, approve=None):
+    if not profile:
+        print('Missing --profile <profile-dir>', file=sys.stderr)
+        sys.exit(1)
+
+    if approve is not None:
+        ids = _parse_ids(approve)
+        results = core.submit_approved(profile, ids)
+        print()
+        ok = True
+        for r in results:
+            status = "submitted" if r["submitted"] else "NOT submitted"
+            print(f"  [{r['id']}] {status} — {r['reason']}")
+            if not r["submitted"]:
+                ok = False
+        print()
+        if not ok:
+            sys.exit(1)
+        return
+
+    queue = core.list_tray(profile)
+    if not queue:
+        print("\n🐭 Mouse Tray — empty. Nothing waiting for your look.\n")
+        return
+
+    pending = [r for r in queue if r["status"] == "pending"]
+    print(f"\n🐭 Mouse Tray — {len(pending)} item(s) awaiting your look "
+          f"({len(queue) - len(pending)} already submitted)\n")
+    for r in queue:
+        e = r["event"]
+        pattern = e.get("indicator") or e.get("source", "?")
+        print(f"  [{r['id']}] {r['status']:<9} {r['queued_at']}  "
+              f"This cat flagged `{pattern}` as {e.get('threat_class', '?')} ({e.get('grade', '?')}).")
+
+    if pending:
+        ids_hint = ",".join(str(r["id"]) for r in pending)
+        print(f"\nNothing leaves this machine until you approve it: "
+              f"curiosity-cat tray --approve {ids_hint}\n")
+    else:
+        print()
+
+
+def cmd_vet(profile=None, recompile=False):
+    if not profile:
+        print('Missing --profile <profile-dir>', file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        report = core.vet(profile, recompile=recompile)
+    except core.InvalidProfileError:
+        print(f'"{profile}" does not look like a compiled profile directory '
+              '(missing manifest.json or scope-policy.json).', file=sys.stderr)
+        sys.exit(1)
+
+    print(f"\nVet — {profile}\n")
+    print(f"  {report.profile_axis}")
+    print(f"  {report.danger_map_axis}")
+    print(f"  {report.platform_axis}")
+
+    if report.drift_signals:
+        print("\nDrift signal — a wall's verdict changed across platform versions:")
+        for d in report.drift_signals:
+            verdicts = ", ".join(f"{verdict} on {pv}" for pv, verdict in d["verdicts"].items())
+            print(f"  - {d['wall']}: {verdicts}")
+
+    if report.recompiled:
+        cb = report.new_clean_bill
+        print(f"\nRecompiled and proved a fresh profile: {cb.profile_dir}")
+        print(f"  {cb.clean_bill_md_path}")
+        if not cb.passed:
+            print("  Some walls did NOT hold in the fresh proof — see the Clean Bill for detail.",
+                  file=sys.stderr)
+    print()
+
+
 def cmd_stories():
     stories_dir = DATA_DIR / "stories"
     if not stories_dir.exists():
@@ -186,6 +270,9 @@ Usage:
                                                              Run escape trials against a compiled profile
   curiosity-cat check <candidate>                          Look up a URL/source against the Danger Map
   curiosity-cat report                                     Show how to submit a close call to the Danger Map
+  curiosity-cat tray --profile <profile-dir> [--approve <ids>]
+                                                             List or approve the Mouse Tray queue
+  curiosity-cat vet --profile <profile-dir> [--recompile]  Compare a profile against what's installed now
   curiosity-cat stories                                    Print the latest story
 
 Roles (for init --role):
@@ -212,6 +299,19 @@ Prove:
 Check:
   <candidate>      A URL, domain, or other source string to look up against
                    the community Danger Map's recent close calls.
+
+Tray:
+  --profile <dir>  A directory produced by "curiosity-cat compile"
+  --approve <ids>  Comma-separated Mouse Tray ids to submit to the Danger Map.
+                   With no --approve, lists the queue instead. Nothing is
+                   ever submitted without an explicit --approve.
+
+Vet:
+  --profile <dir>    A directory produced by "curiosity-cat compile"
+  --recompile        Recompile a fresh, separately-dated profile for the
+                     same level/target and prove it (observed trials),
+                     emitting a new Clean Bill. Without this flag, vet is
+                     read-only and never writes anything.
 """)
 
 
@@ -221,13 +321,16 @@ def main():
         description="AI agent safety framework",
         add_help=False,
     )
-    parser.add_argument("command", nargs="?", choices=["init", "compile", "prove", "check", "report", "stories"])
+    parser.add_argument("command", nargs="?",
+                         choices=["init", "compile", "prove", "check", "report", "tray", "vet", "stories"])
     parser.add_argument("candidate", nargs="?")
     parser.add_argument("--role", choices=list(ROLE_FILES.keys()))
     parser.add_argument("--level", choices=LEVELS)
     parser.add_argument("--target", choices=list(TARGET_EMITTERS.keys()))
     parser.add_argument("--profile")
     parser.add_argument("--no-observed", action="store_true")
+    parser.add_argument("--approve")
+    parser.add_argument("--recompile", action="store_true")
     parser.add_argument("-h", "--help", action="store_true")
 
     args, _ = parser.parse_known_args()
@@ -246,6 +349,10 @@ def main():
         cmd_check(candidate=args.candidate)
     elif args.command == "report":
         cmd_report()
+    elif args.command == "tray":
+        cmd_tray(profile=args.profile, approve=args.approve)
+    elif args.command == "vet":
+        cmd_vet(profile=args.profile, recompile=args.recompile)
     elif args.command == "stories":
         cmd_stories()
 

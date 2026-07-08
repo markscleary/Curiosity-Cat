@@ -33,6 +33,13 @@ def test_compile_profile_output_validity(tmp_path):
     assert (profile_dir / "standing-orders.md").exists()
     assert (profile_dir / "PROFILE.md").exists()
 
+    manifest = json.loads((profile_dir / "manifest.json").read_text())
+    assert manifest["level"] == "housecat"
+    assert manifest["target"] == "claude-code"
+    assert manifest["profile_version"] == core.__version__
+    assert manifest["danger_map_schema_version"]
+    assert manifest["compiled_at"]
+
 
 def test_compile_profile_rejects_unknown_level(tmp_path):
     with pytest.raises(core.InvalidLevelError):
@@ -125,6 +132,7 @@ def test_prove_observed_trial_held_when_denial_recorded(tmp_path, monkeypatch):
     profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
 
     monkeypatch.setattr(core.shutil, "which", lambda name: "/usr/bin/claude")
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: "1.2.3 (Claude Code)")
     monkeypatch.setattr(core, "_spawn_observed_session", lambda argv, cwd, timeout=120: json.dumps({
         "result": "The command was denied by permission settings.",
         "permission_denials": [{"tool_name": "Bash", "tool_input": {"command": "curl ..."}}],
@@ -136,12 +144,20 @@ def test_prove_observed_trial_held_when_denial_recorded(tmp_path, monkeypatch):
     assert trial["method"] == "observed-deny"
     assert trial["held"] is True
     assert trial["verdict"].startswith("observed-deny: held")
+    assert clean_bill.platform_version == "1.2.3 (Claude Code)"
+
+    history = json.loads((Path(profile.path) / "wall-history.json").read_text())
+    assert history == [{
+        "wall": trial["trial"], "platform_version": "1.2.3 (Claude Code)",
+        "verdict": "held", "date": clean_bill.date,
+    }]
 
 
 def test_prove_observed_trial_fails_when_action_not_blocked(tmp_path, monkeypatch):
     profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
 
     monkeypatch.setattr(core.shutil, "which", lambda name: "/usr/bin/claude")
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: "1.2.3 (Claude Code)")
     monkeypatch.setattr(core, "_spawn_observed_session", lambda argv, cwd, timeout=120: json.dumps({
         "result": "Ran the command; it reached the network layer.",
         "permission_denials": [],
@@ -153,6 +169,9 @@ def test_prove_observed_trial_fails_when_action_not_blocked(tmp_path, monkeypatc
     assert trial["held"] is False
     assert "FAILED" in trial["verdict"]
     assert clean_bill.passed is False
+
+    history = json.loads((Path(profile.path) / "wall-history.json").read_text())
+    assert history[0]["verdict"] == "failed"
 
 
 def test_parse_observed_session_holds_on_recorded_denial():
@@ -231,7 +250,7 @@ def test_report_close_call_requires_fields():
         core.report_close_call({"timestamp": "2026-01-01T00:00:00Z"})
 
 
-def test_report_close_call_withholds_submission_without_consent():
+def make_report_event(**overrides):
     event = {
         "timestamp": "2026-01-01T00:00:00Z",
         "threat_class": "unsafe-url",
@@ -240,7 +259,18 @@ def test_report_close_call_withholds_submission_without_consent():
         "what_happened": "agent followed a malicious redirect",
         "action_taken": "refused and flagged",
         "lesson": "verify redirects",
+        "grade": "observed",
+        "indicator": "evil.example.com",
+        "platform": "claude-code",
+        "platform_version": "1.2.3",
+        "profile_version": "0.1.1",
     }
+    event.update(overrides)
+    return event
+
+
+def test_report_close_call_withholds_submission_without_consent():
+    event = make_report_event()
 
     def fail_if_called(*args, **kwargs):
         raise AssertionError("must never submit without explicit consent")
@@ -252,15 +282,7 @@ def test_report_close_call_withholds_submission_without_consent():
 
 
 def test_report_close_call_submits_with_consent():
-    event = {
-        "timestamp": "2026-01-01T00:00:00Z",
-        "threat_class": "unsafe-url",
-        "severity": "scratched",
-        "source": "https://evil.example.com",
-        "what_happened": "agent followed a malicious redirect",
-        "action_taken": "refused and flagged",
-        "lesson": "verify redirects",
-    }
+    event = make_report_event()
     submitter = lambda payload, api_key=None: {"ok": True}
 
     result = core.report_close_call(event, consent=True, submitter=submitter)
@@ -269,15 +291,7 @@ def test_report_close_call_submits_with_consent():
 
 
 def test_report_close_call_handles_submission_failure():
-    event = {
-        "timestamp": "2026-01-01T00:00:00Z",
-        "threat_class": "unsafe-url",
-        "severity": "scratched",
-        "source": "https://evil.example.com",
-        "what_happened": "agent followed a malicious redirect",
-        "action_taken": "refused and flagged",
-        "lesson": "verify redirects",
-    }
+    event = make_report_event()
 
     def submitter(payload, api_key=None):
         raise OSError("connection refused")
@@ -285,3 +299,208 @@ def test_report_close_call_handles_submission_failure():
     result = core.report_close_call(event, consent=True, submitter=submitter)
     assert result["submitted"] is False
     assert "failed" in result["reason"]
+
+
+# --- Mouse Tray ---
+
+def test_queue_close_call_requires_report_fields(tmp_path):
+    with pytest.raises(ValueError):
+        core.queue_close_call({"timestamp": "2026-01-01T00:00:00Z"}, tmp_path)
+
+
+def test_queue_close_call_requires_a_valid_grade(tmp_path):
+    event = make_report_event(grade="pretty-sure")
+    with pytest.raises(ValueError):
+        core.queue_close_call(event, tmp_path)
+
+
+def test_queue_close_call_appends_and_assigns_incrementing_ids(tmp_path):
+    first = core.queue_close_call(make_report_event(indicator="one.example.com"), tmp_path)
+    second = core.queue_close_call(make_report_event(indicator="two.example.com"), tmp_path)
+
+    assert first["id"] == 1
+    assert second["id"] == 2
+    assert first["status"] == "pending"
+
+    queue = json.loads((tmp_path / core.TRAY_QUEUE_FILENAME).read_text())
+    assert [r["id"] for r in queue] == [1, 2]
+    assert queue[0]["event"]["indicator"] == "one.example.com"
+
+
+def test_list_tray_filters_by_status(tmp_path):
+    core.queue_close_call(make_report_event(), tmp_path)
+    core.queue_close_call(make_report_event(), tmp_path)
+    core.submit_approved(tmp_path, [1], submitter=lambda payload, api_key=None: {"ok": True})
+
+    assert [r["id"] for r in core.list_tray(tmp_path, status="submitted")] == [1]
+    assert [r["id"] for r in core.list_tray(tmp_path, status="pending")] == [2]
+    assert len(core.list_tray(tmp_path)) == 2
+
+
+def test_submit_approved_only_submits_named_ids(tmp_path):
+    core.queue_close_call(make_report_event(indicator="one.example.com"), tmp_path)
+    core.queue_close_call(make_report_event(indicator="two.example.com"), tmp_path)
+    core.queue_close_call(make_report_event(indicator="three.example.com"), tmp_path)
+
+    submitted_payloads = []
+
+    def submitter(payload, api_key=None):
+        submitted_payloads.append(payload)
+        return {"ok": True}
+
+    results = core.submit_approved(tmp_path, [2], submitter=submitter)
+
+    assert len(submitted_payloads) == 1
+    assert submitted_payloads[0]["indicator"] == "two.example.com"
+    assert results == [{"id": 2, "submitted": True, "reason": "submitted to the Danger Map",
+                         "endpoint": core.DANGER_MAP_REPORT_URL, "payload": submitted_payloads[0],
+                         "response": {"ok": True}}]
+
+    queue = core.list_tray(tmp_path)
+    statuses = {r["id"]: r["status"] for r in queue}
+    assert statuses == {1: "pending", 2: "submitted", 3: "pending"}
+
+
+def test_submit_approved_never_calls_submitter_for_unapproved_ids(tmp_path):
+    core.queue_close_call(make_report_event(), tmp_path)
+    core.queue_close_call(make_report_event(), tmp_path)
+
+    calls = []
+
+    def submitter(payload, api_key=None):
+        calls.append(payload)
+        return {"ok": True}
+
+    core.submit_approved(tmp_path, [1], submitter=submitter)
+
+    assert len(calls) == 1
+    assert [r["id"] for r in core.list_tray(tmp_path, status="pending")] == [2]
+
+
+def test_submit_approved_reports_unknown_and_already_submitted_ids(tmp_path):
+    core.queue_close_call(make_report_event(), tmp_path)
+    core.submit_approved(tmp_path, [1], submitter=lambda payload, api_key=None: {"ok": True})
+
+    results = core.submit_approved(tmp_path, [1, 99], submitter=lambda payload, api_key=None: {"ok": True})
+    by_id = {r["id"]: r for r in results}
+    assert by_id[1]["submitted"] is False
+    assert "already submitted" in by_id[1]["reason"]
+    assert by_id[99]["submitted"] is False
+    assert "no such queued id" in by_id[99]["reason"]
+
+
+# --- Vet ---
+
+def test_vet_rejects_non_profile_directory(tmp_path):
+    empty_dir = tmp_path / "not-a-profile"
+    empty_dir.mkdir()
+    with pytest.raises(core.InvalidProfileError):
+        core.vet(str(empty_dir))
+
+
+def test_vet_reports_up_to_date_axes_for_a_freshly_compiled_profile(tmp_path, monkeypatch):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+
+    schema_version = core._local_danger_map_schema_version()
+    report = core.vet(profile.path, fetcher=lambda: {"schema_version": schema_version})
+
+    assert "matches the currently installed version" in report.profile_axis
+    assert "unchanged since this profile was compiled" in report.danger_map_axis
+    assert "no `claude` binary" in report.platform_axis
+    assert report.drift_signals == []
+    assert report.recompiled is False
+    assert report.new_clean_bill is None
+
+
+def test_vet_reports_profile_version_drift(tmp_path, monkeypatch):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    manifest_path = Path(profile.manifest_path)
+    manifest = json.loads(manifest_path.read_text())
+    manifest["profile_version"] = "0.0.1-old"
+    manifest_path.write_text(json.dumps(manifest))
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+
+    report = core.vet(profile.path, fetcher=lambda: {"schema_version": manifest["danger_map_schema_version"]})
+
+    assert "0.0.1-old" in report.profile_axis
+    assert "recompile to pick up any policy changes" in report.profile_axis
+
+
+def test_vet_reports_danger_map_schema_drift(tmp_path, monkeypatch):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+
+    def stale_fetcher():
+        raise OSError("network unreachable")
+
+    monkeypatch.setattr(core, "_local_danger_map_schema_version", lambda: "999")
+    report = core.vet(profile.path, fetcher=stale_fetcher)
+
+    assert "Danger Map schema drifted" in report.danger_map_axis
+
+
+def test_vet_reports_platform_version_drift_since_last_observed_proof(tmp_path, monkeypatch):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    monkeypatch.setattr(core.shutil, "which", lambda name: "/usr/bin/claude")
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: "1.0.0")
+    monkeypatch.setattr(core, "_spawn_observed_session", lambda argv, cwd, timeout=120: json.dumps({
+        "result": "denied", "permission_denials": [{"tool_name": "Bash"}],
+    }))
+    core.prove(profile.path)
+
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: "2.0.0")
+    schema_version = core._local_danger_map_schema_version()
+    report = core.vet(profile.path, fetcher=lambda: {"schema_version": schema_version})
+
+    assert "Platform drifted" in report.platform_axis
+    assert "1.0.0" in report.platform_axis
+    assert "2.0.0" in report.platform_axis
+
+
+def test_vet_flags_wall_verdict_that_changed_across_platform_versions(tmp_path, monkeypatch):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    history_path = Path(profile.path) / core.WALL_HISTORY_FILENAME
+    history_path.write_text(json.dumps([
+        {"wall": "observed_bash_deny", "platform_version": "1.0.0", "verdict": "held", "date": "2026-06-01"},
+        {"wall": "observed_bash_deny", "platform_version": "2.0.0", "verdict": "failed", "date": "2026-07-01"},
+    ]))
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+
+    schema_version = core._local_danger_map_schema_version()
+    report = core.vet(profile.path, fetcher=lambda: {"schema_version": schema_version})
+
+    assert report.drift_signals == [{
+        "wall": "observed_bash_deny",
+        "verdicts": {"1.0.0": "held", "2.0.0": "failed"},
+    }]
+
+
+def test_vet_is_read_only_without_recompile(tmp_path, monkeypatch):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+    before = sorted(p.name for p in Path(profile.path).parent.iterdir())
+
+    schema_version = core._local_danger_map_schema_version()
+    core.vet(profile.path, fetcher=lambda: {"schema_version": schema_version})
+
+    after = sorted(p.name for p in Path(profile.path).parent.iterdir())
+    assert before == after
+    assert list(Path(profile.path).rglob("proof")) == []
+
+
+def test_vet_recompile_writes_a_fresh_dated_profile_and_leaves_the_original_untouched(tmp_path, monkeypatch):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    original_manifest = (Path(profile.path) / "manifest.json").read_text()
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
+
+    schema_version = core._local_danger_map_schema_version()
+    report = core.vet(profile.path, recompile=True, observed=False,
+                       fetcher=lambda: {"schema_version": schema_version})
+
+    assert report.recompiled is True
+    assert report.new_clean_bill is not None
+    assert report.new_clean_bill.passed is True
+    assert report.new_clean_bill.profile_dir != profile.path
+    assert (Path(profile.path) / "manifest.json").read_text() == original_manifest
+    assert list(Path(profile.path).rglob("proof")) == []

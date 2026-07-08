@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Curiosity Cat Close Call Report",
+  "schema_version": "2",
   "type": "object",
   "required": ["timestamp", "threat_class", "severity", "source", "what_happened", "action_taken", "lesson", "grade", "indicator", "platform", "platform_version", "profile_version"],
   "properties": {
