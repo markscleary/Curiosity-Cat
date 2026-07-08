@@ -1,57 +1,64 @@
-"""Tests for the curiosity-cat compile and prove commands."""
+"""Tests for the curiosity-cat CLI (curiosity_cat.cli) — a thin wrapper over
+curiosity_cat.core. These confirm the user-facing behaviour (stdout,
+stderr, exit codes) rather than re-testing core's own logic; see
+test_core.py for that.
+"""
 
 import json
 import sys
+from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from curiosity_cat import cli
 
 
-def test_compile_output_validity(tmp_path, monkeypatch):
+def test_compile_prints_created_files_and_exits_cleanly(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     cli.cmd_compile(level="housecat", target="claude-code")
 
-    profile_dirs = list((tmp_path / "curiosity-cat" / "profiles").iterdir())
-    assert len(profile_dirs) == 1
-    profile_dir = profile_dirs[0]
-
-    settings = json.loads((profile_dir / "settings.json").read_text())
-    assert "Bash(curl:*)" in settings["permissions"]["deny"]
-    assert "Read(**/.env)" in settings["permissions"]["deny"]
-    assert settings["sandbox"] == {"enabled": True}
-
-    scope_policy = json.loads((profile_dir / "scope-policy.json").read_text())
-    assert scope_policy["adventure_level"] == "housecat"
-
-    assert (profile_dir / "standing-orders.md").exists()
-    assert (profile_dir / "PROFILE.md").exists()
+    out = capsys.readouterr().out
+    assert "Compiled Housecat profile for claude-code." in out
+    assert "settings.json" in out
+    assert "PROFILE.md" in out
 
 
-def test_prove_holds_for_compiled_profile(tmp_path, monkeypatch):
+def test_compile_rejects_unknown_level(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_compile(level="feral", target="claude-code")
+    assert exc_info.value.code == 1
+    err = capsys.readouterr().err
+    assert 'Missing or unknown --level: "feral"' in err
+    assert "Valid levels: housecat, alleycat, tiger" in err
+
+
+def test_compile_rejects_unknown_target(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_compile(level="housecat", target="cursor")
+    assert exc_info.value.code == 1
+    err = capsys.readouterr().err
+    assert 'Missing or unknown --target: "cursor"' in err
+
+
+def test_prove_reports_clean_bill_and_exits_zero(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     cli.cmd_compile(level="housecat", target="claude-code")
     profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    capsys.readouterr()
 
     cli.cmd_prove(profile=str(profile_dir), observed=False)
 
-    proof_dirs = list((profile_dir / "proof").iterdir())
-    assert len(proof_dirs) == 1
-    clean_bill = json.loads((proof_dirs[0] / "clean-bill.json").read_text())
-
-    assert clean_bill["self_consistency_trials"]
-    assert all(t["held"] for t in clean_bill["self_consistency_trials"])
-    assert all(t["method"] == "self-consistency" for t in clean_bill["self_consistency_trials"])
-    assert all(t["verdict"] == cli.SELF_CONSISTENCY_HELD for t in clean_bill["self_consistency_trials"])
-    assert clean_bill["observed_trials"] == []
-    assert "no-observed" in clean_bill["observed_note"]
-    assert clean_bill["guidance_only"]
-    assert (proof_dirs[0] / "CLEAN-BILL.md").exists()
+    out = capsys.readouterr().out
+    assert "Wrote:" in out
+    assert "clean-bill.json" in out
+    assert "Clean bill of health." in out
 
 
-def test_prove_fails_when_a_wall_is_missing(tmp_path, monkeypatch):
+def test_prove_exits_nonzero_and_lists_failed_walls(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     cli.cmd_compile(level="housecat", target="claude-code")
     profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
@@ -62,134 +69,63 @@ def test_prove_fails_when_a_wall_is_missing(tmp_path, monkeypatch):
         p for p in settings["permissions"]["deny"] if p != "Read(**/.env)"
     ]
     settings_path.write_text(json.dumps(settings, indent=2))
+    capsys.readouterr()
 
     with pytest.raises(SystemExit) as exc_info:
         cli.cmd_prove(profile=str(profile_dir), observed=False)
     assert exc_info.value.code == 1
 
-    proof_dirs = list((profile_dir / "proof").iterdir())
-    clean_bill = json.loads((proof_dirs[0] / "clean-bill.json").read_text())
-    failed = [t for t in clean_bill["self_consistency_trials"] if t["held"] is False]
-    assert any(t["trial"] == "credential_env" for t in failed)
-    assert all(t["verdict"] == cli.SELF_CONSISTENCY_NOT_HELD for t in failed)
+    err = capsys.readouterr().err
+    assert "wall(s) did NOT hold" in err
+    assert "credential_env" in err
+    assert "No safe claim." in err
 
 
-def test_prove_skips_observed_when_no_claude_binary(tmp_path, monkeypatch):
+def test_prove_missing_profile_flag_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_prove(profile=None)
+    assert exc_info.value.code == 1
+    assert "Missing --profile" in capsys.readouterr().err
+
+
+def test_prove_rejects_non_profile_directory(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
-    cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
-
-    monkeypatch.setattr(cli.shutil, "which", lambda name: None)
-
-    def fail_if_called(*args, **kwargs):
-        raise AssertionError("should never spawn a session with no claude binary on PATH")
-
-    monkeypatch.setattr(cli, "_spawn_observed_session", fail_if_called)
-
-    cli.cmd_prove(profile=str(profile_dir))
-
-    proof_dirs = list((profile_dir / "proof").iterdir())
-    clean_bill = json.loads((proof_dirs[0] / "clean-bill.json").read_text())
-    assert clean_bill["observed_trials"] == []
-    assert "no `claude` binary" in clean_bill["observed_note"]
-
-
-def test_prove_skips_observed_when_no_safe_candidate(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    cli.cmd_compile(level="tiger", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
-
-    monkeypatch.setattr(cli.shutil, "which", lambda name: "/usr/bin/claude")
-
-    def fail_if_called(*args, **kwargs):
-        raise AssertionError("tiger has no wall safe to test live — should never spawn a session")
-
-    monkeypatch.setattr(cli, "_spawn_observed_session", fail_if_called)
-
-    cli.cmd_prove(profile=str(profile_dir))
-
-    proof_dirs = list((profile_dir / "proof").iterdir())
-    clean_bill = json.loads((proof_dirs[0] / "clean-bill.json").read_text())
-    assert clean_bill["observed_trials"] == []
-    assert "no wall safe to test live" in clean_bill["observed_note"]
-
-
-def test_prove_observed_trial_held_when_denial_recorded(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
-
-    monkeypatch.setattr(cli.shutil, "which", lambda name: "/usr/bin/claude")
-    monkeypatch.setattr(cli, "_spawn_observed_session", lambda argv, cwd, timeout=120: json.dumps({
-        "result": "The command was denied by permission settings.",
-        "permission_denials": [{"tool_name": "Bash", "tool_input": {"command": "curl ..."}}],
-    }))
-
-    cli.cmd_prove(profile=str(profile_dir))
-
-    proof_dirs = list((profile_dir / "proof").iterdir())
-    clean_bill = json.loads((proof_dirs[0] / "clean-bill.json").read_text())
-    [trial] = clean_bill["observed_trials"]
-    assert trial["method"] == "observed-deny"
-    assert trial["held"] is True
-    assert trial["verdict"].startswith("observed-deny: held")
-
-
-def test_prove_observed_trial_fails_when_action_not_blocked(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
-
-    monkeypatch.setattr(cli.shutil, "which", lambda name: "/usr/bin/claude")
-    monkeypatch.setattr(cli, "_spawn_observed_session", lambda argv, cwd, timeout=120: json.dumps({
-        "result": "Ran the command; it reached the network layer.",
-        "permission_denials": [],
-    }))
+    not_a_profile = tmp_path / "nope"
+    not_a_profile.mkdir()
 
     with pytest.raises(SystemExit) as exc_info:
-        cli.cmd_prove(profile=str(profile_dir))
+        cli.cmd_prove(profile=str(not_a_profile))
     assert exc_info.value.code == 1
-
-    proof_dirs = list((profile_dir / "proof").iterdir())
-    clean_bill = json.loads((proof_dirs[0] / "clean-bill.json").read_text())
-    [trial] = clean_bill["observed_trials"]
-    assert trial["held"] is False
-    assert "FAILED" in trial["verdict"]
+    assert "does not look like a compiled profile directory" in capsys.readouterr().err
 
 
-def test_parse_observed_session_holds_on_recorded_denial():
-    held, detail = cli._parse_observed_session(json.dumps({"permission_denials": [{"tool_name": "Bash"}]}))
-    assert held is True
-    assert "1 permission denial" in detail
+def test_check_prints_matches(monkeypatch, capsys):
+    from curiosity_cat import core
+    monkeypatch.setattr(core, "_fetch_danger_map_recent",
+                         lambda limit=50: [{"source": "https://evil.example.com"}])
+
+    cli.cmd_check(candidate="evil.example.com")
+
+    out = capsys.readouterr().out
+    assert "Whisker check — evil.example.com" in out
+    assert "1 matching Danger Map incident(s) found" in out
 
 
-def test_parse_observed_session_fails_when_no_denial_recorded():
-    held, detail = cli._parse_observed_session(json.dumps({"permission_denials": []}))
-    assert held is False
+def test_check_missing_candidate_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_check(candidate=None)
+    assert exc_info.value.code == 1
+    assert "Missing candidate" in capsys.readouterr().err
 
 
-def test_parse_observed_session_inconclusive_on_bad_output():
-    held, detail = cli._parse_observed_session("not json")
-    assert held is None
-    assert "not valid JSON" in detail
-
-    held, detail = cli._parse_observed_session("")
-    assert held is None
-    assert "no session output" in detail
+def test_report_prints_danger_map_instructions(capsys):
+    cli.cmd_report()
+    out = capsys.readouterr().out
+    assert "POST https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map/report" in out
+    assert '"threat_class"' in out
 
 
-def test_select_observed_candidate_prefers_bash_over_write():
-    perms = {"deny": ["Bash(curl:*)", "Write"]}
-    candidate = cli._select_observed_candidate(perms)
-    assert candidate["trial"] == "observed_bash_deny"
-
-
-def test_select_observed_candidate_falls_back_to_write():
-    perms = {"deny": [], "allow": ["Write(./**)"]}
-    candidate = cli._select_observed_candidate(perms)
-    assert candidate["trial"] == "observed_write_outside_scope"
-
-
-def test_select_observed_candidate_none_when_nothing_safe():
-    perms = {"deny": ["Bash(sudo:*)", "Bash(rm -rf:*)"]}
-    assert cli._select_observed_candidate(perms) is None
+def test_stories_prints_latest_story(capsys):
+    cli.cmd_stories()
+    out = capsys.readouterr().out
+    assert out.startswith("\n--- ")

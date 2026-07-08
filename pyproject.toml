@@ -21,6 +21,7 @@ classifiers = [
 
 [project.scripts]
 curiosity-cat = "curiosity_cat.cli:main"
+ccat-engine = "curiosity_cat.serve:main"
 
 [project.urls]
 Homepage = "https://github.com/markscleary/Curiosity-Cat"
