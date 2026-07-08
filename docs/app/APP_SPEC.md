@@ -11,3 +11,14 @@ LAYERS:
 
 BRIEF SEQUENCE: APP-1 engine library+serve (branch app-v1 off accessible-layer-v1 AFTER ccat-al-5 fix). APP-2 watcher hooks+schema+reference listener. APP-3 Tauri scaffold+slider+tray states. APP-4 feed+Meow+approval gate. APP-5 share card+Purr. APP-6 packaging (BLOCKED on Mark: Apple Developer ID). APP-7 site download page (post PR-merge).
 HUMAN DEPENDENCIES: Apple Developer ID at APP-6. Trademark filing (separate track). Monetisation decision deferred by design.
+
+## Network Layer Principles
+
+Binding on all future briefs/instances touching the Danger Map network layer (report collection, warnings distribution, telemetry) — the reporting/watching client and the receiving service alike.
+
+a. **Consent as architecture** — nothing leaves the machine without an explicit human tap, ever. No background auto-submission, no "send by default," no dark patterns that make declining harder than accepting.
+b. **Pattern not payload** — reports carry `threat_class`, `indicator`, `platform`, `profile_version` only; never prompts, paths, file contents, or user context. The outward-facing warnings feed enforces this at the read boundary regardless of what the write boundary currently accepts.
+c. **Corroboration before escalation** — a threat escalates on multiple independent observed reports, never one.
+d. **Observed vs suspected report grades are distinct end to end** — the `grade` field is never inferred, defaulted away, or blurred between collection, storage, and the warnings feed.
+e. **C-Cat proposes, the human disposes** — no silent profile rewrites, no auto-submission. Every report and every clean bill submission is something the operator explicitly saw and approved before it left the machine.
+f. **Clean Bills are versioned telemetry** — wall x platform_version x held/failed enables fleet-level platform-drift detection: a wall that quietly stops holding across many machines on the same platform version is a signal, not noise.

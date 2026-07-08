@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Curiosity Cat Close Call Report",
   "type": "object",
-  "required": ["timestamp", "threat_class", "severity", "source", "what_happened", "action_taken", "lesson"],
+  "required": ["timestamp", "threat_class", "severity", "source", "what_happened", "action_taken", "lesson", "grade", "indicator", "platform", "platform_version", "profile_version"],
   "properties": {
     "timestamp": {
       "type": "string",
@@ -43,6 +43,32 @@
       "type": "string",
       "enum": ["housecat", "alleycat", "tiger"],
       "description": "Operator's adventure slider setting at time of incident"
+    },
+    "grade": {
+      "type": "string",
+      "enum": ["observed", "suspected"],
+      "description": "observed: the threat was directly witnessed and held/failed against a real wall. suspected: pattern-matched or inferred, not directly witnessed. Never inferred or defaulted by the server — the reporter states it, and it stays distinct through storage and the warnings feed."
+    },
+    "indicator": {
+      "type": "string",
+      "description": "A normalised threat pattern (e.g. a domain, package name, or technique id) — never a raw path, prompt, or file content. This is what corroboration and the warnings feed match on."
+    },
+    "platform": {
+      "type": "string",
+      "description": "Agent platform/runtime the report was generated from, e.g. claude-code, langchain"
+    },
+    "platform_version": {
+      "type": "string",
+      "description": "Version of the platform/runtime named in `platform`"
+    },
+    "profile_version": {
+      "type": "string",
+      "description": "Version of the compiled Danger Map profile in effect when the report was generated"
+    },
+    "corroboration_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Server-computed count of independent observed reports sharing this indicator + threat_class, as of this report. Read-only — any client-supplied value is ignored and overwritten by the server."
     }
   },
   "threatClassStandards": {
