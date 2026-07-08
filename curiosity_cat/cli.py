@@ -118,7 +118,26 @@ AUTONOMY_TO_CLAUDE_CODE_MODE = {
 
 
 def emit_claude_code_settings(level):
-    """Render the abstract level policy into a real Claude Code settings.json."""
+    """Render the abstract level policy into a real Claude Code settings.json.
+
+    Deliberately never emits a bare "Write", "Edit", or "WebFetch" catch-all
+    deny beneath a more specific allow for the same tool. Claude Code's own
+    precedence rule is deny-first regardless of specificity, and a bare
+    tool-name deny removes the tool from Claude's context entirely — so a
+    catch-all like that doesn't confine the tool to the scoped allow, it
+    disables the tool outright, including for the in-scope case the allow
+    rule was meant to cover. Confirmed live: see
+    docs/app/sandbox-deny-findings.md.
+
+    Confinement to project scope for Write/Edit instead comes from
+    `defaultMode` ("default" and "acceptEdits" only auto-accept edits within
+    the working directory; anything outside falls through to the regular
+    permission flow, which fails closed in a non-interactive session).
+    Confinement to the domain allowlist for WebFetch comes from omission: a
+    domain with no matching `WebFetch(domain:...)` allow rule falls through
+    the same way. Both were verified with live trials, not just re-derived
+    from the compiled rules.
+    """
     a = LEVEL_POLICY[level]["abstract"]
 
     allow = []
@@ -133,13 +152,6 @@ def emit_claude_code_settings(level):
     else:
         for domain in a["web_allowed_domains"]:
             allow.append(f"WebFetch(domain:{domain})")
-        deny.append("WebFetch")
-
-    if a["write_scope"] == "project":
-        # Catch-all deny beneath the project-scoped allow above; the more
-        # specific "./**" allow rule takes precedence within the project.
-        deny.append("Write")
-        deny.append("Edit")
 
     permissions = {
         "allow": allow,
@@ -149,9 +161,11 @@ def emit_claude_code_settings(level):
     if a["bash_ask"]:
         permissions["ask"] = list(a["bash_ask"])
 
+    # "sandbox" takes an object, not a bare boolean — see
+    # docs/app/sandbox-deny-findings.md for what a bare `true` actually did.
     return {
         "permissions": permissions,
-        "sandbox": a["sandbox"],
+        "sandbox": {"enabled": a["sandbox"]},
     }
 
 
@@ -216,8 +230,9 @@ def build_profile_md(level, target, settings):
         "",
         "## The safety net underneath",
         "",
-        f"- Sandbox: {'on' if settings['sandbox'] else 'off'}. Even an allowed action runs "
-        "inside the sandbox this target provides.",
+        f"- Sandbox: {'on' if settings['sandbox']['enabled'] else 'off'}. This wraps Bash "
+        "commands only — Read, Write, Edit, and WebFetch are enforced by the permission "
+        "rules above, not the sandbox.",
         f"- Default permission mode: `{perms['defaultMode']}`.",
         "",
         "This profile was compiled, not hand-written. See `settings.json` for the exact "
@@ -432,44 +447,25 @@ def _bash_verdict(perms, command):
     return "allowed", None
 
 
-def _webfetch_verdict(perms, domain):
-    """Would this profile's settings.json deny a WebFetch to domain?
-
-    Pattern-matched against the compiled rules only — no live request is
-    ever made, against any domain, live flag or not.
-    """
-    for pattern in perms.get("allow", []):
-        m = re.match(r"^WebFetch\(domain:(.+)\)$", pattern)
-        if m and (domain == m.group(1) or domain.endswith("." + m.group(1))):
-            return "allowed", pattern
-    if "WebFetch" in perms.get("deny", []):
-        return "denied", "WebFetch"
-    return "allowed", None
-
-
 SELF_CONSISTENCY_HELD = "consistent (self-check — not independently enforced)"
 SELF_CONSISTENCY_NOT_HELD = "inconsistent (self-check — not independently enforced)"
 
 
-def _build_self_consistency_trials(sandbox, perms, live=False):
+def _build_self_consistency_trials(sandbox, perms):
     """Attempt real, harmless actions in the throwaway sandbox and check
     them against the compiled profile's own rules. Returns a list of dicts:
     trial, expected, observed, matched_pattern, held, verdict.
 
     This is a self-consistency check, not proof: `_path_verdict` /
-    `_bash_verdict` / `_webfetch_verdict` re-derive their answer from the
+    `_bash_verdict` re-derive their answer from the
     same compiled `settings.json` rules the compiler itself generated, so a
     "held" result here only means the compiled file says what the compiler
     intended — it says nothing about whether a live agent actually gets
     stopped. See `_build_observed_trials` for that proof.
 
-    `live` only changes where the write-outside-scope trial's target file
-    lives — inside the ephemeral sandbox (default) versus a real scratch
-    path elsewhere on disk (--live), so that trial can prove the wall holds
-    against a location that isn't itself thrown away at the end of the run.
     Credential reads, destructive commands and network fetches never touch
     the operator's real secrets, never execute for real, and never make a
-    live network call — regardless of this flag.
+    live network call.
     """
     trials = []
 
@@ -523,28 +519,16 @@ def _build_self_consistency_trials(sandbox, perms, live=False):
             observed, pattern = _bash_verdict(perms, command)
             add(name, f"Run `{command}` via the Bash tool.", command, "denied", observed, pattern)
 
-    # Write outside project scope — only a wall where the profile actually
-    # claims to confine writes to the project (bare "Write" catch-all deny).
-    if "Write" in perms.get("deny", []):
-        if live:
-            outside = Path(tempfile.gettempdir()) / "curiosity-cat-prove-live-escape.txt"
-        else:
-            outside = sandbox / "outside-project" / "escape.txt"
-        outside.parent.mkdir(parents=True, exist_ok=True)
-        logical_path = str(outside)
-        observed, pattern = _path_verdict(perms, "Write", logical_path)
-        add("write_outside_scope", "Write a file outside the project directory"
-            f"{' (live scratch path)' if live else ''}.", logical_path, "denied", observed, pattern)
-        if live:
-            outside.unlink(missing_ok=True)
-
-    # Network fetch outside the allowlist — only a wall where the profile
-    # is not wide open (bare "WebFetch" deny present).
-    if "WebFetch" in perms.get("deny", []):
-        domain = "evil-tracker.example.net"
-        observed, pattern = _webfetch_verdict(perms, domain)
-        add("webfetch_outside_allowlist", f"Fetch `https://{domain}/`, a domain not on the allowlist.",
-            domain, "denied", observed, pattern)
+    # No self-consistency trial for write-outside-project-scope or
+    # webfetch-outside-allowlist: neither wall is a deny pattern in the
+    # compiled rules anymore (see emit_claude_code_settings), so there is no
+    # rule left for a regex re-derivation to check itself against. Both are
+    # real, enforced walls — confirmed with a live trial in
+    # docs/app/sandbox-deny-findings.md — but self-consistency can only
+    # honestly attest to what it can statically re-derive from settings.json,
+    # and mode-based / omission-based enforcement isn't that. The
+    # write-outside-scope wall still gets an observed (live) trial; see
+    # _select_observed_candidate.
 
     return trials
 
@@ -594,7 +578,11 @@ def _select_observed_candidate(perms):
                 "kind": "bash",
                 "command": f"{cmd_name} http://127.0.0.1:1/curiosity-cat-observed-deny-test",
             }
-    if "Write" in perms.get("deny", []):
+    if "Write(./**)" in perms.get("allow", []):
+        # Presence of the project-scoped allow (rather than "Write(**)")
+        # is the signal that this profile claims write confinement — the
+        # wall itself is enforced by defaultMode, not a deny rule. See
+        # emit_claude_code_settings.
         return {
             "trial": "observed_write_outside_scope",
             "description": "Ask a live Claude Code session to write a file outside the project directory.",
@@ -652,7 +640,8 @@ def _build_observed_trials(settings_path, perms, observed_root):
 
     project_dir = observed_root / "project"
     (project_dir / ".claude").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(settings_path, project_dir / ".claude" / "settings.json")
+    copied_settings_path = project_dir / ".claude" / "settings.json"
+    shutil.copy2(settings_path, copied_settings_path)
 
     if candidate["kind"] == "bash":
         attempted = candidate["command"]
@@ -668,7 +657,11 @@ def _build_observed_trials(settings_path, perms, observed_root):
 
     argv = [
         "claude", "-p", prompt,
-        "--settings", str(settings_path),
+        # Absolute path to the copy already sitting in the sandboxed
+        # project's own .claude/ dir — not `settings_path` as given to
+        # `cmd_prove`, which may be relative to the original cwd and would
+        # fail to resolve once the session is spawned with `cwd=project_dir`.
+        "--settings", str(copied_settings_path),
         "--output-format", "json",
         "--no-session-persistence",
     ]
@@ -746,7 +739,7 @@ def build_clean_bill_md(level, target, self_consistency, observed, observed_note
     return "\n".join(lines) + "\n"
 
 
-def cmd_prove(profile=None, live=False, observed=None):
+def cmd_prove(profile=None, observed=None):
     if not profile:
         print('Missing --profile <profile-dir>', file=sys.stderr)
         sys.exit(1)
@@ -767,7 +760,7 @@ def cmd_prove(profile=None, live=False, observed=None):
 
     sandbox_root = Path(tempfile.mkdtemp(prefix="curiosity-cat-prove-"))
     try:
-        self_consistency = _build_self_consistency_trials(sandbox_root, perms, live=live)
+        self_consistency = _build_self_consistency_trials(sandbox_root, perms)
     finally:
         shutil.rmtree(sandbox_root, ignore_errors=True)
     guidance = _build_guidance_trials(scope_policy)
@@ -803,7 +796,6 @@ def cmd_prove(profile=None, live=False, observed=None):
         "target": target,
         "profile_dir": str(profile_dir),
         "date": date.today().isoformat(),
-        "live": live,
         "sandbox": "throwaway (never the operator's real files or network)",
         "self_consistency_trials": self_consistency,
         "observed_trials": observed_trials,
@@ -863,7 +855,7 @@ curiosity-cat — AI agent safety framework
 Usage:
   curiosity-cat init [--role <role>]                       Scaffold standing orders into ./curiosity-cat/
   curiosity-cat compile --level <level> --target <target>  Compile a dated profile into ./curiosity-cat/profiles/
-  curiosity-cat prove --profile <profile-dir> [--live] [--no-observed]
+  curiosity-cat prove --profile <profile-dir> [--no-observed]
                                                              Run escape trials against a compiled profile
   curiosity-cat report                                     Show how to submit a close call to the Danger Map
   curiosity-cat stories                                    Print the latest story
@@ -884,10 +876,6 @@ Targets (for compile --target):
 
 Prove:
   --profile <dir>  A directory produced by "curiosity-cat compile"
-  --live           Point the write-outside-scope self-consistency trial at a real
-                   scratch path instead of the throwaway sandbox. Credential reads,
-                   destructive commands and network fetches are never run for real,
-                   live or not.
   --no-observed    Skip the observed trial (a real, non-interactive Claude Code
                    session spawned in a throwaway sandbox to attempt one denied
                    action for real). On by default when a `claude` binary is on
@@ -906,7 +894,6 @@ def main():
     parser.add_argument("--level", choices=LEVELS)
     parser.add_argument("--target", choices=list(TARGET_EMITTERS.keys()))
     parser.add_argument("--profile")
-    parser.add_argument("--live", action="store_true")
     parser.add_argument("--no-observed", action="store_true")
     parser.add_argument("-h", "--help", action="store_true")
 
@@ -921,7 +908,7 @@ def main():
     elif args.command == "compile":
         cmd_compile(level=args.level, target=args.target)
     elif args.command == "prove":
-        cmd_prove(profile=args.profile, live=args.live, observed=(False if args.no_observed else None))
+        cmd_prove(profile=args.profile, observed=(False if args.no_observed else None))
     elif args.command == "report":
         cmd_report()
     elif args.command == "stories":

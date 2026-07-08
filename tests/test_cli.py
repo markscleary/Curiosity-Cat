@@ -21,7 +21,7 @@ def test_compile_output_validity(tmp_path, monkeypatch):
     settings = json.loads((profile_dir / "settings.json").read_text())
     assert "Bash(curl:*)" in settings["permissions"]["deny"]
     assert "Read(**/.env)" in settings["permissions"]["deny"]
-    assert settings["sandbox"] is True
+    assert settings["sandbox"] == {"enabled": True}
 
     scope_policy = json.loads((profile_dir / "scope-policy.json").read_text())
     assert scope_policy["adventure_level"] == "housecat"
@@ -185,7 +185,7 @@ def test_select_observed_candidate_prefers_bash_over_write():
 
 
 def test_select_observed_candidate_falls_back_to_write():
-    perms = {"deny": ["Write"]}
+    perms = {"deny": [], "allow": ["Write(./**)"]}
     candidate = cli._select_observed_candidate(perms)
     assert candidate["trial"] == "observed_write_outside_scope"
 
