@@ -20,9 +20,13 @@ classifiers = [
 ]
 dependencies = ["Pillow>=10"]
 
+[project.optional-dependencies]
+mcp = ["mcp>=1.2"]
+
 [project.scripts]
 curiosity-cat = "curiosity_cat.cli:main"
 ccat-engine = "curiosity_cat.serve:main"
+curiosity-cat-mcp = "curiosity_cat.mcp_server:main"
 
 [project.urls]
 Homepage = "https://github.com/markscleary/Curiosity-Cat"

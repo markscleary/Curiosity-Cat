@@ -176,6 +176,34 @@ notarised builds are blocked on an Apple Developer ID — see
 
 ---
 
+## MCP Server
+
+`curiosity-cat-mcp` exposes the engine's two operator-facing calls — `check` and `report` — as an [MCP](https://modelcontextprotocol.io) stdio server, using the official `mcp` Python SDK. Any MCP-aware client can whisker-check a candidate or file a close call directly, no CLI required.
+
+```bash
+pip install "curiosity-cat[mcp]"
+```
+
+**`check`** — read-only Danger Map lookup, no consent required. Takes a URL, package, or command; returns the whisker verdict, any matched `threat_class`(es) with their MITRE ATLAS technique and NIST AI RMF cross-reference (`danger-map/schema.json`'s `threatClassStandards`), and one human sentence.
+
+**`report`** — files a close call through the same consent-gated `core.report_close_call()` path `curiosity-cat report` and the Mouse Tray use. Unlike the Mouse Tray — which queues an event the Watcher captured automatically for a *later*, separate approval — calling this tool *is* the explicit human consent act: an MCP client surfaces a tool call for approval before it ever runs, so that approval is the tap Network Layer Principle a requires. There is no second confirmation step inside the tool itself. Carries pattern only — `threat_class`, `indicator`, `platform`, `profile_version`, and the rest of `REQUIRED_REPORT_FIELDS` — never a raw prompt, path, or file content.
+
+Client config, one line each:
+
+**Claude Code**
+
+```bash
+claude mcp add curiosity-cat -- curiosity-cat-mcp
+```
+
+**Claude Desktop** — add to `claude_desktop_config.json`:
+
+```json
+{"mcpServers": {"curiosity-cat": {"command": "curiosity-cat-mcp"}}}
+```
+
+---
+
 ## Vet
 
 A compiled profile is a snapshot: the engine version, the Danger Map schema, and the platform it was proved against can all move on without it noticing. `curiosity-cat vet` checks whether they have.
