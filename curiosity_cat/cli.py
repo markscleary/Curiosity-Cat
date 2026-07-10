@@ -11,7 +11,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from curiosity_cat import core
+from curiosity_cat import core, listen
 
 DATA_DIR = core.DATA_DIR
 ROLE_FILES = core.ROLE_FILES
@@ -242,6 +242,13 @@ def cmd_vet(profile=None, recompile=False):
     print()
 
 
+def cmd_listen(profile=None):
+    if not profile:
+        print('Missing --profile <profile-dir>', file=sys.stderr)
+        sys.exit(1)
+    listen.serve_forever(profile)
+
+
 def cmd_stories():
     stories_dir = DATA_DIR / "stories"
     if not stories_dir.exists():
@@ -273,6 +280,7 @@ Usage:
   curiosity-cat tray --profile <profile-dir> [--approve <ids>]
                                                              List or approve the Mouse Tray queue
   curiosity-cat vet --profile <profile-dir> [--recompile]  Compare a profile against what's installed now
+  curiosity-cat listen --profile <profile-dir>             Run the reference Watcher listener
   curiosity-cat stories                                    Print the latest story
 
 Roles (for init --role):
@@ -312,6 +320,12 @@ Vet:
                      same level/target and prove it (observed trials),
                      emitting a new Clean Bill. Without this flag, vet is
                      read-only and never writes anything.
+
+Listen:
+  --profile <dir>  A directory produced by "curiosity-cat compile" — denied
+                   events with a threat_class are queued to this profile's
+                   Mouse Tray. Listens on 127.0.0.1:8377/event, the same
+                   endpoint compiled PreToolUse/PostToolUse hooks POST to.
 """)
 
 
@@ -322,7 +336,7 @@ def main():
         add_help=False,
     )
     parser.add_argument("command", nargs="?",
-                         choices=["init", "compile", "prove", "check", "report", "tray", "vet", "stories"])
+                         choices=["init", "compile", "prove", "check", "report", "tray", "vet", "listen", "stories"])
     parser.add_argument("candidate", nargs="?")
     parser.add_argument("--role", choices=list(ROLE_FILES.keys()))
     parser.add_argument("--level", choices=LEVELS)
@@ -353,6 +367,8 @@ def main():
         cmd_tray(profile=args.profile, approve=args.approve)
     elif args.command == "vet":
         cmd_vet(profile=args.profile, recompile=args.recompile)
+    elif args.command == "listen":
+        cmd_listen(profile=args.profile)
     elif args.command == "stories":
         cmd_stories()
 

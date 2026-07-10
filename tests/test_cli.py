@@ -180,6 +180,36 @@ def test_tray_approve_only_submits_named_ids(tmp_path, monkeypatch, capsys):
     assert statuses == {1: "submitted", 2: "pending"}
 
 
+def test_listen_missing_profile_flag_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_listen(profile=None)
+    assert exc_info.value.code == 1
+    assert "Missing --profile" in capsys.readouterr().err
+
+
+def test_listen_delegates_to_listen_serve_forever(tmp_path, monkeypatch):
+    from curiosity_cat import listen
+
+    calls = []
+    monkeypatch.setattr(listen, "serve_forever", lambda profile_dir: calls.append(profile_dir))
+
+    cli.cmd_listen(profile=str(tmp_path))
+
+    assert calls == [str(tmp_path)]
+
+
+def test_main_dispatches_listen_command(tmp_path, monkeypatch):
+    from curiosity_cat import listen
+
+    calls = []
+    monkeypatch.setattr(listen, "serve_forever", lambda profile_dir: calls.append(profile_dir))
+    monkeypatch.setattr(sys, "argv", ["curiosity-cat", "listen", "--profile", str(tmp_path)])
+
+    cli.main()
+
+    assert calls == [str(tmp_path)]
+
+
 def test_vet_missing_profile_flag_exits_one(capsys):
     with pytest.raises(SystemExit) as exc_info:
         cli.cmd_vet(profile=None)

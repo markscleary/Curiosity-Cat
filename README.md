@@ -116,6 +116,8 @@ curiosity-cat prove --profile ./curiosity-cat/profiles/housecat-claude-code-2026
 
 Where a wall is prompt-level only — standing orders, PII stripping, package vetting — prove says so honestly instead of pretending it is enforced.
 
+When the observed trial runs, `prove` also spawns a throwaway instance of the reference Watcher listener and checks that the same session's PreToolUse hook actually reached it — see [Watcher](#watcher) below.
+
 This writes a dated, versioned directory to `<profile-dir>/proof/proof-<YYYYMMDD>/`:
 
 | File | What it is |
@@ -160,6 +162,39 @@ Without `--recompile`, `vet` is read-only and reports drift in one plain sentenc
 It also surfaces a **drift signal**: if a wall's observed verdict (held vs. failed) has changed across platform versions in this profile's history, that's an early warning of platform drift, not noise.
 
 With `--recompile`, `vet` compiles a fresh, separately-dated profile for the same level and target and proves it (observed trials by default), emitting a new Clean Bill and appending to the drift history. It never touches the original profile directory — recompiling always produces a new dated profile alongside the old one, the same as running `compile` again would. Without the flag, `vet` never writes anything at all.
+
+---
+
+## Watcher
+
+A compiled profile is a rulebook. The Watcher is what lets you see it actually being read, live.
+
+`curiosity-cat compile --target claude-code` now writes a `hooks` block into the generated `settings.json`: PreToolUse and PostToolUse entries that invoke `python3 -m curiosity_cat.events` on every tool call and POST a small event to `http://127.0.0.1:8377/event`. **Fail-open, always**: a listener that's down, slow, or absent must never break the agent — the hook's own network timeout is capped at one second, and every failure mode (connection refused, timeout, malformed response) is swallowed silently. The hook always exits 0.
+
+The event schema (`curiosity_cat/events.py`):
+
+| Field | What it is |
+|-------|------------|
+| `ts` | When the event fired |
+| `session` | The Claude Code session id |
+| `tool` | The tool name (`Bash`, `Read`, `Write`, ...) |
+| `input_digest` | A short hash plus a bounded, sanitised excerpt — never a full path, prompt, or file content (pattern, not payload; see below) |
+| `verdict` | `allowed`, `denied`, or `held` |
+| `threat_class` | Set only for a `denied` verdict, from the same enum `curiosity-cat report` uses |
+| `profile_id` | The adventure level this event's profile was compiled for |
+
+PreToolUse fires *before* Claude Code's own permission engine reaches its decision, so its `verdict` is a live re-derivation from the compiled `settings.json`'s own deny rules — the identical logic `prove`'s self-consistency trials already use (`core._path_verdict` / `core._bash_verdict`), applied to the actual call instead of a planted trial. It is a prediction, not an observation of the engine's own decision; anything downstream that grades it must say so honestly (see below). PostToolUse only ever fires once a tool call has already succeeded, so it always reports `allowed`. `input_digest` is built exclusively from argument *keys* and, for Bash, the command's leading verb — never a raw path, URL, prompt, or file content, no matter what the tool call actually carried.
+
+**Reference listener** — `curiosity-cat listen --profile <profile-dir>` runs a local HTTP server on `127.0.0.1:8377`, the same endpoint the compiled hooks POST to. It prints one Meow-voice sentence per event, and for a `denied` event that carries a `threat_class`, queues a Mouse Tray report via `core.queue_close_call()` — nothing is ever submitted from here, same as `tray` (Network Layer Principles a/e). That report's `grade` is always `"suspected"`, never `"observed"`: it came from a PreToolUse hook's live pattern match, not from watching Claude Code's permission engine make its own decision, and Network Layer Principle d means that distinction travels with the event rather than getting inferred away.
+
+```bash
+curiosity-cat compile --level housecat --target claude-code
+curiosity-cat listen --profile ./curiosity-cat/profiles/housecat-claude-code-20260705
+```
+
+`prove` gained a matching trial: with a live `claude` binary available, it now also spawns a throwaway instance of this reference listener, runs its usual observed-deny action, and confirms the hooked event actually reached the listener and got queued — proof of the round trip, not just of the compiled rule. If the Watcher port is already bound by something else (plausibly a real listener already running), this trial reports itself skipped rather than failed.
+
+This is the reference wiring, not the shipping Feed — the Tauri shell's Bell (APP-4) is the real-time UI this listener stands in for today.
 
 ---
 

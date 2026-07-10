@@ -1,7 +1,9 @@
 """Tests for the curiosity-cat engine (curiosity_cat.core)."""
 
 import json
+import socket
 import sys
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -137,14 +139,22 @@ def test_prove_observed_trial_held_when_denial_recorded(tmp_path, monkeypatch):
         "result": "The command was denied by permission settings.",
         "permission_denials": [{"tool_name": "Bash", "tool_input": {"command": "curl ..."}}],
     }))
+    # Hook round-trip is exercised separately (test_prove_hook_roundtrip_trial_*
+    # below) — here it's skipped so this test stays focused on the
+    # pre-existing observed-deny trial alone.
+    monkeypatch.setattr(core, "_start_watcher_listener", lambda watcher_profile_dir, timeout=2.0: None)
 
     clean_bill = core.prove(profile.path)
 
-    [trial] = clean_bill.observed_trials
+    trial = next(t for t in clean_bill.observed_trials if t["trial"] == "observed_bash_deny")
     assert trial["method"] == "observed-deny"
     assert trial["held"] is True
     assert trial["verdict"].startswith("observed-deny: held")
     assert clean_bill.platform_version == "1.2.3 (Claude Code)"
+
+    hook_trial = next(t for t in clean_bill.observed_trials if t["trial"] == "hook_roundtrip")
+    assert hook_trial["held"] is None
+    assert "skipped" in hook_trial["verdict"]
 
     history = json.loads((Path(profile.path) / "wall-history.json").read_text())
     assert history == [{
@@ -162,16 +172,75 @@ def test_prove_observed_trial_fails_when_action_not_blocked(tmp_path, monkeypatc
         "result": "Ran the command; it reached the network layer.",
         "permission_denials": [],
     }))
+    monkeypatch.setattr(core, "_start_watcher_listener", lambda watcher_profile_dir, timeout=2.0: None)
 
     clean_bill = core.prove(profile.path)
 
-    [trial] = clean_bill.observed_trials
+    trial = next(t for t in clean_bill.observed_trials if t["trial"] == "observed_bash_deny")
     assert trial["held"] is False
     assert "FAILED" in trial["verdict"]
     assert clean_bill.passed is False
 
     history = json.loads((Path(profile.path) / "wall-history.json").read_text())
     assert history[0]["verdict"] == "failed"
+
+
+def _watcher_port_in_use():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        try:
+            probe.bind((core.WATCHER_HOST, core.WATCHER_PORT))
+        except OSError:
+            return True
+    return False
+
+
+def test_prove_hook_roundtrip_trial_reaches_real_listener(tmp_path, monkeypatch):
+    """End-to-end proof of item 4 of the Watcher brief: spawn the real
+    reference listener, run a hooked denied action, confirm the event
+    arrived. No real `claude` binary is needed for this — the fake
+    `_spawn_observed_session` below stands in for what a live Claude Code
+    session's PreToolUse hook would actually do (POST the denied event),
+    and everything downstream of that POST (the real listener process, the
+    real HTTP handler, the real queue_close_call) runs for real.
+    """
+    if _watcher_port_in_use():
+        pytest.skip(f"{core.WATCHER_HOST}:{core.WATCHER_PORT} already in use on this machine")
+
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+
+    monkeypatch.setattr(core.shutil, "which", lambda name: "/usr/bin/claude")
+    monkeypatch.setattr(core, "_detect_platform_version", lambda: "1.2.3 (Claude Code)")
+
+    def fake_spawn_session(argv, cwd, timeout=120):
+        event = {
+            "ts": "2026-07-10T00:00:00+00:00", "session": "hook-roundtrip-test", "tool": "Bash",
+            "input_digest": 'deadbeef:{"keys": ["command"], "verb": "curl"}',
+            "verdict": "denied", "threat_class": "unsafe-url", "profile_id": "housecat",
+        }
+        request = urllib.request.Request(
+            f"http://{core.WATCHER_HOST}:{core.WATCHER_PORT}/event",
+            data=json.dumps(event).encode("utf-8"),
+            headers={"Content-Type": "application/json"}, method="POST",
+        )
+        try:
+            urllib.request.urlopen(request, timeout=2).close()
+        except OSError:
+            pass  # no listener up yet for this particular call — fine, see below
+        return json.dumps({
+            "result": "The command was denied by permission settings.",
+            "permission_denials": [{"tool_name": "Bash", "tool_input": {"command": "curl ..."}}],
+        })
+
+    monkeypatch.setattr(core, "_spawn_observed_session", fake_spawn_session)
+
+    clean_bill = core.prove(profile.path)
+
+    hook_trial = next(t for t in clean_bill.observed_trials if t["trial"] == "hook_roundtrip")
+    assert hook_trial["held"] is True
+    assert hook_trial["verdict"].startswith("hook-roundtrip: held")
+
+    main_trial = next(t for t in clean_bill.observed_trials if t["trial"] == "observed_bash_deny")
+    assert main_trial["held"] is True
 
 
 def test_parse_observed_session_holds_on_recorded_denial():
