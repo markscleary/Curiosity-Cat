@@ -4,9 +4,12 @@ Tauri v2 menu bar (tray) shell for Curiosity Cat, macOS only in v1.
 APP-3 (see `../docs/app/APP_SPEC.md`, Shell section) built the tray icon
 state machine, the Slider window, and the first-run journey, plus a
 read-only Feed stub. APP-4 made the Feed live, enforced the Meow spec
-app-wide, and wired the approval gate. APP-5 (this brief) added share-card
-export and the weekly Purr. Signed, notarised packaging is APP-6 (blocked
-on Mark having an Apple Developer ID).
+app-wide, and wired the approval gate. APP-5 added share-card export and
+the weekly Purr. APP-6 (this brief) built the PyInstaller sidecar, an
+unsigned release build (.app + DMG), the Homebrew cask draft, and the
+updater config — everything distribution-shaped short of Apple
+credentials. Signing and notarisation are the one remaining step, blocked
+on Mark having an Apple Developer ID (`docs/app/SIGNING.md`).
 
 ## What APP-4 added
 
@@ -108,60 +111,68 @@ app/
 - Rust + Cargo (`brew install rust`, or rustup)
 - Node (for the `@tauri-apps/cli`, run via `npx` — no project-local
   `package.json`/`node_modules` needed for v1)
-- The `curiosity-cat` Python package installed somewhere on `PATH`, both as
-  `ccat-engine` (the sidecar, see below) and as the `curiosity-cat` CLI
-  itself (`watcher.rs` spawns `curiosity-cat listen --profile <dir>`) — the
-  same `pip install -e ..` step below covers both console scripts.
+- The `curiosity-cat` Python package installed somewhere on `PATH` as the
+  `curiosity-cat` CLI (`watcher.rs` spawns
+  `curiosity-cat listen --profile <dir>` — this is not yet bundled, see
+  "Known gap" below). `ccat-engine`, the sidecar, no longer needs a PATH
+  install — see below.
 
-## Sidecar: dev vs packaged
+## Sidecar: ccat-engine
 
-**Dev (now):** the app spawns whatever `ccat-engine` resolves to on `PATH`
-(`app/src-tauri/src/sidecar.rs`). Install the engine into a virtualenv and
-run Tauri with that venv's `bin/` prepended to `PATH`:
+`ccat-engine` ships as a PyInstaller onefile binary, bundled as a Tauri
+[external binary](https://v2.tauri.app/develop/sidecar/) rather than
+resolved on `PATH`. Build it once (from the repo root):
 
 ```sh
-cd app
-python3 -m venv .venv
-.venv/bin/pip install -e ..
-export PATH="$PWD/.venv/bin:$PATH"
-npx --yes @tauri-apps/cli@2 dev      # or: build --debug
+app/packaging/build-sidecar.sh
 ```
 
-If `ccat-engine` isn't found, the shell logs a warning to stderr and every
+This creates a build-only venv under `app/packaging/.build-venv`
+(`pip install -e .` + `pyinstaller`), runs
+`app/packaging/ccat-engine.spec`, and copies the result into
+`app/src-tauri/binaries/ccat-engine-<target-triple>` — the name
+`bundle.externalBin` (`tauri.conf.json`) and `capabilities/default.json`'s
+`shell:allow-execute` grant both expect. `tauri-build`'s `build.rs` step
+then copies/renames that binary next to the compiled Rust binary for
+every `cargo build`/`cargo tauri dev`/`cargo tauri build`, so this is a
+one-time step per target triple, not a per-build one — re-run it only
+after changing `curiosity_cat/serve.py` or its dependencies.
+
+`sidecar.rs` spawns it via `tauri_plugin_shell`'s `ShellExt::sidecar()`
+(an async, event-stream API — `CommandEvent::Stdout`/`Stderr` — replacing
+the earlier blocking `std::process::Command` + `BufReader`); the
+line-delimited JSON call contract itself
+(`call(method, params) -> Result<Value, String>`) is unchanged. If the
+sidecar binary is missing, `sidecar::init` logs to stderr and every
 sidecar-backed command (compile/prove/etc.) returns a clear error rather
-than crashing the app — see `sidecar::init` / `sidecar::call`.
+than crashing the app.
 
-**Packaged (future, APP-6 territory):** replace the dev spawn with a
-PyInstaller-built `ccat-engine` binary shipped as a Tauri
-[external binary](https://v2.tauri.app/develop/sidecar/) (`bundle.externalBin`
-in `tauri.conf.json`, invoked via `tauri_plugin_shell`'s sidecar API instead
-of a bare `Command::new("ccat-engine")`). The call surface in `sidecar.rs`
-(`call(method, params) -> Result<Value, String>`) does not need to change —
-only how the child process is located and spawned. Steps when that lands:
-
-1. `pyinstaller --onefile --name ccat-engine curiosity_cat/serve.py` (or a
-   spec file) per target triple, output named per Tauri's sidecar
-   convention (`ccat-engine-<target-triple>`).
-2. Add the binary path to `tauri.conf.json`'s `bundle.externalBin`.
-3. Swap `sidecar.rs`'s `Command::new("ccat-engine")` for
-   `app.shell().sidecar("ccat-engine")` (`tauri-plugin-shell`), which
-   resolves the bundled binary instead of searching `PATH`.
+**Known gap:** only `ccat-engine` is packaged this way. The Watcher
+listener (`curiosity-cat listen`, `watcher.rs`) still shells out to
+`curiosity-cat` on `PATH` — a signed/notarised build handed to someone
+without a local Python install would have a working Slider/Feed but no
+live watcher. Packaging that as a second sidecar is follow-up work, not
+part of this brief.
 
 ## Building
 
 ```sh
 cd app
-npx --yes @tauri-apps/cli@2 build --debug
+npx --yes @tauri-apps/cli@2 build          # unsigned release build: .app + .dmg
+# or: build --debug                        # .app only (bundle.targets includes dmg
+                                            # regardless, but --debug skips it)
 ```
 
-Produces `src-tauri/target/debug/bundle/macos/Curiosity Cat.app`. DMG
-bundling is left out of `bundle.targets` for now — it's a distribution
-concern that belongs with APP-6 packaging, not this scaffold.
+Produces `src-tauri/target/release/bundle/macos/Curiosity Cat.app` and
+`src-tauri/target/release/bundle/dmg/Curiosity Cat_0.1.0_aarch64.dmg`.
+Unsigned: macOS Gatekeeper will quarantine both until ad-hoc/Developer-ID
+signed — see `docs/app/SIGNING.md`.
 
-## macOS signing / notarisation (deferred to APP-6)
+## macOS signing / notarisation (deferred to APP-6 signing gate)
 
 Not done in this brief — blocked on Mark obtaining an Apple Developer ID
-(`docs/app/APP_SPEC.md` HUMAN DEPENDENCIES). For when that lands:
+(`docs/app/APP_SPEC.md` HUMAN DEPENDENCIES). Full commands in
+`docs/app/SIGNING.md`; summary:
 
 - `tauri.conf.json`'s `bundle.macOS.signingIdentity` (or the
   `APPLE_SIGNING_IDENTITY` env var) needs a "Developer ID Application"

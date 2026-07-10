@@ -14,13 +14,13 @@ const LAST_PROFILE_FILE: &str = "last-profile.json";
 /// names (serve.py DISPATCH) and returns a normal `{"error": ...}` response
 /// for an unknown one, so this stays a thin, protocol-shaped passthrough.
 #[tauri::command]
-pub fn sidecar_call(
+pub async fn sidecar_call(
     app: AppHandle,
     method: String,
     params: Option<Value>,
 ) -> Result<Value, String> {
     let state = app.state::<SidecarState>();
-    crate::sidecar::call(&state, &method, params.unwrap_or(Value::Object(Default::default())))
+    crate::sidecar::call(&app, &state, &method, params.unwrap_or(Value::Object(Default::default()))).await
 }
 
 /// Show a window for `label`/`url`, creating it on first use and just

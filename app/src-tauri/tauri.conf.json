@@ -20,15 +20,25 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["app"],
+    "targets": ["app", "dmg"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns"
     ],
+    "externalBin": ["binaries/ccat-engine"],
+    "createUpdaterArtifacts": false,
     "macOS": {
       "minimumSystemVersion": "12.0"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "REPLACE_WITH_TAURI_SIGNER_PUBLIC_KEY",
+      "endpoints": [
+        "https://github.com/markscleary/Curiosity-Cat/releases/latest/download/latest.json"
+      ]
     }
   }
 }

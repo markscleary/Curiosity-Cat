@@ -14,18 +14,19 @@ use watcher::WatcherState;
 
 fn main() {
     tauri::Builder::default()
-        .manage(SidecarState(Mutex::new(None)))
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .manage(SidecarState(tauri::async_runtime::Mutex::new(None)))
         .manage(WatcherState(Mutex::new(None)))
         .setup(|app| {
-            sidecar::init(&app.state::<SidecarState>());
+            let handle = app.handle().clone();
+            sidecar::init(&handle, &app.state::<SidecarState>());
             tray::build(app)?;
 
             // Menu bar app: no Dock icon, no window until the tray is
             // clicked or first-run needs to greet the user.
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-
-            let handle = app.handle().clone();
 
             // Created hidden, not lazily on tray click: the Feed's JS
             // (app/src/js/feed.js) is what polls the Watcher listener for
