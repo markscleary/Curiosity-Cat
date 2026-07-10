@@ -163,9 +163,53 @@ def test_vet_round_trip(tmp_path, monkeypatch):
 
 
 def test_unknown_method_is_an_error():
-    response = serve.handle_request({"id": 10, "method": "purr", "params": {}})
+    response = serve.handle_request({"id": 10, "method": "nonexistent_method", "params": {}})
     assert response["id"] == 10
     assert "unknown method" in response["error"]
+
+
+def test_render_share_card_round_trip(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    compiled = serve.handle_request({
+        "id": 20, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
+    })["result"]
+    clean_bill = serve.handle_request({
+        "id": 21, "method": "prove", "params": {"profile_dir": compiled["path"], "observed": False},
+    })["result"]
+
+    response = serve.handle_request({
+        "id": 22, "method": "render_share_card",
+        "params": {"clean_bill_path": clean_bill["clean_bill_path"]},
+    })
+    assert response["id"] == 22
+    assert "error" not in response
+    assert Path(response["result"]["path"]).exists()
+
+
+def test_render_share_card_requires_clean_bill_path():
+    response = serve.handle_request({"id": 23, "method": "render_share_card", "params": {}})
+    assert response["id"] == 23
+    assert "clean_bill_path is required" in response["error"]
+
+
+def test_purr_round_trip(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    compiled = serve.handle_request({
+        "id": 24, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
+    })["result"]
+
+    response = serve.handle_request({
+        "id": 25, "method": "purr", "params": {"profile_dir": compiled["path"]},
+    })
+    assert response["id"] == 25
+    assert "error" not in response
+    assert "stayed curled up" in response["result"]["text"]
+
+
+def test_purr_requires_profile_dir():
+    response = serve.handle_request({"id": 26, "method": "purr", "params": {}})
+    assert response["id"] == 26
+    assert "profile_dir is required" in response["error"]
 
 
 def test_serve_forever_handles_bad_json_line_without_crashing():

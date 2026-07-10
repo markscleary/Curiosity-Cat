@@ -5,14 +5,17 @@
 mod commands;
 mod sidecar;
 mod tray;
+mod watcher;
 
 use sidecar::SidecarState;
 use std::sync::Mutex;
 use tauri::Manager;
+use watcher::WatcherState;
 
 fn main() {
     tauri::Builder::default()
         .manage(SidecarState(Mutex::new(None)))
+        .manage(WatcherState(Mutex::new(None)))
         .setup(|app| {
             sidecar::init(&app.state::<SidecarState>());
             tray::build(app)?;
@@ -23,6 +26,26 @@ fn main() {
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
             let handle = app.handle().clone();
+
+            // Created hidden, not lazily on tray click: the Feed's JS
+            // (app/src/js/feed.js) is what polls the Watcher listener for
+            // live events and pending approval-gate holds, and that has to
+            // keep running whether or not the user has the Feed window
+            // open — this is the app's one always-on background webview.
+            let _ = tauri::WebviewWindowBuilder::new(
+                &handle,
+                "feed",
+                tauri::WebviewUrl::App("feed.html".into()),
+            )
+            .title("Curiosity Cat")
+            .inner_size(720.0, 560.0)
+            .visible(false)
+            .build();
+
+            if let Ok(Some(profile_dir)) = commands::get_last_profile_dir(handle.clone()) {
+                watcher::restart(&handle.state::<WatcherState>(), &profile_dir);
+            }
+
             if commands::is_first_run(handle.clone()).unwrap_or(true) {
                 commands::open_window(
                     handle,
@@ -36,6 +59,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::sidecar_call,
             commands::open_window,
+            commands::close_window,
+            commands::open_approval_window,
             commands::is_first_run,
             commands::complete_first_run,
             commands::get_last_profile_dir,

@@ -21,7 +21,9 @@
   <div class="card" id="cleanbill-card" hidden>
     <h2 id="cleanbill-heading">Clean Bill</h2>
     <div class="profile-md" id="cleanbill-md"></div>
+    <p class="status-line" id="share-card-status"></p>
     <div class="actions">
+      <button id="share-card-btn" class="secondary">Save share card</button>
       <button id="finish-btn">Meet your cat</button>
     </div>
   </div>
@@ -35,7 +37,10 @@
       var cleanbillCard = document.getElementById('cleanbill-card');
       var cleanbillHeading = document.getElementById('cleanbill-heading');
       var cleanbillMdEl = document.getElementById('cleanbill-md');
+      var shareCardBtn = document.getElementById('share-card-btn');
+      var shareCardStatus = document.getElementById('share-card-status');
       var finishBtn = document.getElementById('finish-btn');
+      var lastCleanBill = null;
 
       function trialLine(t) {
         var li = document.createElement('li');
@@ -65,6 +70,7 @@
 
       window.CCAT.prove(profileDir, true)
         .then(function (cleanBill) {
+          lastCleanBill = cleanBill;
           var allTrials = (cleanBill.self_consistency_trials || []).concat(cleanBill.observed_trials || []);
           return streamTrials(allTrials).then(function () {
             statusEl.textContent = cleanBill.passed
@@ -81,6 +87,18 @@
         .catch(function (err) {
           statusEl.textContent = 'Prove failed: ' + err;
         });
+
+      shareCardBtn.addEventListener('click', function () {
+        if (!lastCleanBill) return;
+        shareCardStatus.textContent = 'Rendering…';
+        window.CCAT.renderShareCard(lastCleanBill.clean_bill_path)
+          .then(function (result) {
+            shareCardStatus.textContent = 'Share card saved to ' + result.path;
+          })
+          .catch(function (err) {
+            shareCardStatus.textContent = 'Share card failed: ' + err;
+          });
+      });
 
       finishBtn.addEventListener('click', function () {
         window.CCAT.completeFirstRun()

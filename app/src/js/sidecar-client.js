@@ -20,11 +20,23 @@ window.CCAT = (function () {
     listTray: function (profileDir, status) {
       return call('list_tray', { profile_dir: profileDir, status: status });
     },
+    renderShareCard: function (cleanBillPath, outPath) {
+      return call('render_share_card', { clean_bill_path: cleanBillPath, out_path: outPath });
+    },
+    purr: function (profileDir, days) {
+      return call('purr', { profile_dir: profileDir, days: days });
+    },
     status: function () {
       return call('status', {});
     },
     openWindow: function (label, url) {
       return invoke('open_window', { label: label, url: url });
+    },
+    closeWindow: function (label) {
+      return invoke('close_window', { label: label });
+    },
+    openApprovalWindow: function (entryId) {
+      return invoke('open_approval_window', { entryId: entryId });
     },
     isFirstRun: function () {
       return invoke('is_first_run', {});

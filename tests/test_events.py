@@ -81,6 +81,92 @@ def test_build_event_falls_back_to_allowed_without_settings():
     assert event.verdict == events.VERDICT_ALLOWED
 
 
+def test_build_event_pre_tool_use_holds_irreversible_bash(tmp_path):
+    settings_path = _housecat_settings_path(tmp_path)
+    event = events.build_event("PreToolUse", {
+        "session_id": "s1", "tool_name": "Bash", "tool_input": {"command": "git push --force origin main"},
+    }, settings_path=settings_path)
+
+    assert event.verdict == events.VERDICT_HELD
+    assert event.threat_class is None
+
+
+def test_build_event_holds_irreversible_bash_even_without_settings():
+    # Unlike deny/allow, "held" isn't derived from the compiled
+    # settings.json — it's the approval gate's own floor list.
+    event = events.build_event("PreToolUse", {
+        "session_id": "s1", "tool_name": "Bash", "tool_input": {"command": "git reset --hard HEAD~5"},
+    }, settings_path=None)
+    assert event.verdict == events.VERDICT_HELD
+
+
+def test_build_event_post_tool_use_never_holds_irreversible_bash():
+    event = events.build_event("PostToolUse", {
+        "session_id": "s1", "tool_name": "Bash", "tool_input": {"command": "git push --force origin main"},
+    })
+    assert event.verdict == events.VERDICT_ALLOWED
+
+
+@pytest.mark.parametrize("command", [
+    "git push --force origin main",
+    "git push -f origin main",
+    "git reset --hard HEAD~1",
+    "git branch -D some-branch",
+])
+def test_matches_irreversible_bash_covers_the_floor_list(command):
+    assert events._matches_irreversible_bash(command) is True
+
+
+def test_matches_irreversible_bash_does_not_flag_ordinary_git():
+    assert events._matches_irreversible_bash("git push origin main") is False
+    assert events._matches_irreversible_bash("git status") is False
+
+
+def test_main_held_verdict_prints_deny_hook_output_and_never_raises(monkeypatch, capsys):
+    monkeypatch.setattr(events.gate, "request_decision", lambda event, **kwargs: events.gate.DECISION_DENY)
+    monkeypatch.setattr(events, "post_event", lambda event, **kwargs: True)
+    payload = json.dumps({"session_id": "s1", "tool_name": "Bash", "tool_input": {"command": "git push --force x"}})
+    import io
+    monkeypatch.setattr(sys, "stdin", io.StringIO(payload))
+
+    exit_code = events.main(["PreToolUse"])
+    assert exit_code == 0
+
+    out = json.loads(capsys.readouterr().out.strip())
+    assert out["hookSpecificOutput"]["hookEventName"] == "PreToolUse"
+    assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
+def test_main_held_verdict_prints_allow_hook_output_when_gate_allows(monkeypatch, capsys):
+    monkeypatch.setattr(events.gate, "request_decision", lambda event, **kwargs: events.gate.DECISION_ALLOW)
+    monkeypatch.setattr(events, "post_event", lambda event, **kwargs: True)
+    payload = json.dumps({"session_id": "s1", "tool_name": "Bash", "tool_input": {"command": "git branch -D old"}})
+    import io
+    monkeypatch.setattr(sys, "stdin", io.StringIO(payload))
+
+    exit_code = events.main(["PreToolUse"])
+    assert exit_code == 0
+
+    out = json.loads(capsys.readouterr().out.strip())
+    assert out["hookSpecificOutput"]["permissionDecision"] == "allow"
+
+
+def test_main_held_verdict_denies_when_gate_raises(monkeypatch, capsys):
+    def _boom(event, **kwargs):
+        raise OSError("listener unreachable")
+    monkeypatch.setattr(events.gate, "request_decision", _boom)
+    monkeypatch.setattr(events, "post_event", lambda event, **kwargs: True)
+    payload = json.dumps({"session_id": "s1", "tool_name": "Bash", "tool_input": {"command": "git reset --hard x"}})
+    import io
+    monkeypatch.setattr(sys, "stdin", io.StringIO(payload))
+
+    exit_code = events.main(["PreToolUse"])
+    assert exit_code == 0
+
+    out = json.loads(capsys.readouterr().out.strip())
+    assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
 def test_input_digest_never_leaks_full_path():
     secret_path = "/Users/mark/.ssh/id_rsa"
     digest = events.build_input_digest("Read", {"file_path": secret_path})

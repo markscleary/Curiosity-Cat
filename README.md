@@ -129,6 +129,20 @@ If any wall — self-consistency or observed — fails to hold, `prove` exits no
 
 ---
 
+## Share Card
+
+A Clean Bill is worth showing off, honestly. `curiosity-cat card` renders any `clean-bill.json` into a PNG: a drawn cat glyph, the adventure level, the date, `curiositycat.online`, and one headline number — how many **observed** (live) escape attempts survived.
+
+```bash
+curiosity-cat card ./curiosity-cat/profiles/housecat-claude-code-20260705/proof/proof-20260705/clean-bill.json
+```
+
+Writes `share-card.png` alongside the `clean-bill.json` by default (`--out <path>` to choose somewhere else). The same honesty invariant `prove` and `CLEAN-BILL.md` follow applies here: the headline number is built only from `observed_trials`, never `self_consistency_trials` — those are reported on their own line, clearly labelled a self-check, so the two can never be read as one claim. If no observed trial ran, the card says so plainly ("No live escape attempts run yet") rather than printing a bare `0` that could be misread as a wall that failed.
+
+The app's Clean Bill viewer (the end of the first-run journey) calls the same renderer through the sidecar's `render_share_card` method — one rendering path for the CLI and the app alike.
+
+---
+
 ## Mouse Tray
 
 A close call is a candidate for the Danger Map, not an automatic submission. The Mouse Tray is a local queue of denied/flagged events — a JSON file living inside the profile directory — that sits between "something happened" and "the community heard about it." Nothing in this codebase ever submits automatically; a Mouse Tray entry only reaches the Danger Map after an operator explicitly approves it.
@@ -213,6 +227,21 @@ curiosity-cat listen --profile ./curiosity-cat/profiles/housecat-claude-code-202
 `prove` gained a matching trial: with a live `claude` binary available, it now also spawns a throwaway instance of this reference listener, runs its usual observed-deny action, and confirms the hooked event actually reached the listener and got queued — proof of the round trip, not just of the compiled rule. If the Watcher port is already bound by something else (plausibly a real listener already running), this trial reports itself skipped rather than failed.
 
 This is the reference wiring, not the shipping Feed — the Tauri shell's Bell (APP-4) is the real-time UI this listener stands in for today.
+
+The reference listener also appends every event it receives, one JSON line per event, to `<profile-dir>/event-history.jsonl` — unlike the in-memory Feed above, this persists across listener restarts, and is the Purr's roaming source below.
+
+---
+
+## Purr
+
+A weekly digest in Nine Lives voice — one paragraph: where the cat roamed, what it avoided, and one interesting thing. Template-based, zero LLM dependency, built entirely from two local, already-persisted sources: the Watcher's `event-history.jsonl` and the Mouse Tray.
+
+```bash
+curiosity-cat purr --profile ./curiosity-cat/profiles/housecat-claude-code-20260705
+curiosity-cat purr --profile ./curiosity-cat/profiles/housecat-claude-code-20260705 --days 14
+```
+
+A quiet week — no watched session, nothing in the tray — is reported as honestly as a busy one: "This cat stayed curled up on the windowsill this week." The app has its own Purr window (tray menu: "This Week's Purr"), reading the same digest through the sidecar's `purr` method.
 
 ---
 

@@ -13,10 +13,11 @@ import argparse
 import json
 import sys
 
-from curiosity_cat import __version__, core
+from curiosity_cat import __version__, card, core, purr
 
 METHODS = ("compile", "prove", "check", "report_close_call",
-           "queue_close_call", "list_tray", "submit_approved", "vet", "status")
+           "queue_close_call", "list_tray", "submit_approved", "vet", "status",
+           "render_share_card", "purr")
 
 
 def _handle_compile(params):
@@ -83,6 +84,21 @@ def _handle_vet(params):
     ))
 
 
+def _handle_render_share_card(params):
+    clean_bill_path = params.get("clean_bill_path")
+    if not clean_bill_path:
+        raise ValueError('params.clean_bill_path is required')
+    return {"path": card.render_share_card_from_file(clean_bill_path, out_path=params.get("out_path"))}
+
+
+def _handle_purr(params):
+    profile_dir = params.get("profile_dir")
+    if not profile_dir:
+        raise ValueError('params.profile_dir is required')
+    days = params.get("days") or purr.DEFAULT_WINDOW_DAYS
+    return {"text": purr.generate_purr(profile_dir, days=days)}
+
+
 def _handle_status(params):
     return {
         "engine": "ccat-engine",
@@ -103,6 +119,8 @@ DISPATCH = {
     "submit_approved": _handle_submit_approved,
     "vet": _handle_vet,
     "status": _handle_status,
+    "render_share_card": _handle_render_share_card,
+    "purr": _handle_purr,
 }
 
 

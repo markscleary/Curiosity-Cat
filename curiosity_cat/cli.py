@@ -11,7 +11,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from curiosity_cat import core, listen
+from curiosity_cat import card, core, listen, purr
 
 DATA_DIR = core.DATA_DIR
 ROLE_FILES = core.ROLE_FILES
@@ -141,6 +141,21 @@ def cmd_prove(profile=None, observed=None):
           "tested walls held. Clean bill of health.\n")
 
 
+def cmd_card(clean_bill_path=None, out=None):
+    if not clean_bill_path:
+        print('Missing <clean-bill.json> — usage: curiosity-cat card <clean-bill.json> [--out PATH]',
+              file=sys.stderr)
+        sys.exit(1)
+
+    path = Path(clean_bill_path)
+    if not path.exists():
+        print(f'"{clean_bill_path}" does not exist.', file=sys.stderr)
+        sys.exit(1)
+
+    written = card.render_share_card_from_file(path, out_path=out)
+    print(f"\nWrote share card: {written}\n")
+
+
 def cmd_check(candidate=None):
     if not candidate:
         print('Missing candidate — usage: curiosity-cat check <url-or-source>', file=sys.stderr)
@@ -249,6 +264,15 @@ def cmd_listen(profile=None):
     listen.serve_forever(profile)
 
 
+def cmd_purr(profile=None, days=None):
+    if not profile:
+        print('Missing --profile <profile-dir>', file=sys.stderr)
+        sys.exit(1)
+    print()
+    print(purr.generate_purr(profile, days=days or purr.DEFAULT_WINDOW_DAYS))
+    print()
+
+
 def cmd_stories():
     stories_dir = DATA_DIR / "stories"
     if not stories_dir.exists():
@@ -281,6 +305,8 @@ Usage:
                                                              List or approve the Mouse Tray queue
   curiosity-cat vet --profile <profile-dir> [--recompile]  Compare a profile against what's installed now
   curiosity-cat listen --profile <profile-dir>             Run the reference Watcher listener
+  curiosity-cat card <clean-bill.json> [--out <path>]      Render a Clean Bill share card PNG
+  curiosity-cat purr --profile <profile-dir> [--days <n>]  Print this week's Purr digest
   curiosity-cat stories                                    Print the latest story
 
 Roles (for init --role):
@@ -326,6 +352,16 @@ Listen:
                    events with a threat_class are queued to this profile's
                    Mouse Tray. Listens on 127.0.0.1:8377/event, the same
                    endpoint compiled PreToolUse/PostToolUse hooks POST to.
+
+Card:
+  <clean-bill.json>  Path to a clean-bill.json written by "curiosity-cat prove"
+  --out <path>        Where to write the PNG. Defaults to share-card.png
+                       alongside the clean-bill.json.
+
+Purr:
+  --profile <dir>  A directory produced by "curiosity-cat compile"
+  --days <n>       How many days of event history/Mouse Tray to summarise
+                    (default 7)
 """)
 
 
@@ -336,7 +372,8 @@ def main():
         add_help=False,
     )
     parser.add_argument("command", nargs="?",
-                         choices=["init", "compile", "prove", "check", "report", "tray", "vet", "listen", "stories"])
+                         choices=["init", "compile", "prove", "check", "report", "tray", "vet", "listen",
+                                  "card", "purr", "stories"])
     parser.add_argument("candidate", nargs="?")
     parser.add_argument("--role", choices=list(ROLE_FILES.keys()))
     parser.add_argument("--level", choices=LEVELS)
@@ -345,6 +382,8 @@ def main():
     parser.add_argument("--no-observed", action="store_true")
     parser.add_argument("--approve")
     parser.add_argument("--recompile", action="store_true")
+    parser.add_argument("--out")
+    parser.add_argument("--days", type=int)
     parser.add_argument("-h", "--help", action="store_true")
 
     args, _ = parser.parse_known_args()
@@ -369,6 +408,10 @@ def main():
         cmd_vet(profile=args.profile, recompile=args.recompile)
     elif args.command == "listen":
         cmd_listen(profile=args.profile)
+    elif args.command == "card":
+        cmd_card(clean_bill_path=args.candidate, out=args.out)
+    elif args.command == "purr":
+        cmd_purr(profile=args.profile, days=args.days)
     elif args.command == "stories":
         cmd_stories()
 

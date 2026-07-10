@@ -18,6 +18,7 @@ classifiers = [
     "Topic :: Security",
     "Topic :: Software Development :: Libraries",
 ]
+dependencies = ["Pillow>=10"]
 
 [project.scripts]
 curiosity-cat = "curiosity_cat.cli:main"

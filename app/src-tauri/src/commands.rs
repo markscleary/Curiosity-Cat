@@ -1,4 +1,5 @@
 use crate::sidecar::SidecarState;
+use crate::watcher::WatcherState;
 use serde_json::Value;
 use std::fs;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
@@ -40,6 +41,43 @@ pub fn show_window(app: &AppHandle, label: &str, url: &str) {
 #[tauri::command]
 pub fn open_window(app: AppHandle, label: String, url: String) {
     show_window(&app, &label, &url);
+}
+
+#[tauri::command]
+pub fn close_window(app: AppHandle, label: String) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window(&label) {
+        window.close().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+/// Opens the approval-gate dialog for one held event (APP_SPEC.md Watcher
+/// section: "app surfaces one-sentence Meow-spec prompt") — a small,
+/// always-on-top window distinct from `show_window`'s regular-sized ones,
+/// since this is meant to interrupt and be answered quickly: the
+/// PreToolUse hook waiting on the other end has its own timeout (see
+/// curiosity_cat/gate.py). `entry_id` is the Watcher listener's own
+/// `/event/hold/pending` id; approval.html fetches that endpoint itself to
+/// render the Meow sentence, rather than this command copying it through —
+/// one less place for the text to drift out of sync with the listener's
+/// own record of it. A second call for the same still-open entry_id is a
+/// no-op rather than stacking a duplicate window.
+#[tauri::command]
+pub fn open_approval_window(app: AppHandle, entry_id: i64) -> Result<(), String> {
+    let label = format!("approval-{entry_id}");
+    if app.get_webview_window(&label).is_some() {
+        return Ok(());
+    }
+    let url = format!("approval.html?entryId={entry_id}&label={label}");
+    WebviewWindowBuilder::new(&app, &label, WebviewUrl::App(url.into()))
+        .title("Curiosity Cat — Approval needed")
+        .inner_size(420.0, 260.0)
+        .resizable(false)
+        .always_on_top(true)
+        .center()
+        .build()
+        .map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 /// Read back a file the sidecar just wrote (PROFILE.md, clean-bill.md, ...)
@@ -97,9 +135,16 @@ pub fn get_last_profile_dir(app: AppHandle) -> Result<Option<String>, String> {
     Ok(value.get("profile_dir").and_then(|v| v.as_str()).map(String::from))
 }
 
+/// Persists the active profile *and* restarts the Watcher listener to
+/// point at it — a compile without a live watcher behind it would mean
+/// Watcher hook events (and the approval gate) had nowhere to reach, so
+/// this is the one place that keeps "the profile the Feed reads" and "the
+/// profile the watcher is bound to" from drifting apart.
 #[tauri::command]
 pub fn set_last_profile_dir(app: AppHandle, profile_dir: String) -> Result<(), String> {
     let path = last_profile_path(&app)?;
     let contents = serde_json::json!({ "profile_dir": profile_dir }).to_string();
-    fs::write(path, contents).map_err(|e| e.to_string())
+    fs::write(path, contents).map_err(|e| e.to_string())?;
+    crate::watcher::restart(&app.state::<WatcherState>(), &profile_dir);
+    Ok(())
 }

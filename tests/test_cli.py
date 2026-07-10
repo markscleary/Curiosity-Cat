@@ -249,3 +249,52 @@ def test_stories_prints_latest_story(capsys):
     cli.cmd_stories()
     out = capsys.readouterr().out
     assert out.startswith("\n--- ")
+
+
+def test_card_missing_path_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_card(clean_bill_path=None)
+    assert exc_info.value.code == 1
+    assert "Missing <clean-bill.json>" in capsys.readouterr().err
+
+
+def test_card_rejects_missing_file(tmp_path, capsys):
+    missing = tmp_path / "clean-bill.json"
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_card(clean_bill_path=str(missing))
+    assert exc_info.value.code == 1
+    assert "does not exist" in capsys.readouterr().err
+
+
+def test_card_writes_png_from_a_real_clean_bill(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    cli.cmd_compile(level="housecat", target="claude-code")
+    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    cli.cmd_prove(profile=str(profile_dir), observed=False)
+    clean_bill_path = next(profile_dir.glob("proof/*/clean-bill.json"))
+    capsys.readouterr()
+
+    cli.cmd_card(clean_bill_path=str(clean_bill_path))
+
+    out = capsys.readouterr().out
+    assert "Wrote share card:" in out
+    assert (clean_bill_path.parent / "share-card.png").exists()
+
+
+def test_purr_missing_profile_flag_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_purr(profile=None)
+    assert exc_info.value.code == 1
+    assert "Missing --profile" in capsys.readouterr().err
+
+
+def test_purr_prints_a_digest_for_a_quiet_profile(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    cli.cmd_compile(level="housecat", target="claude-code")
+    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    capsys.readouterr()
+
+    cli.cmd_purr(profile=str(profile_dir))
+
+    out = capsys.readouterr().out
+    assert "stayed curled up" in out

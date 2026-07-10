@@ -14,6 +14,7 @@ tool call being reported on. Every failure mode here is swallowed silently.
 
 import hashlib
 import json
+import re
 import sys
 import urllib.request
 from dataclasses import asdict, dataclass
@@ -21,7 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from . import core
+from . import core, gate
 
 WATCHER_EVENT_URL = "http://127.0.0.1:8377/event"
 WATCHER_HOST = "127.0.0.1"
@@ -30,9 +31,9 @@ WATCHER_TIMEOUT_SECONDS = 1
 
 VERDICT_ALLOWED = "allowed"
 VERDICT_DENIED = "denied"
-# "held" is reserved for the APP-4 approval gate (PreToolUse hold-for-consent
-# on irreversible-class actions, APP_SPEC.md Watcher section) — this module
-# never emits it; it exists here only so the schema is complete up front.
+# The approval gate (PreToolUse hold-for-consent on irreversible-class
+# actions, APP_SPEC.md Watcher section, curiosity_cat.gate) — see
+# _pretool_verdict/_matches_irreversible_bash below for what earns this.
 VERDICT_HELD = "held"
 VERDICTS = [VERDICT_ALLOWED, VERDICT_DENIED, VERDICT_HELD]
 
@@ -110,6 +111,18 @@ def _bash_threat_class(pattern):
     return "scope-violation"
 
 
+def _matches_irreversible_bash(command):
+    """Would this command match one of core.IRREVERSIBLE_HOLD_PATTERNS —
+    the approval gate's floor list of irreversible-class actions? Mirrors
+    core._bash_verdict's own prefix-match style.
+    """
+    for pattern in core.IRREVERSIBLE_HOLD_PATTERNS:
+        m = re.match(r"^Bash\((.+):\*\)$", pattern)
+        if m and command.strip().startswith(m.group(1)):
+            return True
+    return False
+
+
 def _pretool_verdict(tool_name, tool_input, settings_path):
     """The verdict a PreToolUse hook can honestly claim: whether tool_input
     matches a deny pattern in the settings.json this session is actually
@@ -126,7 +139,18 @@ def _pretool_verdict(tool_name, tool_input, settings_path):
     Falls back to (allowed, None) for any tool/shape neither helper can
     evaluate (WebFetch, Grep, an unreadable settings file, ...) — same
     "never fabricate a denial" discipline as the rest of this codebase.
+
+    An irreversible-class Bash command (core.IRREVERSIBLE_HOLD_PATTERNS)
+    always returns "held", checked before anything else and regardless of
+    whether settings_path is even readable: unlike deny/allow, "held" isn't
+    derived from the compiled settings.json (Claude Code's permissions
+    schema has no bucket for it) — the approval gate (curiosity_cat.gate)
+    is this codebase's only enforcement of it.
     """
+    if tool_name == "Bash" and isinstance(tool_input.get("command"), str):
+        if _matches_irreversible_bash(tool_input["command"]):
+            return VERDICT_HELD, None
+
     perms = _load_permissions(settings_path)
     if perms is None:
         return VERDICT_ALLOWED, None
@@ -214,6 +238,12 @@ def main(argv=None):
     exit nonzero or hang would violate the fail-open contract (APP_SPEC.md
     Watcher section): Claude Code must never notice this hook exists,
     whether the listener is up or not.
+
+    The one exception is a held PreToolUse verdict (the approval gate,
+    curiosity_cat.gate): there, this hook's own stdout *is* Claude Code's
+    permission decision, printed as the hookSpecificOutput JSON contract,
+    and that path fails closed (no listener/no reply/any error -> deny)
+    rather than open, by design — see gate.py's docstring.
     """
     argv = sys.argv[1:] if argv is None else argv
     hook_event_name, settings_path, profile_id = _parse_hook_args(argv)
@@ -226,6 +256,23 @@ def main(argv=None):
 
     try:
         event = build_event(hook_event_name, payload, settings_path=settings_path, profile_id=profile_id)
+    except Exception:  # noqa: BLE001 - fail-open
+        return 0
+
+    if hook_event_name == "PreToolUse" and event.verdict == VERDICT_HELD:
+        event_dict = to_jsonable(event)
+        try:
+            decision = gate.request_decision(event_dict)
+        except Exception:  # noqa: BLE001 - fail-closed for the gate specifically, see gate.py
+            decision = gate.DECISION_DENY
+        print(json.dumps(gate.hook_output(decision, event_dict)))
+        try:
+            post_event(event)
+        except Exception:  # noqa: BLE001 - fail-open
+            pass
+        return 0
+
+    try:
         post_event(event)
     except Exception:  # noqa: BLE001 - fail-open
         pass

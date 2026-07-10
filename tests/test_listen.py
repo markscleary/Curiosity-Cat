@@ -3,6 +3,7 @@
 import json
 import sys
 import threading
+import time
 import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
@@ -112,6 +113,8 @@ def running_listener(tmp_path):
     profile = _compiled_profile(tmp_path)
     server = ThreadingHTTPServer(("127.0.0.1", 0), listen.WatcherHandler)
     server.profile_dir = profile.path
+    server.event_log = listen._EventLog()
+    server.holds = listen._HoldRegistry()
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
@@ -122,15 +125,30 @@ def running_listener(tmp_path):
         thread.join(timeout=5)
 
 
-def _post(server, path, payload):
+def _post(server, path, payload, timeout=5):
     host, port = server.server_address
     data = json.dumps(payload).encode("utf-8") if payload is not None else b"not json"
     request = urllib.request.Request(f"http://{host}:{port}{path}", data=data, method="POST")
     try:
-        with urllib.request.urlopen(request, timeout=5) as response:
-            return response.status
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            raw = response.read()
+            return response.status, (json.loads(raw) if raw else None)
     except urllib.error.HTTPError as exc:
-        return exc.code
+        raw = exc.read()
+        body = None
+        if raw:
+            try:
+                body = json.loads(raw)
+            except json.JSONDecodeError:
+                body = None
+        return exc.code, body
+
+
+def _get(server, path):
+    host, port = server.server_address
+    request = urllib.request.Request(f"http://{host}:{port}{path}", method="GET")
+    with urllib.request.urlopen(request, timeout=5) as response:
+        return response.status, json.loads(response.read())
 
 
 def test_listener_queues_denied_event_to_mouse_tray_over_real_http(running_listener):
@@ -140,7 +158,7 @@ def test_listener_queues_denied_event_to_mouse_tray_over_real_http(running_liste
         "input_digest": "abc12345:{}", "verdict": "denied", "threat_class": "unauthorized-tool-use",
         "profile_id": "housecat",
     }
-    status = _post(server, "/event", event)
+    status, _ = _post(server, "/event", event)
     assert status == 204
 
     queue = core.list_tray(profile.path)
@@ -155,18 +173,172 @@ def test_listener_does_not_queue_allowed_event_over_real_http(running_listener):
         "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Read",
         "input_digest": "abc12345:{}", "verdict": "allowed", "profile_id": "housecat",
     }
-    status = _post(server, "/event", event)
+    status, _ = _post(server, "/event", event)
     assert status == 204
     assert core.list_tray(profile.path) == []
 
 
 def test_listener_rejects_unknown_path(running_listener):
     server, _profile = running_listener
-    status = _post(server, "/not-event", {"tool": "Bash", "verdict": "allowed"})
+    status, _ = _post(server, "/not-event", {"tool": "Bash", "verdict": "allowed"})
     assert status == 404
 
 
 def test_listener_rejects_malformed_json(running_listener):
     server, _profile = running_listener
-    status = _post(server, "/event", None)
+    status, _ = _post(server, "/event", None)
     assert status == 400
+
+
+def test_denied_event_prints_meow_block_not_one_liner(running_listener, capsys):
+    server, _profile = running_listener
+    event = {
+        "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Bash",
+        "input_digest": "abc12345:{}", "verdict": "denied", "threat_class": "unauthorized-tool-use",
+        "profile_id": "housecat",
+    }
+    status, _ = _post(server, "/event", event)
+    assert status == 204
+    # ThreadingHTTPServer prints from a worker thread; give it a beat.
+    time.sleep(0.2)
+    printed = capsys.readouterr().out
+    assert printed.count(".") >= 3
+    assert "disagree" in printed
+
+
+def test_get_events_returns_recent_events_and_supports_since(running_listener):
+    server, _profile = running_listener
+    event = {
+        "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Read",
+        "input_digest": "abc12345:{}", "verdict": "allowed", "profile_id": "housecat",
+    }
+    _post(server, "/event", event)
+    status, entries = _get(server, "/events")
+    assert status == 200
+    assert len(entries) == 1
+    assert entries[0]["event"]["tool"] == "Read"
+    assert entries[0]["kind"] == "event"
+
+    status, entries_since = _get(server, f"/events?since={entries[0]['id']}")
+    assert status == 200
+    assert entries_since == []
+
+
+def test_hold_resolves_to_allow_when_decision_posted(running_listener):
+    server, _profile = running_listener
+    event = {
+        "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Bash",
+        "input_digest": "abc12345:{}", "verdict": "held", "profile_id": "housecat",
+    }
+
+    result = {}
+
+    def _hold():
+        status, body = _post(server, "/event/hold", event, timeout=10)
+        result["status"] = status
+        result["body"] = body
+
+    thread = threading.Thread(target=_hold)
+    thread.start()
+
+    entry_id = None
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline and entry_id is None:
+        status, pending = _get(server, "/event/hold/pending")
+        if pending:
+            entry_id = pending[0]["id"]
+        else:
+            time.sleep(0.05)
+    assert entry_id is not None
+
+    status, _ = _post(server, f"/event/hold/{entry_id}/decision", {"decision": "allow"})
+    assert status == 204
+
+    thread.join(timeout=10)
+    assert result["status"] == 200
+    assert result["body"]["decision"] == "allow"
+    assert result["body"]["id"] == entry_id
+
+    status, entries = _get(server, "/events")
+    resolved = [e for e in entries if e["id"] == entry_id][0]
+    assert resolved["status"] == "allowed"
+
+
+def test_hold_times_out_to_deny_when_nobody_answers(running_listener, monkeypatch):
+    server, _profile = running_listener
+    monkeypatch.setattr(listen, "HOLD_WAIT_SECONDS", 0.3)
+    event = {
+        "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Bash",
+        "input_digest": "abc12345:{}", "verdict": "held", "profile_id": "housecat",
+    }
+
+    status, body = _post(server, "/event/hold", event, timeout=10)
+    assert status == 200
+    assert body["decision"] == "deny"
+
+    status, entries = _get(server, "/events")
+    resolved = [e for e in entries if e["id"] == body["id"]][0]
+    assert resolved["status"] == "denied"
+
+
+def test_decision_on_unknown_id_returns_404(running_listener):
+    server, _profile = running_listener
+    status, _ = _post(server, "/event/hold/999/decision", {"decision": "allow"})
+    assert status == 404
+
+
+def test_handle_event_appends_to_persisted_event_history(running_listener):
+    server, profile = running_listener
+    event = {
+        "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Read",
+        "input_digest": "abc12345:{}", "verdict": "allowed", "profile_id": "housecat",
+    }
+    status, _ = _post(server, "/event", event)
+    assert status == 204
+
+    history_path = Path(profile.path) / listen.EVENT_HISTORY_FILENAME
+    assert history_path.exists()
+    lines = [json.loads(line) for line in history_path.read_text().splitlines() if line.strip()]
+    assert len(lines) == 1
+    assert lines[0]["tool"] == "Read"
+
+
+def test_handle_event_appends_denied_events_too_for_the_purr(running_listener):
+    server, profile = running_listener
+    for verdict in ("allowed", "denied", "held"):
+        event = {
+            "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Bash",
+            "input_digest": "abc12345:{}", "verdict": verdict, "profile_id": "housecat",
+        }
+        status, _ = _post(server, "/event", event)
+        assert status == 204
+
+    history_path = Path(profile.path) / listen.EVENT_HISTORY_FILENAME
+    lines = [json.loads(line) for line in history_path.read_text().splitlines() if line.strip()]
+    assert [l["verdict"] for l in lines] == ["allowed", "denied", "held"]
+
+
+def test_decision_with_invalid_value_returns_400(running_listener):
+    server, _profile = running_listener
+    # Register a real pending hold first so a bad decision value is the
+    # only thing under test.
+    event = {"tool": "Bash", "verdict": "held"}
+    thread = threading.Thread(target=lambda: _post(server, "/event/hold", event, timeout=10))
+    thread.start()
+    entry_id = None
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline and entry_id is None:
+        _, pending = _get(server, "/event/hold/pending")
+        if pending:
+            entry_id = pending[0]["id"]
+        else:
+            time.sleep(0.05)
+    assert entry_id is not None
+
+    status, _ = _post(server, f"/event/hold/{entry_id}/decision", {"decision": "maybe"})
+    assert status == 400
+
+    # Clean up: resolve it for real so the background thread doesn't
+    # linger past the test.
+    _post(server, f"/event/hold/{entry_id}/decision", {"decision": "deny"})
+    thread.join(timeout=10)

@@ -50,6 +50,21 @@ DESTRUCTIVE_DENY_PATTERNS = [
     "Bash(rm -rf:*)",
 ]
 
+# Irreversible-class actions (docs/app/APP_SPEC.md Watcher section's
+# approval gate). Claude Code's settings.json has no "hold for a human"
+# permission bucket — only allow/deny/ask — so these never appear in
+# emit_claude_code_settings' compiled deny/ask lists below. The PreToolUse
+# hook (curiosity_cat/events.py) is the only enforcement point for them,
+# via curiosity_cat/gate.py. Same floor treatment as CREDENTIAL_DENY_
+# PATTERNS/DESTRUCTIVE_DENY_PATTERNS above: holds at every adventure level,
+# widening the slider widens exploration, not this.
+IRREVERSIBLE_HOLD_PATTERNS = [
+    "Bash(git push --force:*)",
+    "Bash(git push -f:*)",
+    "Bash(git reset --hard:*)",
+    "Bash(git branch -D:*)",
+]
+
 # Level definitions are target-agnostic ("abstract"). Each target emitter
 # below reads these knobs and renders them into that tool's own config
 # format — adding a new target is a new emitter function, not a rewrite
@@ -139,8 +154,19 @@ WATCHER_PORT = 8377
 # repoint this at the bundled PyInstaller sidecar interpreter instead.
 _WATCHER_HOOK_TIMEOUT_SECONDS = 2
 
+# PreToolUse gets a longer budget than PostToolUse: it's the one hook that
+# can be asked to hold for a human decision via the approval gate
+# (curiosity_cat/gate.py), and 2 seconds is nowhere near enough time for
+# that. PostToolUse never gates — it only ever observes an already-finished
+# tool call — so it keeps the fast, purely-observational budget. Kept above
+# gate.DEFAULT_TIMEOUT_SECONDS with margin, so a normal timeout-deny round
+# trip finishes and reports itself honestly instead of Claude Code killing
+# the hook process first and leaving no decision at all.
+_WATCHER_GATE_TIMEOUT_SECONDS = 30
+
 
 def _watcher_hook_entry(hook_event_name, level):
+    timeout = _WATCHER_GATE_TIMEOUT_SECONDS if hook_event_name == "PreToolUse" else _WATCHER_HOOK_TIMEOUT_SECONDS
     command = (
         f"python3 -m curiosity_cat.events {hook_event_name} "
         "--settings ${CLAUDE_PROJECT_DIR}/.claude/settings.json "
@@ -148,7 +174,7 @@ def _watcher_hook_entry(hook_event_name, level):
     )
     return [{
         "matcher": "*",
-        "hooks": [{"type": "command", "command": command, "timeout": _WATCHER_HOOK_TIMEOUT_SECONDS}],
+        "hooks": [{"type": "command", "command": command, "timeout": timeout}],
     }]
 
 
