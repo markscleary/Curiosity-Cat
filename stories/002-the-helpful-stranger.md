@@ -18,3 +18,4 @@ Severity: nearly_eaten
 Threat class: package-risk
 What caught it: standing order — flag packages with low downloads and recent creation
 Lesson: the most helpful-looking stranger is sometimes the most dangerous one.
+The vet's reference for this: MITRE ATLAS AML.T0011.001

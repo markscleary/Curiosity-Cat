@@ -11,6 +11,7 @@ The agent did not enter anything. It did not click through. It noted the redirec
 The cat came home with a scratch and a report.
 
 Severity: bitten
-Threat class: credential_phishing
+Threat class: credential-exposure
 What caught it: standing order — do not follow unexpected redirects, never enter credentials on unrecognised domains
 Lesson: three doors between you and where you started is two doors too many.
+The vet's reference for this: MITRE ATLAS AML.T0055

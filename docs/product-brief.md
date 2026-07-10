@@ -88,7 +88,7 @@ Curiosity Cat provides close calls, not death notices.
 
 The foundation layer is local. It runs on the operator's own system and provides immediate protection without depending on anything external.
 
-Curiosity Cat applies operator-defined rules to external content before that content is used by an agent. Depending on policy, content may be allowed, logged, flagged, quarantined or blocked.
+Curiosity Cat's standing orders and policy files guide how external content should be handled before that content is used by an agent. Depending on policy, content is meant to be allowed, logged, flagged or quarantined.
 
 This layer includes:
 
@@ -99,14 +99,14 @@ This layer includes:
 - **Policy packs** — preset configurations for common agent types (research agent, coding agent, enterprise analyst, education-safe agent) so operators do not have to build policy from scratch
 - **Action thresholds** that determine when the operator should be notified versus when the system handles the event silently
 
-The operator does not manually decide every event. The operator defines the policy. Curiosity Cat enforces or escalates according to that policy.
+The operator does not manually decide every event. The operator defines the policy. Curiosity Cat guides or escalates according to that policy.
 
-**Policy modes:**
+**Coming: enforcement modes**
 
-- **Observe** — records and reports without interrupting the workflow unless something very serious occurs
-- **Warn** — flags medium- and high-risk events and asks for review in selected cases
-- **Quarantine** — isolates suspicious files or outputs for approval before use
-- **Block** — prevents selected classes of action entirely according to local policy
+- **Observe** — will record and report without interrupting the workflow unless something very serious occurs
+- **Warn** — will flag medium- and high-risk events and ask for review in selected cases
+- **Quarantine** — will isolate suspicious files or outputs for approval before use
+- **Block** — will prevent selected classes of action entirely according to local policy
 
 Different agents need different settings. A research assistant browsing academic papers does not need the same controls as an agent executing code from unknown repositories.
 
@@ -252,14 +252,14 @@ Rather than static safety prompts, future versions can dynamically inject specif
 Curiosity Cat helps operators do five things better:
 
 1. **Inspect and classify** external content before it is trusted by an agent
-2. **Enforce local policy** around scope, destinations, file handling, tool usage and memory decisions
+2. **Guide local policy** around scope, destinations, file handling, tool usage and memory decisions
 3. **Quarantine** suspicious or untrusted material for review instead of silently allowing or discarding it
 4. **Learn from patterns** reported by other Curiosity Cat users through the Danger Map
 5. **Turn real incidents into understandable lessons** that improve judgement and community awareness
 
 **Measurable outcomes:**
 
-- Reduced unsafe agent actions through policy enforcement
+- Reduced unsafe agent actions through policy guidance
 - Fewer repeat encounters with known threats through shared intelligence
 - Better visibility into near misses that would otherwise go unnoticed
 - Faster operator awareness of emerging threat patterns
