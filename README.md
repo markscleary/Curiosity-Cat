@@ -144,6 +144,24 @@ At the library level, `core.queue_close_call(event)` stores a pattern-not-payloa
 
 ---
 
+## App (macOS, in development)
+
+A Tauri v2 menu bar app is taking shape in [`app/`](app/) as a shell over
+everything above — Compile, Prove and the Mouse Tray, without the terminal.
+Tray icon states (asleep / ears-up / hackles / mouse) mirror what's
+happening; a Slider window drives `compile`; a first-run journey walks a
+new install through choosing a level, compiling it, and watching the Clean
+Bill trials run live; a Feed window stub reads the Mouse Tray queue.
+
+It talks to the same engine as the CLI — `ccat-engine serve` speaks a
+line-delimited JSON protocol over stdio to the exact `core.py` functions
+`curiosity-cat compile`/`prove`/`tray` call directly. Still local-only, no
+accounts, no cloud (`docs/app/APP_SPEC.md`'s FORM line). Signed,
+notarised builds are blocked on an Apple Developer ID — see
+[`app/README.md`](app/README.md) for the dev setup and what's left.
+
+---
+
 ## Vet
 
 A compiled profile is a snapshot: the engine version, the Danger Map schema, and the platform it was proved against can all move on without it noticing. `curiosity-cat vet` checks whether they have.

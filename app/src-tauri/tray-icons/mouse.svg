@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- placeholder glyph: cat state "mouse" (tripwire/alarm). Replace with final art. -->
+  <line x1="34" y1="90" x2="10" y2="76" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="64" cy="85" rx="30" ry="25" fill="#000"/>
+  <ellipse cx="88" cy="58" rx="18" ry="18" fill="#000"/>
+  <ellipse cx="97" cy="39" rx="9" ry="9" fill="#000"/>
+  <ellipse cx="103" cy="55" rx="9" ry="9" fill="#000"/>
+  <circle cx="98" cy="56" r="2.5" fill="#fff"/>
+</svg>

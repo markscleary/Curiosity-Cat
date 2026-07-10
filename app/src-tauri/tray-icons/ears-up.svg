@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- placeholder glyph: cat state "ears-up" (activity). Replace with final art. -->
+  <polygon points="26,56 40,4 58,42" fill="#000"/>
+  <polygon points="102,56 88,4 70,42" fill="#000"/>
+  <circle cx="64" cy="72" r="40" fill="#000"/>
+  <circle cx="50" cy="68" r="6" fill="#fff"/>
+  <circle cx="78" cy="68" r="6" fill="#fff"/>
+</svg>

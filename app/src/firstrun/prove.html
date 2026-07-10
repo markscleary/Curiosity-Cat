@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Curiosity Cat — Proving it holds</title>
+  <link rel="stylesheet" href="../css/app.css" />
+</head>
+<body>
+  <div class="step-dots">
+    <span class="active"></span><span class="active"></span><span class="active"></span>
+  </div>
+
+  <h1>Watching the escape attempts</h1>
+  <p class="subtitle">Every trial below is a harmless, sandboxed attempt to break its own fence.</p>
+
+  <div class="card">
+    <p class="status-line" id="status">Running trials…</p>
+    <ul class="trial-list" id="trial-list"></ul>
+  </div>
+
+  <div class="card" id="cleanbill-card" hidden>
+    <h2 id="cleanbill-heading">Clean Bill</h2>
+    <div class="profile-md" id="cleanbill-md"></div>
+    <div class="actions">
+      <button id="finish-btn">Meet your cat</button>
+    </div>
+  </div>
+
+  <script src="../js/sidecar-client.js"></script>
+  <script>
+    (function () {
+      var profileDir = sessionStorage.getItem('ccat_profile_dir');
+      var statusEl = document.getElementById('status');
+      var trialListEl = document.getElementById('trial-list');
+      var cleanbillCard = document.getElementById('cleanbill-card');
+      var cleanbillHeading = document.getElementById('cleanbill-heading');
+      var cleanbillMdEl = document.getElementById('cleanbill-md');
+      var finishBtn = document.getElementById('finish-btn');
+
+      function trialLine(t) {
+        var li = document.createElement('li');
+        var verdict = t.held === false ? 'FAILED' : (t.held === true ? 'held' : t.verdict || '');
+        li.className = t.held === false ? 'held' : '';
+        li.textContent = (t.trial || 'trial') + ' — ' + (t.description || '') + ' → ' + verdict;
+        return li;
+      }
+
+      function streamTrials(trials) {
+        return trials.reduce(function (chain, t, i) {
+          return chain.then(function () {
+            return new Promise(function (resolve) {
+              setTimeout(function () {
+                trialListEl.appendChild(trialLine(t));
+                resolve();
+              }, i === 0 ? 0 : 220);
+            });
+          });
+        }, Promise.resolve());
+      }
+
+      if (!profileDir) {
+        statusEl.textContent = 'No compiled profile found — go back and compile first.';
+        return;
+      }
+
+      window.CCAT.prove(profileDir, true)
+        .then(function (cleanBill) {
+          var allTrials = (cleanBill.self_consistency_trials || []).concat(cleanBill.observed_trials || []);
+          return streamTrials(allTrials).then(function () {
+            statusEl.textContent = cleanBill.passed
+              ? 'Clean bill — every wall held.'
+              : 'One or more trials did not hold — see the report below.';
+            cleanbillHeading.textContent = cleanBill.passed ? '✅ Clean Bill' : '⚠️ Clean Bill (with findings)';
+            return window.CCAT.readTextFile(cleanBill.clean_bill_md_path);
+          });
+        })
+        .then(function (md) {
+          cleanbillMdEl.textContent = md;
+          cleanbillCard.hidden = false;
+        })
+        .catch(function (err) {
+          statusEl.textContent = 'Prove failed: ' + err;
+        });
+
+      finishBtn.addEventListener('click', function () {
+        window.CCAT.completeFirstRun()
+          .then(function () { return window.CCAT.openWindow('slider', 'slider.html'); })
+          .then(function () { return window.__TAURI__.window.getCurrentWindow().close(); });
+      });
+    })();
+  </script>
+</body>
+</html>

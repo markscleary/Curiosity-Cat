@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- placeholder glyph: cat state "hackles" (close call). Replace with final art. -->
+  <polygon points="24,58 34,2 44,40 54,8 60,42" fill="#000"/>
+  <polygon points="104,58 94,2 84,40 74,8 68,42" fill="#000"/>
+  <circle cx="64" cy="72" r="40" fill="#000"/>
+  <line x1="42" y1="68" x2="56" y2="72" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  <line x1="86" y1="68" x2="72" y2="72" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+</svg>

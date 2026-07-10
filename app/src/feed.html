@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Curiosity Cat — Feed</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <h1>🔔 The Feed</h1>
+  <p class="subtitle">
+    Stub view onto the Mouse Tray (<code>mouse-tray.json</code> in the compiled profile).
+    One human sentence per event, Meow-spec blocks and live Watcher push land in APP-4 —
+    this just proves the read path works.
+  </p>
+
+  <div class="card">
+    <p class="status-line" id="status">Loading…</p>
+    <div id="feed-list"></div>
+  </div>
+
+  <script src="js/sidecar-client.js"></script>
+  <script>
+    (function () {
+      var statusEl = document.getElementById('status');
+      var listEl = document.getElementById('feed-list');
+      var POLL_MS = 4000;
+
+      function render(records) {
+        listEl.innerHTML = '';
+        if (!records.length) {
+          var empty = document.createElement('p');
+          empty.className = 'feed-empty';
+          empty.textContent = 'No queued events yet. Nothing has tried the fence.';
+          listEl.appendChild(empty);
+          return;
+        }
+        records.slice().reverse().forEach(function (r) {
+          var div = document.createElement('div');
+          div.className = 'feed-item';
+          var ev = r.event || {};
+          div.innerHTML =
+            '<div>' + (ev.what_happened || ev.threat_class || 'event') + '</div>' +
+            '<div class="meta">#' + r.id + ' · ' + r.status + ' · queued ' + r.queued_at + '</div>';
+          listEl.appendChild(div);
+        });
+      }
+
+      function poll() {
+        window.CCAT.getLastProfileDir()
+          .then(function (profileDir) {
+            if (!profileDir) {
+              statusEl.textContent = 'No compiled profile yet — open the Slider and compile one first.';
+              return;
+            }
+            return window.CCAT.listTray(profileDir).then(function (records) {
+              statusEl.textContent = records.length + ' queued event(s).';
+              render(records);
+            });
+          })
+          .catch(function (err) {
+            statusEl.textContent = 'Feed read failed: ' + err;
+          });
+      }
+
+      poll();
+      setInterval(poll, POLL_MS);
+    })();
+  </script>
+</body>
+</html>

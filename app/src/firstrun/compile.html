@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Curiosity Cat — Compiling</title>
+  <link rel="stylesheet" href="../css/app.css" />
+</head>
+<body>
+  <div class="step-dots">
+    <span class="active"></span><span class="active"></span><span></span>
+  </div>
+
+  <h1>Compiling your <span id="level-name"></span> profile</h1>
+  <p class="subtitle">Standing orders, scope policy and the Watcher hooks, all in one pass.</p>
+
+  <div class="card">
+    <p class="status-line" id="status">Compiling…</p>
+    <div class="actions">
+      <button id="continue-btn" hidden>Continue to Prove</button>
+    </div>
+  </div>
+
+  <script src="../js/sidecar-client.js"></script>
+  <script>
+    (function () {
+      var level = sessionStorage.getItem('ccat_level') || 'housecat';
+      document.getElementById('level-name').textContent = level;
+
+      var statusEl = document.getElementById('status');
+      var continueBtn = document.getElementById('continue-btn');
+
+      function goToProve() {
+        location.href = 'prove.html';
+      }
+
+      window.CCAT.compile(level, 'claude-code')
+        .then(function (profileDir) {
+          sessionStorage.setItem('ccat_profile_dir', profileDir.path);
+          return window.CCAT.setLastProfileDir(profileDir.path);
+        })
+        .then(function () {
+          statusEl.textContent = 'Compiled. Time to prove it holds.';
+          continueBtn.hidden = false;
+          setTimeout(goToProve, 1200);
+        })
+        .catch(function (err) {
+          statusEl.textContent = 'Compile failed: ' + err;
+        });
+
+      continueBtn.addEventListener('click', goToProve);
+    })();
+  </script>
+</body>
+</html>

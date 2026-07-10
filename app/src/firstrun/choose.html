@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Curiosity Cat — Choose your cat</title>
+  <link rel="stylesheet" href="../css/app.css" />
+  <link rel="stylesheet" href="../css/adventure-slider.css" />
+</head>
+<body>
+  <div class="step-dots">
+    <span class="active"></span><span></span><span></span>
+  </div>
+
+  <h1>🐱 Welcome to Curiosity Cat</h1>
+  <p class="subtitle">Every agent gets to choose how brave it's allowed to be. Start here.</p>
+
+  <div class="card">
+    <div class="adventure-slider">
+      <div class="slider-skin-name"></div>
+      <div class="slider-track-wrapper">
+        <div class="slider-track">
+          <div class="slider-tick" style="left:0%"></div>
+          <div class="slider-tick" style="left:50%"></div>
+          <div class="slider-tick" style="left:100%"></div>
+          <div class="slider-handle" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="2" aria-label="Adventure level"></div>
+        </div>
+        <div class="slider-labels">
+          <span class="slider-label" data-position="0"></span>
+          <span class="slider-label" data-position="1"></span>
+          <span class="slider-label" data-position="2"></span>
+        </div>
+      </div>
+      <div class="slider-desc"></div>
+    </div>
+
+    <div class="actions">
+      <button id="continue-btn">Continue</button>
+    </div>
+  </div>
+
+  <script src="../js/skins.js"></script>
+  <script src="../js/adventure-slider.js"></script>
+  <script>
+    (function () {
+      var level = window.CC_LEVELS[0];
+      window.CCAT_initSlider(document.querySelector('.adventure-slider'), 0, function (_pos, chosen) {
+        level = chosen;
+      });
+      document.getElementById('continue-btn').addEventListener('click', function () {
+        sessionStorage.setItem('ccat_level', level);
+        location.href = 'compile.html';
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- placeholder glyph: cat state "asleep" (housecat quiet). Replace with final art. -->
+  <polygon points="30,48 46,12 58,44" fill="#000"/>
+  <polygon points="98,48 82,12 70,44" fill="#000"/>
+  <circle cx="64" cy="72" r="40" fill="#000"/>
+  <line x1="46" y1="70" x2="56" y2="70" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <line x1="72" y1="70" x2="82" y2="70" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <text x="92" y="38" font-family="sans-serif" font-size="18" fill="#000">z</text>
+</svg>
