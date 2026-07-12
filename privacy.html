@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy — Curiosity Cat</title>
+  <meta name="description" content="Curiosity Cat's privacy statement." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-raised: #111111;
+      --bg-card: #161616;
+      --amber: #f59e0b;
+      --amber-dim: #b97d09;
+      --white: #f5f5f0;
+      --muted: #888880;
+      --border: rgba(245, 158, 11, 0.2);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2 { font-family: 'Playfair Display', serif; line-height: 1.2; }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
+
+    nav {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.08);
+    }
+
+    .nav-brand { font-family: 'Playfair Display', serif; color: var(--amber); text-decoration: none; font-size: 1.1rem; }
+    .nav-back { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.03em; }
+    .nav-back:hover { color: var(--amber); }
+
+    header.hero { padding: 4rem 0 2rem; }
+    header.hero h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin-bottom: 0.75rem; }
+    header.hero h1 span { color: var(--amber); }
+    header.hero p { color: var(--muted); font-size: 1.05rem; max-width: 620px; }
+
+    section.step {
+      padding: 2.5rem 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .placeholder-block {
+      background: var(--bg-card);
+      border: 1px dashed var(--amber-dim);
+      border-radius: 8px;
+      padding: 1.75rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .placeholder-block strong { color: var(--amber); }
+    .placeholder-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--amber);
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    footer { padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    footer a { color: var(--amber); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-brand">🐱 Curiosity Cat</a>
+    <a href="index.html" class="nav-back">← Back to the site</a>
+  </nav>
+
+  <div class="container">
+    <header class="hero">
+      <h1>Privacy <span>Statement</span></h1>
+      <p>What Curiosity Cat collects, what it doesn't, and how the Danger Map keeps reports anonymous.</p>
+    </header>
+
+    <section class="step">
+      <div class="placeholder-block">
+        <span class="placeholder-tag">Placeholder — awaiting Mark's signed statement</span>
+        <p>This page is a shell. The privacy statement itself has not been written yet — it needs to be drafted and signed off by Mark Cleary before it replaces this block. Nothing below is a claim about what Curiosity Cat does or does not collect; see <a href="https://github.com/markscleary/Curiosity-Cat/blob/main/FAQ.md" style="color: var(--amber);">FAQ.md</a> in the meantime for the current, reviewed answer on Danger Map data handling.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p>Curiosity Cat — built by <a href="https://shortandsweet.org">Short+Sweet AI Lab</a>. Questions: <a href="mailto:curiosity@shortandsweet.org">curiosity@shortandsweet.org</a></p>
+  </footer>
+
+</body>
+</html>

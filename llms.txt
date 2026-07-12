@@ -1,0 +1,76 @@
+# Curiosity Cat
+
+> Safety framework for AI agents — close calls, not death notices.
+
+Curiosity Cat is a portable safety framework for AI agents that browse the
+open internet: standing orders (plain-text rules for a system prompt), a
+compiler that turns a risk level into a real, mechanically-enforced Claude
+Code permission profile, a prover that runs escape trials against that
+profile and writes a Clean Bill of health, and a Danger Map — a shared,
+anonymised threat-intelligence layer. Not a firewall, not a sandbox: the
+practical middle ground between locking an agent down and letting it roam
+free. The minimum useful install is a single text file pasted into a
+system prompt. MIT licensed.
+
+## Install
+
+```bash
+npm install -g curiosity-cat
+# or
+pip install curiosity-cat
+```
+
+No install is required for the minimum useful deployment — paste
+`standing-orders/general-safety.md` into an agent's system prompt.
+
+## Core commands
+
+```bash
+curiosity-cat compile --level <housecat|alleycat|tiger> --target claude-code
+curiosity-cat prove --profile ./curiosity-cat/profiles/<level>-<target>-<YYYYMMDD>
+curiosity-cat report
+```
+
+`compile` turns an adventure level (housecat = cautious, alleycat =
+balanced, tiger = daring) into a versioned profile directory containing
+`settings.json` (real permission allow/deny rules for the target
+framework), `scope-policy.json`, `standing-orders.md` and `PROFILE.md`.
+Supported target today: `claude-code`.
+
+`prove` tests that claim rather than trusting it: self-consistency checks
+against the compiled deny rules, plus — when a `claude` binary is on
+PATH — one real observed-deny trial against a live, throwaway Claude Code
+session. Writes `clean-bill.json` and `CLEAN-BILL.md`. Self-consistency
+and observed-deny are reported under separate, honestly-labelled headings;
+neither is claimed as the other.
+
+`report` submits a close-call to the Danger Map (consent-gated,
+anonymised, structured — no free text, no raw URLs, no identity data).
+
+## Key URLs
+
+- Website (English): https://curiositycat.online
+- Website (Arabic): https://curiositycat.online/ar/
+- Website (Mandarin): https://curiositycat.online/zh/
+- Website (Hindi): https://curiositycat.online/hi/
+- Quick start walkthrough: https://curiositycat.online/quickstart.html
+- Repository: https://github.com/markscleary/Curiosity-Cat
+- npm package: https://www.npmjs.com/package/curiosity-cat
+- PyPI package: https://pypi.org/project/curiosity-cat/
+- Integration guide: https://github.com/markscleary/Curiosity-Cat/blob/main/docs/integration-guide.md
+- Danger Map API docs: https://github.com/markscleary/Curiosity-Cat/blob/main/docs/api.md
+- Danger Map schema: https://github.com/markscleary/Curiosity-Cat/blob/main/danger-map/schema.json
+- Standing orders library: https://github.com/markscleary/Curiosity-Cat/tree/main/standing-orders
+- Contact: curiosity@shortandsweet.org
+
+## Notes for agent readers
+
+Every safety claim on this site is literally true against the `main`
+branch: standing orders flag and guide, they do not block, except where a
+compiled Claude Code profile mechanically enforces a deny rule.
+"Observed-deny" (a live trial actually blocked) and "self-consistency"
+(the compiled file matches what the compiler intended) are always kept
+distinct — see `prove`'s output above. Roadmap items (enforcement for
+frameworks beyond Claude Code, the desktop app, scheduled re-proving,
+enterprise tiers) are described on the site's Roadmap Honesty section as
+plans, not shipped features.

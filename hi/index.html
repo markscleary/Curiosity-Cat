@@ -346,6 +346,8 @@
     .card-title { font-size: 1.3rem; margin-bottom: 0.6rem; color: var(--white); }
     .card-body { font-size: 1.15rem; color: var(--muted); line-height: 1.55; margin-bottom: 1rem; }
     .card-tag { font-size: 0.88rem; font-style: italic; color: var(--amber-dim); font-family: 'Noto Sans Devanagari', 'Playfair Display', serif; }
+    .card-counter { font-size: 0.85rem; color: var(--muted); margin-top: 0.75rem; font-variant-numeric: tabular-nums; }
+    .card-counter strong { color: var(--amber); font-weight: 700; }
 
     #quickstart {
       background: var(--bg-raised);
@@ -806,18 +808,13 @@
           <h3 class="card-title">सुरक्षा जाल</h3>
           <p class="card-body">आपका एजेंट एक पैकेज इंस्टॉल करने वाला है। बारह डाउनलोड। कल बनाया गया। एक छोटी गलती, एक अक्षर या कॉमा असली से अलग। सुरक्षा जाल नुकसान होने से पहले पकड़ लेता है। हर रिपोर्ट की गई घटना हर एजेंट को होशियार बनाती है।</p>
           <p class="card-tag">C-Cat के स्थायी आदेश और नीति मार्गदर्शन किसी भी एजेंट के सिस्टम प्रॉम्प्ट में सीधे जुड़ते हैं — कोई SDK नहीं, कोई सर्वर नहीं, कोई निर्भरता नहीं। यह मार्गदर्शन है, प्रवर्तन नहीं: यहां कुछ भी उस तरह मशीनी रूप से जांचा नहीं जाता जैसे एक कंपाइल की गई Claude Code प्रोफ़ाइल जांची जाती है।</p>
-          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JOKGncCffEc" frameborder="0" allowfullscreen data-category="stuck"></iframe>
-          </div>
         </div>
         <div class="card fade-up delay-2">
           <span class="card-icon">🗺️</span>
           <h3 class="card-title">खतरे का नक्शा</h3>
           <p class="card-body">पिछले हफ्ते, सिंगापुर के एक ग्राफिक डिज़ाइनर का OpenClaw एजेंट एक रीडायरेक्ट चेन के जरिए क्रेडेंशियल फिशिंग पेज पर पहुंच गया। इस हफ्ते, दुनिया भर के अन्य एजेंट जानते हैं कि इसमें न फंसें। खतरे का नक्शा अपडेट हो गया और हर एजेंट को सावधान रहना है।</p>
           <p class="card-tag">वास्तविक घटनाओं से क्राउडसोर्स्ड खतरे की जानकारी। गुमनाम, संरचित, गोपनीयता द्वारा डिज़ाइन। कोई मुक्त पाठ नहीं, कोई कच्चे URL नहीं, कोई पहचान डेटा नहीं। नेटवर्क प्रभाव ही बचाव है।</p>
-          <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/sVi1go-hqh0" frameborder="0" allowfullscreen data-category="chaos"></iframe>
-          </div>
+          <p class="card-counter" id="danger-map-counter" aria-live="polite">नक्शा जाग रहा है&hellip;</p>
         </div>
         <div class="card fade-up delay-3">
           <span class="card-icon">🐈</span>
@@ -825,7 +822,7 @@
           <p class="card-body">सिएटल की एक इंजीनियरिंग फर्म के एजेंट ने एक दस्तावेज़ पेज ब्राउज़ किया। HTML टिप्पणियों में छिपे थे बिल्कुल अलग निर्देश। उसने देखा नहीं। स्थायी आदेशों ने इसे पकड़ लिया। वह करीबी कहानी बन गई — अब हर बिल्ली को चाल पता है।</p>
           <p class="card-tag">वास्तविक करीबी मौकों को छोटी, यादगार कहानियों के रूप में प्रकाशित किया जाता है। जिज्ञासु बिल्ली से सुरक्षा सबक जो याद रहते हैं क्योंकि वे CVE नंबरों की तरह नहीं, कहानियों की तरह पढ़े जाते हैं।</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen data-category="curiosity"></iframe>
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/kgwQ9KHRPlY" frameborder="0" allowfullscreen loading="lazy" data-category="curiosity"></iframe>
           </div>
         </div>
       </div>
@@ -1171,6 +1168,7 @@
           <ul>
             <li><a href="https://shortandsweet.org" target="_blank" rel="noopener">shortandsweet.org</a></li>
             <li><a href="mailto:curiosity@shortandsweet.org">curiosity@shortandsweet.org</a></li>
+            <li><a href="../privacy.html">गोपनीयता</a></li>
           </ul>
         </div>
       </div>
@@ -1191,6 +1189,50 @@
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+  <script>
+  (function () {
+    // Same base URL curiosity_cat/core.py uses for GET /stats.
+    var DANGER_MAP_STATS_URL = 'https://pcmqmvcxqsaypuabrkgj.supabase.co/functions/v1/danger-map/stats';
+    // Placeholder — no DANGER_MAP_ANON_KEY was available in this build's
+    // environment. core.py's own GET /stats call sends no Authorization
+    // header at all and that works today (the endpoint is public-by-design),
+    // but this is wired defensively in case the endpoint starts requiring
+    // one. TODO(mark): replace with the real public anon key, or remove
+    // this constant entirely, once confirmed.
+    var DANGER_MAP_ANON_KEY = '';
+
+    var el = document.getElementById('danger-map-counter');
+    if (!el) return;
+
+    var headers = {};
+    if (DANGER_MAP_ANON_KEY) {
+      headers['Authorization'] = 'Bearer ' + DANGER_MAP_ANON_KEY;
+    }
+
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 6000) : null;
+
+    fetch(DANGER_MAP_STATS_URL, {
+      headers: headers,
+      signal: controller ? controller.signal : undefined
+    })
+      .then(function (response) {
+        if (timeoutId) clearTimeout(timeoutId);
+        if (!response.ok) throw new Error('Danger Map stats request failed: ' + response.status);
+        return response.json();
+      })
+      .then(function (data) {
+        var total = data && typeof data.total === 'number' ? data.total : null;
+        if (total === null) throw new Error('Danger Map stats response missing total');
+        el.innerHTML = '<strong>' + total.toLocaleString() + '</strong> घटनाएं खतरे के नक्शे पर दर्ज हुईं';
+      })
+      .catch(function () {
+        if (timeoutId) clearTimeout(timeoutId);
+        el.textContent = 'नक्शा जाग रहा है…';
+      });
+  })();
   </script>
 
   <script src="../site/js/skins.js" defer></script>
