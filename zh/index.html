@@ -190,6 +190,98 @@
       animation: fadeUp 0.6s ease 0.35s both;
     }
 
+    .hero-promise {
+      font-size: 1.15rem;
+      color: #ddd;
+      max-width: 620px;
+      margin-bottom: 1.25rem;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    .hero-install {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.25rem;
+      max-width: fit-content;
+      animation: fadeUp 0.6s ease 0.32s both;
+    }
+
+    .hero-install-cmd {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.05rem;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--white);
+      border-radius: 5px;
+      padding: 0.35rem 0.85rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+    .hero-adventure-mini {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      max-width: 620px;
+      animation: fadeUp 0.6s ease 0.34s both;
+    }
+
+    .hero-mini-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+
+    .hero-mini-tab {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .hero-mini-tab:hover { border-color: var(--amber); color: var(--white); }
+    .hero-mini-tab.active { background: var(--amber); border-color: var(--amber); color: #0a0a0a; }
+
+    .hero-mini-cmd-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0d0d0d;
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      margin-bottom: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-mini-cmd {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.92rem;
+      color: #d4d4d4;
+    }
+
+    .hero-mini-sentence { font-size: 0.98rem; color: var(--muted); line-height: 1.5; }
+
     .btn {
       display: inline-block;
       padding: 0.8rem 1.8rem;
@@ -536,7 +628,7 @@
     <a href="#hero" class="nav-brand"><span id="nav-brand-text">好奇猫</span><span class="nav-brand-sub">by Short+Sweet</span></a>
     <ul class="nav-links">
       <li><a href="#adventure">工作原理</a></li>
-      <li><a href="#layers">三层架构</a></li>
+      <li><a href="#mechanism">编译+验证</a></li>
       <li><a href="#quickstart">快速开始</a></li>
       <li><a href="#stories">九条命</a></li>
       <li><a href="#about">关于我们</a></li>
@@ -561,6 +653,26 @@
         <h1 class="hero-title">好奇猫 <span id="hero-emoji" style="font-size: 0.8em; vertical-align: bottom; line-height: 1; margin-left: 0.3em;">🐱</span></h1>
         <p class="hero-sub" id="hero-sub">你的AI 代理正在互联网上漫游，为你寻找机会。但谁在守护它们，确保它们安全回家？</p>
         <p class="hero-quip" id="hero-quip"><em>一只猫吃了亏，其他猫就长了记性。</em></p>
+        <p class="hero-promise" id="hero-promise">为你的智能体编译一份真实的权限档案。证明它真的能守住——部分是在真实环境中现场验证，而不只是纸上谈兵。得到一份健康证明，或者一份坦诚说明哪里没有守住的清单。</p>
+
+        <div class="hero-install">
+          <code class="hero-install-cmd" id="hero-install-cmd">pip install curiosity-cat</code>
+          <button class="copy-btn" id="hero-copy-btn" type="button" data-copy-text="pip install curiosity-cat" aria-label="Copy install command">复制</button>
+        </div>
+
+        <div class="hero-adventure-mini" id="hero-adventure-mini" role="group" aria-label="选择冒险等级">
+          <div class="hero-mini-tabs">
+            <button class="hero-mini-tab active" data-level="housecat" type="button" aria-pressed="true">家猫</button>
+            <button class="hero-mini-tab" data-level="alleycat" type="button" aria-pressed="false">街猫</button>
+            <button class="hero-mini-tab" data-level="tiger" type="button" aria-pressed="false">猛虎</button>
+          </div>
+          <div class="hero-mini-cmd-row">
+            <code class="hero-mini-cmd" id="hero-mini-cmd">curiosity-cat compile --level housecat --target claude-code</code>
+            <button class="copy-btn" id="hero-mini-copy-btn" type="button" aria-label="Copy compile command">复制</button>
+          </div>
+          <p class="hero-mini-sentence" id="hero-mini-sentence">只能在此项目内读写，且只能从两个文档域名获取内容——无论如何，凭据、sudo 和 rm -rf 始终禁止。</p>
+        </div>
+
         <div class="hero-ctas">
           <a href="#quickstart" class="btn btn-primary">立即开始</a>
           <a href="https://github.com/markscleary/Curiosity-Cat" target="_blank" rel="noopener" class="btn btn-primary">在GitHub上查看</a>
@@ -574,6 +686,84 @@
       </div>
     </div>
   </section>
+
+  <!-- HERO MINI-SLIDER + COPY BUTTONS — real compile command, sourced from curiosity_cat/cli.py LEVEL_POLICY -->
+  <script>
+  (function () {
+    var LEVEL_INFO = {
+      housecat: {
+        cmd: 'curiosity-cat compile --level housecat --target claude-code',
+        sentence: "只能在此项目内读写，且只能从两个文档域名获取内容——无论如何，凭据、sudo 和 rm -rf 始终禁止。"
+      },
+      alleycat: {
+        cmd: 'curiosity-cat compile --level alleycat --target claude-code',
+        sentence: "可以读取任何地方，但仍只能在此项目内写入，获取范围更广的允许列表，并在执行 curl、wget 或安装前先询问——凭据、sudo 和 rm -rf 仍然禁止。"
+      },
+      tiger: {
+        cmd: 'curiosity-cat compile --level tiger --target claude-code',
+        sentence: "可以在任何地方读写，并可获取任何网页，没有允许列表——唯一仍然存在的墙是凭据、sudo 和 rm -rf，这些在每个级别都始终成立。"
+      }
+    };
+
+    function setupCopyButton(btn, getText) {
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        var text = getText();
+        var done = function () {
+          var original = btn.textContent;
+          btn.textContent = "已复制！";
+          btn.classList.add('copied');
+          setTimeout(function () {
+            btn.textContent = original === "已复制！" ? "复制" : original;
+            btn.classList.remove('copied');
+          }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, done);
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done();
+        }
+      });
+    }
+
+    var installBtn = document.getElementById('hero-copy-btn');
+    setupCopyButton(installBtn, function () { return installBtn.getAttribute('data-copy-text') || 'pip install curiosity-cat'; });
+
+    var miniCmdEl = document.getElementById('hero-mini-cmd');
+    var miniCopyBtn = document.getElementById('hero-mini-copy-btn');
+    setupCopyButton(miniCopyBtn, function () { return miniCmdEl.textContent; });
+
+    var miniWrapper = document.getElementById('hero-adventure-mini');
+    if (miniWrapper) {
+      var tabs = miniWrapper.querySelectorAll('.hero-mini-tab');
+      var sentenceEl = document.getElementById('hero-mini-sentence');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var level = tab.getAttribute('data-level');
+          var info = LEVEL_INFO[level];
+          if (!info) return;
+          tabs.forEach(function (t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-pressed', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-pressed', 'true');
+          miniCmdEl.textContent = info.cmd;
+          sentenceEl.textContent = info.sentence;
+        });
+      });
+    }
+  })();
+  </script>
+
 
   <!-- ADVENTURE SLIDER — page 2 -->
   <section id="adventure">
@@ -600,23 +790,58 @@
       </div>
       <div class="page-nav">
         <a href="#hero">← 首页</a>
-        <a href="#layers">架构 →</a>
+        <a href="#mechanism">编译、验证、健康证明 →</a>
       </div>
     </div>
   </section>
 
   <!-- THREE LAYERS — page 3 -->
-  <section id="layers">
+  <!-- COMPILE / PROVE / CLEAN BILL -->
+
+  <section id="mechanism">
     <div class="container">
-      <p class="section-label fade-up">架构</p>
-      <h2 class="section-title fade-up delay-1">三层架构。一个框架。</h2>
-      <p class="section-body fade-up delay-2">每一层独立工作。合在一起，覆盖浏览网页的代理的全部威胁面。</p>
+      <p class="section-label fade-up">等级如何变为现实</p>
+      <h2 class="section-title fade-up delay-1">编译。验证。健康证明。</h2>
+      <p class="section-body fade-up delay-2">在上面的滑块上选择等级，不只是选个心情。它会编译成一份真实的权限档案，而这份档案在被称为安全之前，会先被测试。</p>
+      <div class="cards">
+        <div class="card fade-up delay-1">
+          <span class="card-icon">🛠️</span>
+          <h3 class="card-title">编译（Compile）</h3>
+          <p class="card-body"><code>curiosity-cat compile --level &lt;level&gt; --target claude-code</code> 会把家猫、街猫或猛虎变成一份真正的 Claude Code <code>settings.json</code>——真实的 allow、deny 和 ask 规则，而不是一段建议性的文字。</p>
+          <p class="card-tag">今天只有一个目标已经上线：Claude Code。其他每一个框架仍然只能依靠下面的常规指令——诚实地说，在拥有自己的编译器之前，都是如此。</p>
+        </div>
+        <div class="card fade-up delay-2">
+          <span class="card-icon">🧪</span>
+          <h3 class="card-title">验证（Prove）</h3>
+          <p class="card-body"><code>curiosity-cat prove --profile &lt;dir&gt;</code> 会对编译出的文件运行逃逸试验。大多数是自洽性检查——把编译器自己的规则拿来对照自己重放一遍。还有一项，在可以安全尝试的情况下，是一次现场验证试验：让一个真实的 Claude Code 会话去尝试被禁止的操作，实时进行。</p>
+          <p class="card-tag">自洽性检查只能证明这份文件表达了编译器当初的意图。只有现场验证试验能证明一个真实运行中的代理确实被拦下了——每一份报告都诚实地划清这条界线，从不含糊。</p>
+        </div>
+        <div class="card fade-up delay-3">
+          <span class="card-icon">🩺</span>
+          <h3 class="card-title">健康证明（Clean Bill）</h3>
+          <p class="card-body">每一项试验——无论通过与否——都会写进 <code>CLEAN-BILL.md</code>。九条命式的语气，每项试验一句话。所有防线都守住了：一份健康证明。有防线没守住：会明确告诉你是哪一道防线，为什么没守住。否则绝不会声称安全。</p>
+          <p class="card-tag">不是一张贴上就忘的徽章，而是一份可能会失败、并且会如实说出失败的报告。</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <a href="#adventure">← 风险偏好</a>
+        <a href="../quickstart.html">查看真实终端记录 →</a>
+        <a href="#layers">框架里的其他部分 →</a>
+      </div>
+    </div>
+  </section>
+
+<section id="layers">
+    <div class="container">
+      <p class="section-label fade-up">框架里的其他部分</p>
+      <h2 class="section-title fade-up delay-1">常规指令、危险地图、九条命。</h2>
+      <p class="section-body fade-up delay-2">编译与验证目前只覆盖 Claude Code 这一个目标。下面这些，是在这份名单继续增长的同时，其他每一个代理——以及运行它们的每一个人——保持知情、保持警觉的方式。</p>
       <div class="cards">
         <div class="card fade-up delay-1">
           <span class="card-icon">📋</span>
           <h3 class="card-title">安全网</h3>
           <p class="card-body" id="safety-scenario">你的代理即将安装一个软件包。十二次下载。昨天创建。一个小错误，一个字母或一个逗号与真品略有不同。安全网在损害发生之前拦截它。每一次上报的险情都让每个代理更聪明。</p>
-          <p class="card-tag">好奇猫的常规指令、隔离和策略执行直接添加到任何代理的系统提示词中。无需SDK。无需服务器。无依赖。复制粘贴即可保护你的代理。</p>
+          <p class="card-tag">好奇猫的常规指令与策略指引，直接写入任何代理的系统提示词——无需SDK，无需服务器，无依赖。这是指引，不是强制执行：这里的一切都不像编译后的 Claude Code 档案那样被机械化地检查。</p>
           <div style="width: 100%; max-width: 480px; aspect-ratio: 16/9; margin-top: 1.5rem; border-radius: 8px; overflow: hidden;">
             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JOKGncCffEc" frameborder="0" allowfullscreen data-category="stuck"></iframe>
           </div>
@@ -641,11 +866,41 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#adventure">← 风险偏好</a>
+        <a href="#mechanism">← 编译、验证、健康证明</a>
+        <a href="#roadmap">这只猫还做不到的事 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP HONESTY -->
+  <section id="roadmap" class="page-section">
+    <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
+      <h2 class="section-title" style="margin-bottom:0.5rem;">这只猫还做不到的事</h2>
+      <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">九条命也意味着，对还没用上的那些命，同样诚实。</p>
+      <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
+        <p style="margin-bottom:1.5rem;">一只这么好奇的猫，许起愿来很快。以下是仍然只是承诺的部分——没有上线，也不会假装已经上线。</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">Claude Code 之外的强制执行</p>
+        <p style="margin-bottom:1.5rem;">Compile 今天只会说一种语言：Claude Code 的 <code>settings.json</code>。如果你向它要一份 OpenClaw、LangChain、CrewAI 或 AutoGen 的编译防线，它给你的只会是所有人都有的那份常规指令——是指引，不是围栏。其他每一个目标都排在计划里，但还不是现在。</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">配套的应用</p>
+        <p style="margin-bottom:1.5rem;">现在，要读一份健康证明，还得在终端里打开一个 Markdown 文件。没有仪表盘，没有手机通知，也没有一个小小的、代表「一切正常」的爪印图标。那是计划，还不是产品。</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">定期复诊</p>
+        <p style="margin-bottom:1.5rem;">一份健康证明只是一张快照，拍摄于你运行 <code>prove</code> 的那一天。今天，没有任何东西会在一周后、在你调宽滑块之后、或者在你的代理框架发生变化之后重新检查它。计划中的、自动的重新验证——那种反复的复诊，而不是一次性的体检——还在路线图上，还没进入 CLI。</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">企业版的一切</p>
+        <p style="margin-bottom:1.5rem;">团队仪表盘、私有危险地图实例、可审计的决策记录：本站其他地方把它们描述为付费层级。今天，它们都还只是计划，不是已经上线的功能。</p>
+
+        <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2rem 0;padding:1.2rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">一只愿意告诉你它还抓不住什么的猫，才是一只你可以信任它能抓住什么的猫。</p>
+      </div>
+      <div class="page-nav">
+        <a href="#layers">← 框架里的其他部分</a>
         <a href="#stories">实战报告 →</a>
       </div>
     </div>
   </section>
+
 
   <!-- NINE LIVES — page 4 -->
   <section id="stories">
@@ -666,7 +921,7 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#layers">← 三层架构</a>
+        <a href="#roadmap">← 这只猫还做不到的事</a>
         <a href="#story-helpful-stranger">更多故事 →</a>
         <a href="#emergency" class="escape">你不喜欢猫？</a>
       </div>

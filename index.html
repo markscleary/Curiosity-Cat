@@ -189,6 +189,98 @@
       animation: fadeUp 0.6s ease 0.35s both;
     }
 
+    .hero-promise {
+      font-size: 1.15rem;
+      color: #ddd;
+      max-width: 620px;
+      margin-bottom: 1.25rem;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    .hero-install {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.25rem;
+      max-width: fit-content;
+      animation: fadeUp 0.6s ease 0.32s both;
+    }
+
+    .hero-install-cmd {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.05rem;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--white);
+      border-radius: 5px;
+      padding: 0.35rem 0.85rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+    .hero-adventure-mini {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      max-width: 620px;
+      animation: fadeUp 0.6s ease 0.34s both;
+    }
+
+    .hero-mini-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+
+    .hero-mini-tab {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .hero-mini-tab:hover { border-color: var(--amber); color: var(--white); }
+    .hero-mini-tab.active { background: var(--amber); border-color: var(--amber); color: #0a0a0a; }
+
+    .hero-mini-cmd-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0d0d0d;
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      margin-bottom: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-mini-cmd {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.92rem;
+      color: #d4d4d4;
+    }
+
+    .hero-mini-sentence { font-size: 0.98rem; color: var(--muted); line-height: 1.5; }
+
     .btn {
       display: inline-block;
       padding: 0.8rem 1.8rem;
@@ -497,6 +589,10 @@
       .hero-ctas { flex-direction: row; align-items: center; gap: 0.5rem; }
       .hero-ctas .btn { flex: 1; text-align: center; padding: 0.5rem 0.4rem; font-size: 0.8rem; }
       .install-options { flex-direction: column; }
+      .hero-install { max-width: 100%; flex-wrap: wrap; }
+      .hero-install-cmd { white-space: normal; word-break: break-all; }
+      .hero-adventure-mini { max-width: 100%; padding: 1rem 1.1rem; }
+      .hero-mini-cmd { word-break: break-all; }
       .slider-desc span:last-child { text-align: left; }
       .page-nav { flex-direction: column; align-items: center; gap: 0.5rem; }
       .btn { padding: 0.6rem 1.2rem; font-size: 0.85rem; }
@@ -557,7 +653,7 @@
     <a href="#hero" class="nav-brand"><span id="nav-brand-text">Curiosity Cat</span><span class="nav-brand-sub">by Short+Sweet</span></a>
     <ul class="nav-links">
       <li><a href="#adventure">How It Works</a></li>
-      <li><a href="#layers">Layers</a></li>
+      <li><a href="#mechanism">Compile+Prove</a></li>
       <li><a href="#quickstart">Quick Start</a></li>
       <li><a href="#stories">Nine Lives</a></li>
       <li><a href="#about">About</a></li>
@@ -583,8 +679,29 @@
         <h1 class="hero-title">Curiosity<br /><span id="hero-animal">Cat</span> <span id="hero-emoji" style="font-size: 0.8em; vertical-align: baseline; position:relative; top:0.05em; line-height: 1; margin-left: 0.3em;">🐱</span></h1>
         <p class="hero-sub" id="hero-sub">Your agents are out there roaming the internet, looking out for you. But who's keeping watch, to make sure they come home safe and sound?</p>
         <p class="hero-quip" id="hero-quip"><em>When a cat falls flat, the rest learn the trick.</em></p>
+
+        <p class="hero-promise" id="hero-promise">Compile a real permission profile for your agent. Prove it holds — some of that live, not just on paper. Walk away with a Clean Bill of health, or an honest list of what didn't hold.</p>
+
+        <div class="hero-install">
+          <code class="hero-install-cmd" id="hero-install-cmd">pip install curiosity-cat</code>
+          <button class="copy-btn" id="hero-copy-btn" type="button" data-copy-text="pip install curiosity-cat" aria-label="Copy install command">Copy</button>
+        </div>
+
+        <div class="hero-adventure-mini" id="hero-adventure-mini" role="group" aria-label="Pick an adventure level">
+          <div class="hero-mini-tabs">
+            <button class="hero-mini-tab active" data-level="housecat" type="button" aria-pressed="true">Housecat</button>
+            <button class="hero-mini-tab" data-level="alleycat" type="button" aria-pressed="false">Alley Cat</button>
+            <button class="hero-mini-tab" data-level="tiger" type="button" aria-pressed="false">Tiger</button>
+          </div>
+          <div class="hero-mini-cmd-row">
+            <code class="hero-mini-cmd" id="hero-mini-cmd">curiosity-cat compile --level housecat --target claude-code</code>
+            <button class="copy-btn" id="hero-mini-copy-btn" type="button" aria-label="Copy compile command">Copy</button>
+          </div>
+          <p class="hero-mini-sentence" id="hero-mini-sentence">Reads and writes only inside this project and fetches only two documentation domains — credentials, sudo, and rm -rf stay off-limits no matter what.</p>
+        </div>
+
         <div class="hero-ctas">
-          <a href="#layers" class="btn btn-primary">Get Started</a>
+          <a href="#mechanism" class="btn btn-primary">Get Started</a>
           <a href="#overview" class="btn btn-primary">How It Works</a>
           <a href="#adventure" class="btn btn-primary">Risk Appetite</a>
         </div>
@@ -596,6 +713,83 @@
       </div>
     </div>
   </section>
+
+  <!-- HERO MINI-SLIDER + COPY BUTTONS — real compile command, sourced from curiosity_cat/cli.py LEVEL_POLICY -->
+  <script>
+  (function () {
+    var LEVEL_INFO = {
+      housecat: {
+        cmd: 'curiosity-cat compile --level housecat --target claude-code',
+        sentence: "Reads and writes only inside this project and fetches only two documentation domains — credentials, sudo, and rm -rf stay off-limits no matter what."
+      },
+      alleycat: {
+        cmd: 'curiosity-cat compile --level alleycat --target claude-code',
+        sentence: "Reads anywhere but still only writes inside this project, fetches a wider allowlist, and asks first before curl, wget, or an install — credentials, sudo, and rm -rf are still off the table."
+      },
+      tiger: {
+        cmd: 'curiosity-cat compile --level tiger --target claude-code',
+        sentence: "Reads and writes anywhere and fetches any page with no allowlist — the only walls left standing are credentials, sudo, and rm -rf, which hold at every level."
+      }
+    };
+
+    function setupCopyButton(btn, getText) {
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        var text = getText();
+        var done = function () {
+          var original = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(function () {
+            btn.textContent = original === 'Copied!' ? 'Copy' : original;
+            btn.classList.remove('copied');
+          }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, done);
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done();
+        }
+      });
+    }
+
+    var installBtn = document.getElementById('hero-copy-btn');
+    setupCopyButton(installBtn, function () { return installBtn.getAttribute('data-copy-text') || 'pip install curiosity-cat'; });
+
+    var miniCmdEl = document.getElementById('hero-mini-cmd');
+    var miniCopyBtn = document.getElementById('hero-mini-copy-btn');
+    setupCopyButton(miniCopyBtn, function () { return miniCmdEl.textContent; });
+
+    var miniWrapper = document.getElementById('hero-adventure-mini');
+    if (miniWrapper) {
+      var tabs = miniWrapper.querySelectorAll('.hero-mini-tab');
+      var sentenceEl = document.getElementById('hero-mini-sentence');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var level = tab.getAttribute('data-level');
+          var info = LEVEL_INFO[level];
+          if (!info) return;
+          tabs.forEach(function (t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-pressed', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-pressed', 'true');
+          miniCmdEl.textContent = info.cmd;
+          sentenceEl.textContent = info.sentence;
+        });
+      });
+    }
+  })();
+  </script>
 
   <!-- ADVENTURE SLIDER — page 2 -->
   <section id="adventure">
@@ -622,23 +816,57 @@
       </div>
       <div class="page-nav">
         <a href="#hero">← Home</a>
-        <a href="#layers">Architecture →</a>
+        <a href="#mechanism">Compile, Prove, Clean Bill →</a>
       </div>
     </div>
   </section>
 
-  <!-- THREE LAYERS — page 3 -->
+  <!-- COMPILE / PROVE / CLEAN BILL — page 3 -->
+  <section id="mechanism">
+    <div class="container">
+      <p class="section-label fade-up">How The Level Becomes Real</p>
+      <h2 class="section-title fade-up delay-1">Compile. Prove. Clean Bill.</h2>
+      <p class="section-body fade-up delay-2">Picking a level on the slider above isn't a mood setting. It compiles into a real permission profile, and that profile gets tested before anyone calls it safe.</p>
+      <div class="cards">
+        <div class="card fade-up delay-1">
+          <span class="card-icon">🛠️</span>
+          <h3 class="card-title">Compile</h3>
+          <p class="card-body"><code>curiosity-cat compile --level &lt;level&gt; --target claude-code</code> turns Housecat, Alley Cat or Tiger into an actual Claude Code <code>settings.json</code> — real allow, deny and ask rules, not a paragraph of advice.</p>
+          <p class="card-tag">One target ships today: Claude Code. Every other framework still runs on the standing orders below, honestly, until it gets its own compiler.</p>
+        </div>
+        <div class="card fade-up delay-2">
+          <span class="card-icon">🧪</span>
+          <h3 class="card-title">Prove</h3>
+          <p class="card-body"><code>curiosity-cat prove --profile &lt;dir&gt;</code> runs escape trials against the compiled file. Most are self-consistency checks — the compiler's own rules replayed against themselves. One, when it's safe to run, is an observed-deny trial: a real Claude Code session asked to do the denied thing, live.</p>
+          <p class="card-tag">Self-consistency only proves the file says what the compiler intended. Only the observed trial proves a live agent actually got stopped — that line is drawn honestly on every report, never blurred.</p>
+        </div>
+        <div class="card fade-up delay-3">
+          <span class="card-icon">🩺</span>
+          <h3 class="card-title">Clean Bill</h3>
+          <p class="card-body">Every trial — held or not — lands in <code>CLEAN-BILL.md</code>. Nine Lives voice, one sentence per trial. All walls held: a clean bill of health. Something didn't: you're told exactly which wall, and why. No safe claim otherwise.</p>
+          <p class="card-tag">Not a badge you paste in and forget. A report that can fail, and says so when it does.</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <a href="#adventure">← Risk Appetite</a>
+        <a href="quickstart.html">See the real transcript →</a>
+        <a href="#layers">The rest of the framework →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- THREE LAYERS — page 3b -->
   <section id="layers">
     <div class="container">
-      <p class="section-label fade-up">Architecture</p>
-      <h2 class="section-title fade-up delay-1">Three layers. One framework.</h2>
-      <p class="section-body fade-up delay-2">Each layer works independently. Together, they cover the full threat surface of an agent that browses the web.</p>
+      <p class="section-label fade-up">Also In The Framework</p>
+      <h2 class="section-title fade-up delay-1">Standing orders, the Danger Map, Nine Lives.</h2>
+      <p class="section-body fade-up delay-2">Compile and Prove cover the Claude Code target today. Everything below is how every other agent — and every human running one — stays briefed and informed while that list of targets grows.</p>
       <div class="cards">
         <div class="card fade-up delay-1">
           <span class="card-icon">📋</span>
           <h3 class="card-title">Safety Net</h3>
           <p class="card-body" id="safety-scenario">Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net catches it before the damage is done. Every close call reported makes every agent smarter.</p>
-          <p class="card-tag">C-Cat standing orders, quarantine, and policy guidance that drop into any agent's system prompt. No SDK. No server. No dependencies. Copy-paste and your agent is guided toward safer behaviour.</p>
+          <p class="card-tag">C-Cat standing orders and policy guidance that drop into any agent's system prompt — no SDK, no server, no dependencies. Guidance, not enforcement: nothing here is mechanically checked the way a compiled Claude Code profile is.</p>
         </div>
         <div class="card fade-up delay-2">
           <span class="card-icon">🗺️</span>
@@ -654,7 +882,36 @@
         </div>
       </div>
       <div class="page-nav">
-        <a href="#adventure">← Risk Appetite</a>
+        <a href="#mechanism">← Compile, Prove, Clean Bill</a>
+        <a href="#roadmap">What this cat can't do yet →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP HONESTY -->
+  <section id="roadmap" class="page-section">
+    <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
+      <h2 class="section-title" style="margin-bottom:0.5rem;">What This Cat Can't Do Yet</h2>
+      <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Nine Lives means honesty about the ones we haven't used yet, too.</p>
+      <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
+        <p style="margin-bottom:1.5rem;">A cat this curious makes promises fast. Here's what's still just a promise — not shipped, not fudged as shipped.</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">Enforcement beyond Claude Code</p>
+        <p style="margin-bottom:1.5rem;">Compile speaks one language today: Claude Code's <code>settings.json</code>. Ask it for a compiled wall in OpenClaw, LangChain, CrewAI or AutoGen and it hands you the same standing orders everyone else gets — guidance, not a fence. Every other target is next, not now.</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">The app</p>
+        <p style="margin-bottom:1.5rem;">Right now, reading a Clean Bill means opening a Markdown file in a terminal. There's no dashboard, no phone notification, no little paw-print icon that means all clear. That's the plan. It isn't the product yet.</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">Vet visits</p>
+        <p style="margin-bottom:1.5rem;">A Clean Bill of health is a snapshot, taken the day you ran <code>prove</code>. Nothing today re-checks it next week, or after you widen the slider, or after your agent framework changes underneath you. Scheduled, automatic re-proving — the recurring vet visit, not just the one checkup — is on the roadmap, not in the CLI.</p>
+
+        <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">Enterprise everything</p>
+        <p style="margin-bottom:1.5rem;">Team dashboards, private Danger Map instances, auditable decision trails: described elsewhere on this site as tiers. All of them are plans, not shipped features, today.</p>
+
+        <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2rem 0;padding:1.2rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">A cat that tells you what it can't catch yet is a cat you can trust about what it can.</p>
+      </div>
+      <div class="page-nav">
+        <a href="#layers">← Also in the framework</a>
         <a href="#stories">Field Reports →</a>
       </div>
     </div>
@@ -692,19 +949,21 @@
   <section id="quickstart">
     <div class="container">
       <p class="section-label fade-up">Quick Start</p>
-      <h2 class="section-title fade-up delay-1">Up in sixty seconds.</h2>
-      <p class="section-body fade-up delay-2">The fastest path: copy the general safety policy into your agent's system prompt. That's the whole install.</p>
+      <h2 class="section-title fade-up delay-1">Compile it. Prove it. Read the Clean Bill.</h2>
+      <p class="section-body fade-up delay-2">On Claude Code, the fastest path is real, compiled enforcement — not a paste. On any other framework, the fastest path is still the standing orders.</p>
       <div class="code-block fade-up delay-2">
-        <span class="comment"># Step 1 — Copy the policy into your agent's system prompt</span><br />
+        <span class="comment"># Claude Code — compiled and proven</span><br />
         <br />
-        Copy <span class="keyword">standing-orders/general-safety.md</span> into your agent's system prompt. Done.<br />
+        <span class="keyword">pip install curiosity-cat</span><br />
+        curiosity-cat compile --level housecat --target claude-code<br />
+        curiosity-cat prove --profile curiosity-cat/profiles/&lt;compiled-dir&gt;<br />
         <br />
-        <span class="comment"># Step 2 (optional) — Use the CLI to scaffold a full setup</span>
+        <span class="comment"># Any other framework — guidance, honestly, not yet a compiled wall</span><br />
+        Copy <span class="keyword">standing-orders/general-safety.md</span> into your agent's system prompt.
       </div>
       <div class="install-options fade-up delay-3">
-        <span class="install-pill">← npx curiosity-cat init</span>
-        <span class="install-pill" style="background:#0a0a0a;color:var(--white);border:1px solid rgba(255,255,255,0.25);">pip install curiosity-cat</span>
-        <a href="#integration" class="qs-link">Read the integration guide &rarr;</a>
+        <a href="quickstart.html" class="qs-link">See the full journey, real terminal output &rarr;</a>
+        <a href="#integration" class="qs-link" style="background:#0a0a0a;color:var(--white);border:1px solid rgba(255,255,255,0.25);">Read the integration guide &rarr;</a>
       </div>
       <hr style="border:none;border-top:1px solid rgba(245,158,11,0.2);margin:2rem 0 1.5rem;">
       <div class="page-nav">
@@ -935,18 +1194,20 @@
   <section id="overview" class="page-section">
 <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
 <h2 class="section-title" style="margin-bottom:0.5rem;">How It Works</h2>
-<p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A text file, a shared map and stories that stick. The whole framework in two minutes.</p>
+<p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A compiled profile, a proof, a shared map, and stories that stick. The whole framework in two minutes.</p>
 <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
-<p style="margin-bottom:1.2rem;">Curiosity Cat is three things working together.</p>
-<p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">The Safety Net</strong> is a set of standing orders — plain text rules you paste into your agent's system prompt. No SDK. No server. No dependencies. Your agent reads them and follows them. That is the whole install. It takes sixty seconds.</p>
+<p style="margin-bottom:1.2rem;">Curiosity Cat is four things working together.</p>
+<p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">Compile</strong> turns a risk level — Housecat, Alley Cat, Tiger — into a real Claude Code <code>settings.json</code>. Actual allow, deny and ask rules, not a paragraph of advice.</p>
+<p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">Prove</strong> runs escape trials against that compiled file — some self-consistency, one observed live where it's safe to try — and writes an honest Clean Bill of health, or an honest list of what didn't hold.</p>
+<p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">The Safety Net</strong> is standing orders — plain text rules you paste into your agent's system prompt. No SDK. No server. No dependencies. This is guidance, not enforcement, and today it's the only layer for frameworks Compile doesn't target yet.</p>
 <p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">The Danger Map</strong> is shared intelligence. When one agent has a close call, every other agent learns from it. Anonymised, structured, privacy by design. The network effect is the moat.</p>
 <p style="margin-bottom:1.2rem;"><strong style="color:var(--amber);">Nine Lives</strong> are the stories. Real close calls told plainly. Security lessons that stick because they read like stories, not CVE numbers.</p>
-<p style="margin-bottom:1.2rem;">It works with any agent framework that accepts a system prompt — which is all of them. OpenClaw, Nanobot, LangChain, CrewAI, AutoGen, Claude Code, or anything custom.</p>
+<p style="margin-bottom:1.2rem;">Compile and Prove target Claude Code today. The standing orders still work with any agent framework that accepts a system prompt — OpenClaw, Nanobot, LangChain, CrewAI, AutoGen, or anything custom — as guidance, not as a compiled, proven wall.</p>
 <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2rem 0;padding:1.2rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">Curiosity Cat provides close calls, not death notices.</p>
 <p style="margin-bottom:1.2rem;">Want the full technical detail? There are 10 pages ahead. Each one is short.</p>
 </div>
 <div class="page-nav">
-<a href="#layers">← Back to Architecture</a>
+<a href="#mechanism">← Back to Compile, Prove, Clean Bill</a>
 <a href="#why">The full story — 1 of 10 →</a>
 <a href="#hero" class="escape">Home</a>
 </div>
@@ -998,18 +1259,19 @@
   <section id="theproduct" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
   <h2 class="section-title" style="margin-bottom:0.5rem;">The Product</h2>
-  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A portable safety framework that sits alongside any agent system.</p>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">A compiler, a prover, and a portable safety framework that sits alongside any agent system.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
-  <p style="margin-bottom:1.2rem;">Curiosity Cat is a portable safety framework for AI agents that interact with external content.</p>
+  <p style="margin-bottom:1.2rem;">Curiosity Cat is a safety framework for AI agents that interact with external content. For Claude Code, it compiles a chosen risk level into a real permission profile and proves that profile holds. For every other framework, it's guidance you paste into a system prompt while its own compiler is still on the roadmap.</p>
   <p style="margin-bottom:1.2rem;">It sits alongside existing agent systems and helps operators inspect, filter, quarantine and report risky external inputs before those inputs are trusted, stored or acted on. It is not tied to any single provider, platform or operating system.</p>
   <p style="margin-bottom:1.2rem;">The name says what the product does. Cats are curious. They explore. They get into things they shouldn't. They survive. Curiosity Cat does not try to eliminate the instinct to explore. It helps that instinct come home safely.</p>
   <p style="margin-bottom:1.2rem;font-weight:600;color:var(--amber);">Curiosity Cat provides close calls, not death notices.</p>
-  <p style="margin-bottom:1.2rem;">Curiosity Cat helps operators do five things better:</p>
-  <p style="margin-bottom:0.6rem;padding-left:1rem;">1. Inspect and classify external content before it is trusted by an agent</p>
-  <p style="margin-bottom:0.6rem;padding-left:1rem;">2. Guide local policy around scope, destinations, file handling, tool usage and memory decisions</p>
-  <p style="margin-bottom:0.6rem;padding-left:1rem;">3. Quarantine suspicious material for review instead of silently allowing or discarding it</p>
-  <p style="margin-bottom:0.6rem;padding-left:1rem;">4. Learn from patterns reported by other Curiosity Cat users through the Danger Map</p>
-  <p style="margin-bottom:1.2rem;padding-left:1rem;">5. Turn real incidents into understandable lessons that improve judgement and community awareness</p>
+  <p style="margin-bottom:1.2rem;">Curiosity Cat helps operators do six things better:</p>
+  <p style="margin-bottom:0.6rem;padding-left:1rem;">1. Compile a risk level into a real, mechanically enforced Claude Code permission profile</p>
+  <p style="margin-bottom:0.6rem;padding-left:1rem;">2. Prove that profile holds — some of it observed live, not just re-derived from its own rules</p>
+  <p style="margin-bottom:0.6rem;padding-left:1rem;">3. Inspect and classify external content before it is trusted by an agent</p>
+  <p style="margin-bottom:0.6rem;padding-left:1rem;">4. Guide local policy around scope, destinations, file handling, tool usage and memory decisions</p>
+  <p style="margin-bottom:0.6rem;padding-left:1rem;">5. Learn from patterns reported by other Curiosity Cat users through the Danger Map</p>
+  <p style="margin-bottom:1.2rem;padding-left:1rem;">6. Turn real incidents into understandable lessons that improve judgement and community awareness</p>
   </div>
   <div class="page-nav">
   <a href="#whofrom">← Where it comes from</a>
@@ -1023,10 +1285,10 @@
   <section id="safetylayer" class="page-section">
   <div class="story-page" style="border-left:2px solid rgba(245,158,11,0.2);padding-left:2rem;">
   <h2 class="section-title" style="margin-bottom:0.5rem;">The Safety Net — In Detail</h2>
-  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Scope policies, standing orders, quarantine, and four enforcement modes on the roadmap.</p>
+  <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;color:var(--muted);margin-bottom:2rem;">Scope policies, standing orders, quarantine — and where compiled enforcement takes over.</p>
   <div style="font-family:'Source Sans 3',sans-serif;font-size:1.1rem;color:#ccc;line-height:1.5;">
-  <p style="margin-bottom:1.2rem;">The foundation layer is local. It runs on the operator's own system and provides immediate protection without depending on anything external.</p>
-  <p style="margin-bottom:1.2rem;">Curiosity Cat's standing orders and policy files guide how external content should be handled before that content is used by an agent. Depending on policy, content is meant to be allowed, logged, flagged or quarantined.</p>
+  <p style="margin-bottom:1.2rem;">The Safety Net is the guidance layer. It runs on the operator's own system as plain text and policy files — no server, no dependency — but nothing in it is mechanically checked. An agent that ignores its own system prompt is not stopped by any of this.</p>
+  <p style="margin-bottom:1.2rem;">Curiosity Cat's standing orders and policy files guide how external content should be handled before that content is used by an agent. Depending on policy, content is <em>meant to</em> be allowed, logged, flagged or quarantined — "meant to," because this layer is prose an agent has to choose to follow.</p>
   <p style="margin-bottom:1.2rem;font-weight:600;color:var(--amber);">What the Safety Net includes:</p>
   <p style="margin-bottom:0.6rem;padding-left:1rem;">Scope policies defining where agents are allowed to go and what they can do with external content</p>
   <p style="margin-bottom:0.6rem;padding-left:1rem;">Standing orders that reinforce safe behaviour inside the agent's prompt context — copy-pasteable snippets that work across frameworks</p>
@@ -1034,11 +1296,10 @@
   <p style="margin-bottom:0.6rem;padding-left:1rem;">Domain and tool trust controls including allowlists, denylists and trust levels for MCP servers</p>
   <p style="margin-bottom:0.6rem;padding-left:1rem;">Policy packs — preset configurations for common agent types so operators don't build policy from scratch</p>
   <p style="margin-bottom:1.2rem;padding-left:1rem;">Action thresholds that determine when to notify the operator versus handle the event silently</p>
-  <p style="margin-bottom:1.2rem;font-weight:600;color:var(--amber);">Coming: enforcement modes</p>
-  <p style="margin-bottom:0.6rem;padding-left:1rem;">Observe — will record and report without interrupting unless something serious occurs</p>
-  <p style="margin-bottom:0.6rem;padding-left:1rem;">Warn — will flag medium- and high-risk events and ask for review in selected cases</p>
-  <p style="margin-bottom:0.6rem;padding-left:1rem;">Quarantine — will isolate suspicious files or outputs for approval before use</p>
-  <p style="margin-bottom:1.2rem;padding-left:1rem;">Block — will prevent selected classes of action entirely according to local policy</p>
+  <p style="margin-bottom:1.2rem;font-weight:600;color:var(--amber);">Where real enforcement already exists</p>
+  <p style="margin-bottom:1.2rem;">For the Claude Code target, <code>curiosity-cat compile</code> turns this same policy into an actual <code>settings.json</code> — real allow, deny and ask rules Claude Code itself enforces, plus a sandbox around Bash. <code>curiosity-cat prove</code> then runs escape trials against it: self-consistency checks that confirm the compiled file matches what the compiler intended, and — where it's safe to attempt — one observed-deny trial that watches a real, live Claude Code session actually get stopped. Only the observed trial is proof a live agent gets stopped; self-consistency alone is not, and every Clean Bill says so plainly.</p>
+  <p style="margin-bottom:1.2rem;font-weight:600;color:var(--amber);">Coming: a compiler for every other target</p>
+  <p style="margin-bottom:1.2rem;">Compile has one target today — Claude Code. OpenClaw, LangChain, CrewAI, AutoGen and the rest still run on the Safety Net above as guidance only, honestly, until each gets its own compiler. See <a href="#roadmap" style="color:var(--amber);">what else is still ahead of us</a>.</p>
   <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2rem 0;padding:1.2rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">Different agents need different settings. A research assistant browsing academic papers does not need the same controls as an agent executing code from unknown repositories.</p>
   </div>
   <div class="page-nav">
@@ -1180,7 +1441,7 @@
 <p style="margin-bottom:2rem;">Copy the contents of standing-orders/general-safety.md into your agent's system prompt or system message. Add a role-specific standing order if applicable (research-agent.md, coding-agent.md, enterprise-analyst.md). That is it. Your agent now operates under Curiosity Cat safety protocols.</p>
 
 <p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Claude Code</p>
-<p style="margin-bottom:2rem;">Add the general safety standing order to your CLAUDE.md file in the project root. Claude Code reads CLAUDE.md at session start and treats its contents as standing instructions. Place the standing order text under a clear heading. Role-specific orders can go in the same file.</p>
+<p style="margin-bottom:2rem;">Run <code>curiosity-cat compile --level &lt;level&gt; --target claude-code</code> and point Claude Code at the compiled <code>settings.json</code> — real allow, deny and ask rules, not a paste. Run <code>curiosity-cat prove --profile &lt;dir&gt;</code> against it to get a Clean Bill of health before you trust it. You can still add the general safety standing order to CLAUDE.md alongside it for the guidance a compiled profile doesn't cover — Claude Code reads CLAUDE.md at session start and treats its contents as standing instructions.</p>
 
 <p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Nanobot / OpenClaw</p>
 <p style="margin-bottom:2rem;">Add the standing order to your agent's IDENTITY.md or SOUL.md file. These are read at agent initialisation and persist across sessions. For multi-agent setups, each agent can have its own role-specific standing order alongside the shared general safety order.</p>
@@ -1251,17 +1512,17 @@
 
       <details class="faq-item">
         <summary>What is Curiosity Cat?</summary>
-        <div class="faq-answer">A safety framework for AI agents that explore the internet. It helps your agents inspect, filter, quarantine and report risky external inputs before those inputs are trusted, stored or acted on. The minimum install is copying a text file into your agent's system prompt — that takes sixty seconds.</div>
+        <div class="faq-answer">A safety framework for AI agents that explore the internet. For Claude Code, it compiles a chosen risk level into a real permission profile and proves that profile holds — some of it live, not just on paper. For every other framework, the minimum install is copying a text file into your agent's system prompt — guidance, not enforcement, until that framework gets its own compiler.</div>
       </details>
 
       <details class="faq-item">
         <summary>How does it work?</summary>
-        <div class="faq-answer">Three layers. The Safety Net is a set of standing orders — plain text rules your agent follows. The Danger Map is shared threat intelligence — when one agent has a close call, every other agent learns from it. Nine Lives are the stories — real close calls told plainly so people remember the lessons.</div>
+        <div class="faq-answer">Four things. Compile turns a risk level into a real Claude Code permission profile. Prove runs escape trials against it — self-consistency checks plus, where it's safe, one observed-deny trial on a live session — and writes a Clean Bill of health. The Safety Net is standing orders — plain text rules your agent follows, guidance until it's compiled. The Danger Map is shared threat intelligence — when one agent has a close call, every other agent learns from it. Nine Lives are the stories — real close calls told plainly so people remember the lessons.</div>
       </details>
 
       <details class="faq-item">
         <summary>What frameworks does it support?</summary>
-        <div class="faq-answer">Anything that accepts a system prompt. OpenClaw, Nanobot, LangChain, CrewAI, AutoGen, Claude Code, or anything custom. The standing orders are plain text. If your agent can read instructions, it can use Curiosity Cat.</div>
+        <div class="faq-answer">Compile and Prove target Claude Code today — real, compiled, proven enforcement. Every other framework that accepts a system prompt — OpenClaw, Nanobot, LangChain, CrewAI, AutoGen, or anything custom — gets the standing orders as guidance, honestly, until it has its own compiler.</div>
       </details>
 
       <details class="faq-item">
@@ -1276,12 +1537,12 @@
 
       <details class="faq-item">
         <summary>Is it just a system prompt?</summary>
-        <div class="faq-answer">The minimum install is a system prompt addition — and that alone provides meaningful protection. The full framework includes scope policies, file quarantine, domain trust controls, policy packs for different agent types and the shared Danger Map intelligence layer.</div>
+        <div class="faq-answer">For most frameworks, yes — the standing orders are the whole thing, and that's guidance, not enforcement. For Claude Code, no: compile generates a real settings.json and prove tests it against a live session. The full framework also includes scope policies, file quarantine, domain trust controls, policy packs and the shared Danger Map intelligence layer.</div>
       </details>
 
       <details class="faq-item">
         <summary>What's the performance impact?</summary>
-        <div class="faq-answer">None. The standing orders are read once when the agent starts — they add no latency to operations. Quarantine and reporting happen only when something suspicious is detected, which is exactly when you want your agent to slow down.</div>
+        <div class="faq-answer">None day-to-day. The standing orders are read once when the agent starts. Compiling and proving a profile happens once, ahead of time — not on every request. Quarantine and reporting happen only when something suspicious is detected, which is exactly when you want your agent to slow down.</div>
       </details>
 
       <details class="faq-item">
