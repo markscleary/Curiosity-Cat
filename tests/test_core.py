@@ -13,6 +13,45 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from curiosity_cat import core
 
 
+def test_resolve_home_env_override_wins_over_everything(tmp_path, monkeypatch):
+    override = tmp_path / "custom-home"
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(override))
+    legacy = tmp_path / "curiosity-cat"
+    legacy.mkdir()
+
+    assert core.resolve_home(cwd=tmp_path) == override
+
+
+def test_resolve_home_reuses_existing_legacy_dir_in_writable_cwd(tmp_path, monkeypatch):
+    monkeypatch.delenv("CURIOSITY_CAT_HOME", raising=False)
+    legacy = tmp_path / "curiosity-cat"
+    legacy.mkdir()
+
+    assert core.resolve_home(cwd=tmp_path) == legacy
+
+
+def test_resolve_home_falls_back_to_platform_default_with_no_legacy_dir(tmp_path, monkeypatch):
+    monkeypatch.delenv("CURIOSITY_CAT_HOME", raising=False)
+    fake_default = tmp_path / "platform-default"
+    monkeypatch.setattr(core, "_platform_default_home", lambda: fake_default)
+    fresh_cwd = tmp_path / "fresh-project"
+    fresh_cwd.mkdir()
+
+    assert core.resolve_home(cwd=fresh_cwd) == fake_default
+
+
+def test_resolve_home_falls_back_when_cwd_is_not_writable(tmp_path, monkeypatch):
+    monkeypatch.delenv("CURIOSITY_CAT_HOME", raising=False)
+    fake_default = tmp_path / "platform-default"
+    monkeypatch.setattr(core, "_platform_default_home", lambda: fake_default)
+    unwritable = tmp_path / "readonly-project"
+    unwritable.mkdir()
+    (unwritable / "curiosity-cat").mkdir()
+    monkeypatch.setattr(core.os, "access", lambda path, mode: False)
+
+    assert core.resolve_home(cwd=unwritable) == fake_default
+
+
 def test_compile_profile_output_validity(tmp_path):
     profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
 

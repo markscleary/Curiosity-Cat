@@ -90,6 +90,27 @@ pub fn read_text_file(path: String) -> Result<String, String> {
     fs::read_to_string(path).map_err(|e| e.to_string())
 }
 
+/// Where this installed app keeps compiled profiles — passed explicitly to
+/// the sidecar's `compile` call (see sidecar-client.js) rather than letting
+/// ccat-engine fall back to its own cwd-derived default. A Finder launch
+/// gives the sidecar cwd "/" (read-only), which is exactly the bug this
+/// works around: the app always knows and states its own writable data
+/// directory, the same one `marker_path`/`last_profile_path` already use.
+fn profiles_dir_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
+    let dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("could not resolve app data dir: {e}"))?
+        .join("profiles");
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir)
+}
+
+#[tauri::command]
+pub fn get_profiles_dir(app: AppHandle) -> Result<String, String> {
+    Ok(profiles_dir_path(&app)?.to_string_lossy().to_string())
+}
+
 fn marker_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
     let dir = app
         .path()

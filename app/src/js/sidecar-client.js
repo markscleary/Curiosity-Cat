@@ -12,7 +12,9 @@ window.CCAT = (function () {
 
   return {
     compile: function (level, target) {
-      return call('compile', { level: level, target: target || 'claude-code' });
+      return invoke('get_profiles_dir', {}).then(function (profilesDir) {
+        return call('compile', { level: level, target: target || 'claude-code', profiles_dir: profilesDir });
+      });
     },
     prove: function (profileDir, observed) {
       return call('prove', { profile_dir: profileDir, observed: observed });

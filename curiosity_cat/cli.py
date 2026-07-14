@@ -25,8 +25,7 @@ def cmd_init(role=None):
         print(f'Valid roles: {", ".join(ROLE_FILES)}', file=sys.stderr)
         sys.exit(1)
 
-    cwd = Path.cwd()
-    dest_root = cwd / "curiosity-cat"
+    dest_root = core.resolve_home()
     dest_orders = dest_root / "standing-orders"
     dest_policies = dest_root / "policies"
     dest_quarantine = dest_root / "quarantine"
@@ -52,23 +51,23 @@ def cmd_init(role=None):
         dest = dest_orders / filename
         if src.exists():
             shutil.copy2(src, dest)
-            copied.append(f"  curiosity-cat/standing-orders/{filename}")
+            copied.append(f"  {dest}")
 
     policy_src = DATA_DIR / "policies" / "scope-policy-template.json"
     policy_dest = dest_policies / "scope-policy-template.json"
     if policy_src.exists():
         shutil.copy2(policy_src, policy_dest)
-        copied.append("  curiosity-cat/policies/scope-policy-template.json")
+        copied.append(f"  {policy_dest}")
 
-    print("\nCuriosity Cat initialised.\n")
+    print(f"\nCuriosity Cat initialised at {dest_root}\n")
     print("Created:")
     for f in copied:
         print(f)
-    print("  curiosity-cat/quarantine/   (safe drop zone for suspicious content)")
-    print("  curiosity-cat/logs/         (incident log directory)")
+    print(f"  {dest_quarantine}   (safe drop zone for suspicious content)")
+    print(f"  {dest_logs}         (incident log directory)")
     print("\nNext steps:")
-    print("  1. Open curiosity-cat/standing-orders/ and paste the relevant file into your agent's system prompt.")
-    print("  2. Customise curiosity-cat/policies/scope-policy-template.json for your project.")
+    print(f"  1. Open {dest_orders} and paste the relevant file into your agent's system prompt.")
+    print(f"  2. Customise {policy_dest} for your project.")
     print('  3. Run "curiosity-cat report" to learn how to submit a close call to the Danger Map.\n')
 
 
@@ -76,9 +75,9 @@ def cmd_report():
     print(core.DANGER_MAP_REPORT_HELP)
 
 
-def cmd_compile(level=None, target=None):
+def cmd_compile(level=None, target=None, profiles_dir=None):
     try:
-        profile = core.compile_profile(level, target)
+        profile = core.compile_profile(level, target, profiles_dir=profiles_dir)
     except core.InvalidLevelError:
         print(f'Missing or unknown --level: "{level}"', file=sys.stderr)
         print(f'Valid levels: {", ".join(LEVELS)}', file=sys.stderr)
@@ -89,15 +88,15 @@ def cmd_compile(level=None, target=None):
         sys.exit(1)
 
     profile_dir = Path(profile.path)
-    rel = profile_dir.relative_to(Path.cwd())
     print(f"\nCompiled {core.LEVEL_POLICY[level]['label']} profile for {target}.\n")
+    print(f"Profiles live at: {profile_dir.parent}\n")
     print("Created:")
-    print(f"  {rel}/settings.json")
-    print(f"  {rel}/scope-policy.json")
-    print(f"  {rel}/standing-orders.md")
-    print(f"  {rel}/PROFILE.md")
-    print(f"  {rel}/manifest.json")
-    print(f'\nRead {rel}/PROFILE.md first — plain-language summary of what this cat can and cannot do.\n')
+    print(f"  {profile_dir / 'settings.json'}")
+    print(f"  {profile_dir / 'scope-policy.json'}")
+    print(f"  {profile_dir / 'standing-orders.md'}")
+    print(f"  {profile_dir / 'PROFILE.md'}")
+    print(f"  {profile_dir / 'manifest.json'}")
+    print(f"\nRead {profile_dir / 'PROFILE.md'} first — plain-language summary of what this cat can and cannot do.\n")
 
 
 def cmd_prove(profile=None, observed=None):
@@ -113,10 +112,6 @@ def cmd_prove(profile=None, observed=None):
         sys.exit(1)
 
     proof_dir = Path(clean_bill.proof_dir)
-    try:
-        rel = proof_dir.relative_to(Path.cwd())
-    except ValueError:
-        rel = proof_dir
     failed = [t for t in clean_bill.self_consistency_trials + clean_bill.observed_trials
               if t.get("held") is False]
 
@@ -126,8 +121,8 @@ def cmd_prove(profile=None, observed=None):
     if clean_bill.observed_note:
         print(clean_bill.observed_note)
     print("\nWrote:")
-    print(f"  {rel}/clean-bill.json")
-    print(f"  {rel}/CLEAN-BILL.md")
+    print(f"  {proof_dir / 'clean-bill.json'}")
+    print(f"  {proof_dir / 'CLEAN-BILL.md'}")
 
     if failed:
         print(f"\n{len(failed)} wall(s) did NOT hold:", file=sys.stderr)
@@ -295,8 +290,9 @@ def print_help():
 curiosity-cat — AI agent safety framework
 
 Usage:
-  curiosity-cat init [--role <role>]                       Scaffold standing orders into ./curiosity-cat/
-  curiosity-cat compile --level <level> --target <target>  Compile a dated profile into ./curiosity-cat/profiles/
+  curiosity-cat init [--role <role>]                       Scaffold standing orders
+  curiosity-cat compile --level <level> --target <target> [--profiles-dir <dir>]
+                                                             Compile a dated profile
   curiosity-cat prove --profile <profile-dir> [--no-observed]
                                                              Run escape trials against a compiled profile
   curiosity-cat check <candidate>                          Look up a URL/source against the Danger Map
@@ -322,6 +318,15 @@ Levels (for compile --level):
 
 Targets (for compile --target):
   claude-code  Claude Code settings.json (permissions, sandbox)
+
+Where profiles live:
+  By default, curiosity-cat writes profiles/, standing-orders/, policies/,
+  quarantine/, and logs/ under a resolved "home" directory. In order:
+    1. --profiles-dir <dir>      (compile only — used exactly as given)
+    2. $CURIOSITY_CAT_HOME       (env var — sets the whole home directory)
+    3. ./curiosity-cat           (if it already exists and cwd is writable)
+    4. ~/Library/Application Support/Curiosity Cat  (macOS default)
+  The resolved location is always printed after compile/init.
 
 Prove:
   --profile <dir>  A directory produced by "curiosity-cat compile"
@@ -379,6 +384,7 @@ def main():
     parser.add_argument("--level", choices=LEVELS)
     parser.add_argument("--target", choices=list(TARGET_EMITTERS.keys()))
     parser.add_argument("--profile")
+    parser.add_argument("--profiles-dir")
     parser.add_argument("--no-observed", action="store_true")
     parser.add_argument("--approve")
     parser.add_argument("--recompile", action="store_true")
@@ -395,7 +401,7 @@ def main():
     if args.command == "init":
         cmd_init(role=args.role)
     elif args.command == "compile":
-        cmd_compile(level=args.level, target=args.target)
+        cmd_compile(level=args.level, target=args.target, profiles_dir=args.profiles_dir)
     elif args.command == "prove":
         cmd_prove(profile=args.profile, observed=(False if args.no_observed else None))
     elif args.command == "check":

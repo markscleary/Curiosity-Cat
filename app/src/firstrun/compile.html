@@ -36,10 +36,12 @@
       window.CCAT.compile(level, 'claude-code')
         .then(function (profileDir) {
           sessionStorage.setItem('ccat_profile_dir', profileDir.path);
-          return window.CCAT.setLastProfileDir(profileDir.path);
+          return window.CCAT.setLastProfileDir(profileDir.path).then(function () {
+            return profileDir;
+          });
         })
-        .then(function () {
-          statusEl.textContent = 'Compiled. Time to prove it holds.';
+        .then(function (profileDir) {
+          statusEl.textContent = 'Compiled to ' + profileDir.path + '. Time to prove it holds.';
           continueBtn.hidden = false;
           setTimeout(goToProve, 1200);
         })

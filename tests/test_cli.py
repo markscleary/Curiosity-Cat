@@ -17,6 +17,7 @@ from curiosity_cat import cli
 
 def test_compile_prints_created_files_and_exits_cleanly(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     cli.cmd_compile(level="housecat", target="claude-code")
 
     out = capsys.readouterr().out
@@ -27,6 +28,7 @@ def test_compile_prints_created_files_and_exits_cleanly(tmp_path, monkeypatch, c
 
 def test_compile_rejects_unknown_level(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     with pytest.raises(SystemExit) as exc_info:
         cli.cmd_compile(level="feral", target="claude-code")
     assert exc_info.value.code == 1
@@ -37,6 +39,7 @@ def test_compile_rejects_unknown_level(tmp_path, monkeypatch, capsys):
 
 def test_compile_rejects_unknown_target(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     with pytest.raises(SystemExit) as exc_info:
         cli.cmd_compile(level="housecat", target="cursor")
     assert exc_info.value.code == 1
@@ -46,8 +49,9 @@ def test_compile_rejects_unknown_target(tmp_path, monkeypatch, capsys):
 
 def test_prove_reports_clean_bill_and_exits_zero(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    profile_dir = next((tmp_path / "profiles").iterdir())
     capsys.readouterr()
 
     cli.cmd_prove(profile=str(profile_dir), observed=False)
@@ -60,8 +64,9 @@ def test_prove_reports_clean_bill_and_exits_zero(tmp_path, monkeypatch, capsys):
 
 def test_prove_exits_nonzero_and_lists_failed_walls(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    profile_dir = next((tmp_path / "profiles").iterdir())
 
     settings_path = profile_dir / "settings.json"
     settings = json.loads(settings_path.read_text())
@@ -90,6 +95,7 @@ def test_prove_missing_profile_flag_exits_one(capsys):
 
 def test_prove_rejects_non_profile_directory(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     not_a_profile = tmp_path / "nope"
     not_a_profile.mkdir()
 
@@ -230,8 +236,9 @@ def test_vet_rejects_non_profile_directory(tmp_path, capsys):
 def test_vet_prints_one_sentence_per_axis(tmp_path, monkeypatch, capsys):
     from curiosity_cat import core
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    profile_dir = next((tmp_path / "profiles").iterdir())
     monkeypatch.setattr(core, "_detect_platform_version", lambda: None)
     monkeypatch.setattr(core, "_fetch_danger_map_stats",
                          lambda timeout=10: {"schema_version": core._local_danger_map_schema_version()})
@@ -268,8 +275,9 @@ def test_card_rejects_missing_file(tmp_path, capsys):
 
 def test_card_writes_png_from_a_real_clean_bill(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    profile_dir = next((tmp_path / "profiles").iterdir())
     cli.cmd_prove(profile=str(profile_dir), observed=False)
     clean_bill_path = next(profile_dir.glob("proof/*/clean-bill.json"))
     capsys.readouterr()
@@ -290,8 +298,9 @@ def test_purr_missing_profile_flag_exits_one(capsys):
 
 def test_purr_prints_a_digest_for_a_quiet_profile(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     cli.cmd_compile(level="housecat", target="claude-code")
-    profile_dir = next((tmp_path / "curiosity-cat" / "profiles").iterdir())
+    profile_dir = next((tmp_path / "profiles").iterdir())
     capsys.readouterr()
 
     cli.cmd_purr(profile=str(profile_dir))

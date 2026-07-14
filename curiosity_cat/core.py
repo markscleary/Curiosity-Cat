@@ -7,6 +7,7 @@ JSON on stdio. Neither caller should need anything not exported here.
 
 import fnmatch
 import json
+import os
 import re
 import shutil
 import socket
@@ -24,6 +25,57 @@ from typing import Optional
 from . import __version__
 
 DATA_DIR = Path(__file__).parent / "data"
+
+# Where curiosity-cat keeps everything it writes (profiles/, standing-orders/,
+# policies/, quarantine/, logs/) when nobody's told it otherwise. A bare
+# `Path.cwd()` default is what broke a Finder launch of the app (sidecar
+# inherits cwd "/", read-only) — see docs/app/APP_SPEC.md APP-FIX-1.
+CURIOSITY_CAT_HOME_ENV = "CURIOSITY_CAT_HOME"
+LEGACY_HOME_DIRNAME = "curiosity-cat"
+APP_SUPPORT_DIRNAME = "Curiosity Cat"
+
+
+def _platform_default_home():
+    """The per-user application-data directory curiosity-cat falls back to
+    when there's no CURIOSITY_CAT_HOME override and no pre-existing legacy
+    `./curiosity-cat` in a writable cwd. Minimal per-platform convention —
+    not a platformdirs dependency, just the one path each OS actually uses.
+    """
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / APP_SUPPORT_DIRNAME
+    if os.name == "nt":
+        base = os.environ.get("APPDATA")
+        root = Path(base) if base else Path.home() / "AppData" / "Roaming"
+        return root / APP_SUPPORT_DIRNAME
+    xdg = os.environ.get("XDG_DATA_HOME")
+    root = Path(xdg) if xdg else Path.home() / ".local" / "share"
+    return root / LEGACY_HOME_DIRNAME
+
+
+def resolve_home(cwd=None):
+    """Resolve the curiosity-cat home directory — the parent of profiles/,
+    standing-orders/, policies/, quarantine/, and logs/.
+
+    Precedence:
+      1. CURIOSITY_CAT_HOME env var, if set.
+      2. Back-compat for terminal users: an already-existing `./curiosity-cat`
+         directory in a writable `cwd` (defaults to the process cwd).
+      3. The platform's per-user application-data default.
+
+    Never falls back to a bare `cwd` on its own — that's the cwd-relative
+    write this function exists to replace.
+    """
+    override = os.environ.get(CURIOSITY_CAT_HOME_ENV)
+    if override:
+        return Path(override).expanduser()
+
+    cwd = Path(cwd) if cwd is not None else Path.cwd()
+    legacy = cwd / LEGACY_HOME_DIRNAME
+    if legacy.is_dir() and os.access(cwd, os.W_OK):
+        return legacy
+
+    return _platform_default_home()
+
 
 ROLE_FILES = {
     "research":   ["general-safety.md", "research-agent.md"],
@@ -421,9 +473,15 @@ def build_manifest(level, target):
     }
 
 
-def compile_profile(level, target, cwd=None):
-    """Compile a dated profile directory for `level`/`target` under
-    `cwd`/curiosity-cat/profiles (`cwd` defaults to the process cwd).
+def compile_profile(level, target, cwd=None, profiles_dir=None):
+    """Compile a dated profile directory for `level`/`target`.
+
+    Where it's written, in order: `profiles_dir` if given (used exactly as
+    passed, no resolution); else `cwd`/curiosity-cat/profiles if `cwd` is
+    given (the legacy layout, honoured literally for callers — tests,
+    `vet(recompile=True)` — that pass an explicit root); else
+    `resolve_home()`/profiles, which is the only path that ever falls back
+    to a bare `Path.cwd()`, and does so safely (see resolve_home()).
 
     Raises InvalidLevelError / InvalidTargetError for an unknown level or
     target. Returns a ProfileDir describing what was written.
@@ -433,8 +491,12 @@ def compile_profile(level, target, cwd=None):
     if target not in TARGET_EMITTERS:
         raise InvalidTargetError(target)
 
-    cwd = Path(cwd) if cwd is not None else Path.cwd()
-    profiles_root = cwd / "curiosity-cat" / "profiles"
+    if profiles_dir is not None:
+        profiles_root = Path(profiles_dir)
+    elif cwd is not None:
+        profiles_root = Path(cwd) / LEGACY_HOME_DIRNAME / "profiles"
+    else:
+        profiles_root = resolve_home() / "profiles"
     profiles_root.mkdir(parents=True, exist_ok=True)
 
     base_name = f"{level}-{target}-{date.today().strftime('%Y%m%d')}"
@@ -1521,12 +1583,11 @@ def vet(profile_dir, recompile=False, observed=None, fetcher=None):
     recompiled = False
     new_clean_bill = None
     if recompile:
-        # profile_dir == <cwd>/curiosity-cat/profiles/<name> — three parents
-        # up recovers the cwd compile_profile() itself expects, so this
-        # lands the fresh profile in the same profiles/ directory rather
-        # than nested under the old one.
-        cwd = profile_dir.parent.parent.parent
-        new_profile = compile_profile(level, target, cwd=cwd)
+        # profile_dir == <profiles_root>/<name> — its parent is the profiles
+        # root itself, whatever produced it (legacy cwd-relative layout or
+        # the resolved home), so the fresh profile lands alongside the old
+        # one rather than nested under it.
+        new_profile = compile_profile(level, target, profiles_dir=profile_dir.parent)
         new_clean_bill = prove(new_profile.path, observed=observed)
         recompiled = True
 

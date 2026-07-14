@@ -22,6 +22,7 @@ def test_status_round_trip():
 
 def test_compile_round_trip(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     response = serve.handle_request({
         "id": 2, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
     })
@@ -30,8 +31,50 @@ def test_compile_round_trip(tmp_path, monkeypatch):
     assert Path(response["result"]["settings_path"]).exists()
 
 
+def test_compile_round_trip_survives_a_finder_style_launch(tmp_path, monkeypatch):
+    """APP-FIX-1 regression: a Finder-launched sidecar inherits cwd "/"
+    (read-only) with no --profiles-dir override — the exact conditions that
+    used to raise Errno 30 out of a bare `Path.cwd()` default. compile must
+    still succeed by falling back to the resolved platform-default home,
+    never touching cwd.
+    """
+    monkeypatch.chdir("/")
+    monkeypatch.delenv("CURIOSITY_CAT_HOME", raising=False)
+    fake_default_home = tmp_path / "resolved-home"
+    monkeypatch.setattr(core, "_platform_default_home", lambda: fake_default_home)
+
+    response = serve.handle_request({
+        "id": 200, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
+    })
+
+    assert "error" not in response, response.get("error")
+    assert response["result"]["level"] == "housecat"
+    settings_path = Path(response["result"]["settings_path"])
+    assert settings_path.exists()
+    assert settings_path.is_relative_to(fake_default_home)
+
+
+def test_compile_round_trip_honors_explicit_profiles_dir_from_the_app(tmp_path, monkeypatch):
+    """Mirrors how the Tauri app calls compile (sidecar-client.js): it
+    resolves its own app-data profiles dir and passes it explicitly, so the
+    engine's own cwd/home resolution never even runs.
+    """
+    monkeypatch.chdir("/")
+    explicit = tmp_path / "app-data" / "profiles"
+
+    response = serve.handle_request({
+        "id": 201, "method": "compile",
+        "params": {"level": "housecat", "target": "claude-code", "profiles_dir": str(explicit)},
+    })
+
+    assert "error" not in response, response.get("error")
+    settings_path = Path(response["result"]["settings_path"])
+    assert settings_path.is_relative_to(explicit)
+
+
 def test_compile_round_trip_reports_invalid_level_as_error(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     response = serve.handle_request({
         "id": 3, "method": "compile", "params": {"level": "feral", "target": "claude-code"},
     })
@@ -42,6 +85,7 @@ def test_compile_round_trip_reports_invalid_level_as_error(tmp_path, monkeypatch
 
 def test_prove_round_trip(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     compiled = serve.handle_request({
         "id": 4, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
     })["result"]
@@ -147,6 +191,7 @@ def test_submit_approved_round_trip_only_submits_named_ids(tmp_path, monkeypatch
 
 def test_vet_round_trip(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     compiled = serve.handle_request({
         "id": 15, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
     })["result"]
@@ -170,6 +215,7 @@ def test_unknown_method_is_an_error():
 
 def test_render_share_card_round_trip(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     compiled = serve.handle_request({
         "id": 20, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
     })["result"]
@@ -194,6 +240,7 @@ def test_render_share_card_requires_clean_bill_path():
 
 def test_purr_round_trip(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
     compiled = serve.handle_request({
         "id": 24, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
     })["result"]

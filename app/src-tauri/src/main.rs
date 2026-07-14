@@ -59,6 +59,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::sidecar_call,
+            commands::get_profiles_dir,
             commands::open_window,
             commands::close_window,
             commands::open_approval_window,

@@ -23,7 +23,7 @@ METHODS = ("compile", "prove", "check", "report_close_call",
 def _handle_compile(params):
     level = params.get("level")
     target = params.get("target")
-    return core.to_jsonable(core.compile_profile(level, target))
+    return core.to_jsonable(core.compile_profile(level, target, profiles_dir=params.get("profiles_dir")))
 
 
 def _handle_prove(params):
