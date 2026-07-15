@@ -101,25 +101,113 @@ def cmd_compile(level=None, target=None, profiles_dir=None):
           "applied — run \"curiosity-cat estate\" to see what's out there to protect.\n")
 
 
-def cmd_prove(profile=None, observed=None):
+def _protection_summary_lines(level, target_label, applied_at):
+    """The Assignment Model's three-question answer (docs/app/APP_SPEC.md):
+    what is now protected, from what, since when. Every apply-time
+    protection claim this CLI prints goes through here so none of them can
+    drift into a bare "protected" with no level, wall list, or date.
+    """
+    policy = core.LEVEL_POLICY[level]
+    abstract = policy["abstract"]
+
+    walls = ["credential files (.env, .pem, SSH/AWS keys)", "destructive commands (sudo, rm -rf)"]
+    bash_cmds = [p[5:-3] for p in abstract["bash_deny"] if p.startswith("Bash(") and p.endswith(":*)")]
+    if bash_cmds:
+        walls.append(f"{', '.join(bash_cmds)} (denied outright at this level)")
+    if not abstract["web_wide_open"] and abstract["web_allowed_domains"]:
+        walls.append(f"web fetches outside {len(abstract['web_allowed_domains'])} allow-listed domain(s)")
+    if abstract["write_scope"] == "project":
+        walls.append("writes/edits outside this project")
+
+    return [
+        f"What is now protected: {target_label} — {policy['label']} ({level}) profile applied.",
+        f"From what: {'; '.join(walls)}.",
+        f"Since when: {applied_at}.",
+    ]
+
+
+def cmd_apply(level=None, target=None, observed=None):
+    if not level or level not in LEVELS:
+        print(f'Missing or unknown --level: "{level}"', file=sys.stderr)
+        print(f'Valid levels: {", ".join(LEVELS)}', file=sys.stderr)
+        sys.exit(1)
+    if not target:
+        print('Missing --target <path|global>', file=sys.stderr)
+        sys.exit(1)
+
+    profile = core.compile_profile(level, "claude-code")
+    apply_result = core.apply(profile.path, target)
+
+    print(f"\nApplied {core.LEVEL_POLICY[level]['label']} profile to {apply_result.target}.\n")
+    print(f"  {apply_result.settings_path}")
+    if apply_result.backup_path:
+        print(f"  Backed up prior settings to: {apply_result.backup_path}")
+    print("\nWhat was merged:" if apply_result.merged else "\nInstalled:")
+    for line in apply_result.merge_report:
+        print(f"  - {line}")
+
+    try:
+        clean_bill = core.prove(profile.path, observed=observed, target=target)
+    except core.TargetNotAppliedError as exc:
+        print(f"\nProve failed: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    failed = [t for t in clean_bill.self_consistency_trials + clean_bill.observed_trials
+              if t.get("held") is False]
+
+    print(f"\nRan {len(clean_bill.self_consistency_trials)} self-consistency trial(s) and "
+          f"{len(clean_bill.observed_trials)} observed (live) trial(s) against {apply_result.target}.")
+    if clean_bill.observed_note:
+        print(clean_bill.observed_note)
+
+    print()
+    for line in _protection_summary_lines(level, apply_result.target, apply_result.applied_at):
+        print(line)
+    print(f"\n  {clean_bill.clean_bill_md_path}\n")
+
+    if failed:
+        print(f"{len(failed)} wall(s) did NOT hold — see the Clean Bill above for detail.\n", file=sys.stderr)
+        sys.exit(1)
+
+
+def cmd_unapply(target=None):
+    if not target:
+        print('Missing --target <path|global>', file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        result = core.unapply(target)
+    except core.TargetNotAppliedError as exc:
+        print(str(exc), file=sys.stderr)
+        sys.exit(1)
+
+    print(f"\nUnapplied {result.target}.")
+    print(f"  {result.note}\n")
+
+
+def cmd_prove(profile=None, observed=None, target=None):
     if not profile:
         print('Missing --profile <profile-dir>', file=sys.stderr)
         sys.exit(1)
 
     try:
-        clean_bill = core.prove(profile, observed=observed)
+        clean_bill = core.prove(profile, observed=observed, target=target)
     except core.InvalidProfileError:
         print(f'"{profile}" does not look like a compiled profile directory '
               '(missing settings.json or scope-policy.json).', file=sys.stderr)
+        sys.exit(1)
+    except core.TargetNotAppliedError as exc:
+        print(str(exc), file=sys.stderr)
         sys.exit(1)
 
     proof_dir = Path(clean_bill.proof_dir)
     failed = [t for t in clean_bill.self_consistency_trials + clean_bill.observed_trials
               if t.get("held") is False]
 
+    against = clean_bill.applied_target or profile
     print(f"\nRan {len(clean_bill.self_consistency_trials)} self-consistency trial(s), "
           f"{len(clean_bill.observed_trials)} observed (live) trial(s), and noted "
-          f"{len(clean_bill.guidance_only)} guidance-only item(s) against {profile}.")
+          f"{len(clean_bill.guidance_only)} guidance-only item(s) against {against}.")
     if clean_bill.observed_note:
         print(clean_bill.observed_note)
     print("\nWrote:")
@@ -339,8 +427,11 @@ Usage:
   curiosity-cat init [--role <role>]                       Scaffold standing orders
   curiosity-cat compile --level <level> --target <target> [--profiles-dir <dir>]
                                                              Compile a dated profile
-  curiosity-cat prove --profile <profile-dir> [--no-observed]
+  curiosity-cat prove --profile <profile-dir> [--no-observed] [--target <path|global>]
                                                              Run escape trials against a compiled profile
+  curiosity-cat apply --level <level> --target <path|global> [--no-observed]
+                                                             Compile, apply, and prove in one motion
+  curiosity-cat unapply --target <path|global>              Undo apply — restore the pre-apply backup
   curiosity-cat check <candidate>                          Look up a URL/source against the Danger Map
   curiosity-cat report                                     Show how to submit a close call to the Danger Map
   curiosity-cat tray --profile <profile-dir> [--approve <ids>]
@@ -381,6 +472,29 @@ Prove:
                    session spawned in a throwaway sandbox to attempt one denied
                    action for real). On by default when a `claude` binary is on
                    PATH; skipped with a note otherwise.
+  --target <path|global>
+                   Prove against a target's real, applied settings.json instead
+                   of the profile directory in isolation — requires "apply" to
+                   have already run against this target. The Clean Bill records
+                   the target proved, and the target's registry entry gets its
+                   proof date stamped.
+
+Apply:
+  --level <level>  Which adventure level to compile and apply (see Levels below).
+  --target <path|global>
+                   Where to install it: a Claude Code project directory, or the
+                   literal word "global" for ~/.claude/settings.json.
+  --no-observed    Passed through to the prove step (see Prove above).
+  Compiles a fresh profile, installs it into the target's real settings.json
+  (always backing up whatever was there first, merging conservatively if
+  anything was), then proves it live against that target. Prints the
+  three-question summary: what is now protected, from what, since when.
+
+Unapply:
+  --target <path|global>
+                   The target to restore — same values as "apply --target".
+  Restores the target's pre-apply settings.json from its backup (or removes
+  it, if there was nothing there before) and clears the registry entry.
 
 Check:
   <candidate>      A URL, domain, or other source string to look up against
@@ -421,7 +535,7 @@ Estate:
   configured MCP servers — each with its current, honest protection state.
   A compiled profile protects nothing until it's applied to a target (see
   docs/app/APP_SPEC.md's Assignment Model), so every target here reads
-  UNGUARDED until an "apply" command exists and has run against it.
+  UNGUARDED until "curiosity-cat apply --target <path>" has run against it.
   Override the project-search roots with $CURIOSITY_CAT_DISCOVER_ROOTS
   (a PATH-style, colon-separated list) — default is your home directory.
 """)
@@ -434,12 +548,17 @@ def main():
         add_help=False,
     )
     parser.add_argument("command", nargs="?",
-                         choices=["init", "compile", "prove", "check", "report", "tray", "vet", "listen",
-                                  "card", "purr", "stories", "estate"])
+                         choices=["init", "compile", "prove", "apply", "unapply", "check", "report", "tray",
+                                  "vet", "listen", "card", "purr", "stories", "estate"])
     parser.add_argument("candidate", nargs="?")
     parser.add_argument("--role", choices=list(ROLE_FILES.keys()))
     parser.add_argument("--level", choices=LEVELS)
-    parser.add_argument("--target", choices=list(TARGET_EMITTERS.keys()))
+    # No `choices=` here: compile's --target names a platform emitter
+    # ("claude-code", validated below via core.InvalidTargetError), but
+    # apply's/unapply's/prove's --target names an Assignment Model
+    # location — an arbitrary project path, or "global" — which argparse
+    # choices can't express. Each command validates what it needs.
+    parser.add_argument("--target")
     parser.add_argument("--profile")
     parser.add_argument("--profiles-dir")
     parser.add_argument("--no-observed", action="store_true")
@@ -460,7 +579,11 @@ def main():
     elif args.command == "compile":
         cmd_compile(level=args.level, target=args.target, profiles_dir=args.profiles_dir)
     elif args.command == "prove":
-        cmd_prove(profile=args.profile, observed=(False if args.no_observed else None))
+        cmd_prove(profile=args.profile, observed=(False if args.no_observed else None), target=args.target)
+    elif args.command == "apply":
+        cmd_apply(level=args.level, target=args.target, observed=(False if args.no_observed else None))
+    elif args.command == "unapply":
+        cmd_unapply(target=args.target)
     elif args.command == "check":
         cmd_check(candidate=args.candidate)
     elif args.command == "report":

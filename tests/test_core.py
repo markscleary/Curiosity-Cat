@@ -612,3 +612,258 @@ def test_vet_recompile_writes_a_fresh_dated_profile_and_leaves_the_original_unto
     assert report.new_clean_bill.profile_dir != profile.path
     assert (Path(profile.path) / "manifest.json").read_text() == original_manifest
     assert list(Path(profile.path).rglob("proof")) == []
+
+
+# --- Assign: apply()/unapply() ---
+
+def _apply_fixture(tmp_path, level="housecat"):
+    profile = core.compile_profile(level, "claude-code", cwd=tmp_path)
+    project = tmp_path / "target-project"
+    project.mkdir()
+    registry_home = tmp_path / "cc-home"
+    return profile, project, registry_home
+
+
+def test_apply_installs_compiled_settings_when_target_has_none(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+
+    result = core.apply(profile.path, str(project), registry_home=registry_home)
+
+    installed_path = project / ".claude" / "settings.json"
+    assert installed_path.exists()
+    assert json.loads(installed_path.read_text()) == json.loads(Path(profile.settings_path).read_text())
+
+    assert result.settings_path == str(installed_path)
+    assert result.level == "housecat"
+    assert result.profile_id == Path(profile.path).name
+    assert result.backup_path is None
+    assert result.merged is False
+    assert "no existing settings.json" in result.merge_report[0]
+
+
+def test_apply_to_global_target_uses_home_dir_override(tmp_path):
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    home_dir = tmp_path / "operator-home"
+    registry_home = tmp_path / "cc-home"
+
+    result = core.apply(profile.path, "global", home_dir=home_dir, registry_home=registry_home)
+
+    expected_path = home_dir / ".claude" / "settings.json"
+    assert result.settings_path == str(expected_path)
+    assert expected_path.exists()
+    assert result.target_kind == "claude-code-global"
+
+
+def test_apply_rejects_non_profile_directory(tmp_path):
+    not_a_profile = tmp_path / "not-a-profile"
+    not_a_profile.mkdir()
+    with pytest.raises(core.InvalidProfileError):
+        core.apply(str(not_a_profile), str(tmp_path / "target"))
+
+
+def test_apply_backs_up_existing_settings_before_writing(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    claude_dir = project / ".claude"
+    claude_dir.mkdir()
+    original = {"permissions": {"allow": ["Read(./custom/**)"]}}
+    (claude_dir / "settings.json").write_text(json.dumps(original, indent=2))
+
+    result = core.apply(profile.path, str(project), registry_home=registry_home)
+
+    assert result.backup_path is not None
+    backup_path = Path(result.backup_path)
+    assert backup_path.exists()
+    assert json.loads(backup_path.read_text()) == original
+    # Backup lives under curiosity-cat's own home, never inside the target.
+    assert registry_home in backup_path.parents
+    assert claude_dir not in backup_path.parents
+
+
+def test_apply_merge_never_drops_operators_existing_rules(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    claude_dir = project / ".claude"
+    claude_dir.mkdir()
+    existing = {
+        "permissions": {
+            "allow": ["Read(./custom/**)"],
+            "deny": ["Bash(operators-own-danger:*)"],
+            "defaultMode": "acceptEdits",
+        },
+        "env": {"MY_CUSTOM_VAR": "1"},
+    }
+    (claude_dir / "settings.json").write_text(json.dumps(existing, indent=2))
+
+    result = core.apply(profile.path, str(project), registry_home=registry_home)
+
+    merged = json.loads((claude_dir / "settings.json").read_text())
+    assert result.merged is True
+    # Operator's own rules survive...
+    assert "Read(./custom/**)" in merged["permissions"]["allow"]
+    assert "Bash(operators-own-danger:*)" in merged["permissions"]["deny"]
+    # ...their explicit defaultMode is never silently overwritten...
+    assert merged["permissions"]["defaultMode"] == "acceptEdits"
+    # ...an unrelated top-level key passes through untouched...
+    assert merged["env"] == {"MY_CUSTOM_VAR": "1"}
+    # ...and the compiled profile's own walls were still added.
+    assert "Read(**/.env)" in merged["permissions"]["deny"]
+    assert "Bash(curl:*)" in merged["permissions"]["deny"]
+
+    report_text = " ".join(result.merge_report)
+    assert "preserved" in report_text
+    assert "added" in report_text
+    assert "env" in report_text
+
+
+def test_apply_merge_reports_but_does_not_raise_on_malformed_existing_json(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    claude_dir = project / ".claude"
+    claude_dir.mkdir()
+    (claude_dir / "settings.json").write_text("{not valid json")
+
+    result = core.apply(profile.path, str(project), registry_home=registry_home)
+
+    assert result.backup_path is not None
+    assert Path(result.backup_path).read_text() == "{not valid json"
+    assert any("not valid JSON" in line for line in result.merge_report)
+    # Recovers by installing the compiled profile as the merge base.
+    merged = json.loads((claude_dir / "settings.json").read_text())
+    assert "Read(**/.env)" in merged["permissions"]["deny"]
+
+
+def test_apply_records_registry_entry_matching_discover_target_id(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path, level="tiger")
+
+    result = core.apply(profile.path, str(project), registry_home=registry_home)
+
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert set(registry.keys()) == {result.target_id}
+    entry = registry[result.target_id]
+    assert entry["target"] == str(project)
+    assert entry["profile_id"] == Path(profile.path).name
+    assert entry["level"] == "tiger"
+    assert entry["applied_at"] == result.applied_at
+    assert entry["backup_path"] is None
+    assert entry["proof_date"] is None
+
+    # discover.py reads this same file back via protection_state_for().
+    from curiosity_cat import discover
+    state = discover.protection_state_for(result.target_id, registry)
+    assert state.guarded is True
+    assert state.level == "tiger"
+
+
+def test_apply_twice_reapplies_and_updates_registry(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+
+    first = core.apply(profile.path, str(project), registry_home=registry_home)
+    second = core.apply(profile.path, str(project), registry_home=registry_home)
+
+    assert second.backup_path is not None  # the first apply's output got backed up in turn
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert len(registry) == 1
+    assert registry[first.target_id]["applied_at"] == second.applied_at
+
+
+def test_unapply_restores_pre_apply_backup_exactly(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    claude_dir = project / ".claude"
+    claude_dir.mkdir()
+    original = {"permissions": {"allow": ["Read(./custom/**)"], "defaultMode": "default"}}
+    (claude_dir / "settings.json").write_text(json.dumps(original, indent=2))
+
+    core.apply(profile.path, str(project), registry_home=registry_home)
+    result = core.unapply(str(project), registry_home=registry_home)
+
+    assert result.restored_from_backup is True
+    restored = json.loads((claude_dir / "settings.json").read_text())
+    assert restored == original
+
+
+def test_unapply_removes_file_when_nothing_existed_before_apply(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+
+    core.apply(profile.path, str(project), registry_home=registry_home)
+    result = core.unapply(str(project), registry_home=registry_home)
+
+    assert result.restored_from_backup is False
+    assert not (project / ".claude" / "settings.json").exists()
+
+
+def test_unapply_clears_registry_entry(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+
+    applied = core.apply(profile.path, str(project), registry_home=registry_home)
+    core.unapply(str(project), registry_home=registry_home)
+
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert applied.target_id not in registry
+
+
+def test_unapply_raises_when_target_was_never_applied(tmp_path):
+    registry_home = tmp_path / "cc-home"
+    with pytest.raises(core.TargetNotAppliedError):
+        core.unapply(str(tmp_path / "never-applied"), registry_home=registry_home)
+
+
+def test_unapply_raises_when_backup_file_is_missing(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    claude_dir = project / ".claude"
+    claude_dir.mkdir()
+    (claude_dir / "settings.json").write_text(json.dumps({"permissions": {"allow": ["Read(./x/**)"]}}))
+
+    result = core.apply(profile.path, str(project), registry_home=registry_home)
+    Path(result.backup_path).unlink()
+
+    with pytest.raises(core.TargetNotAppliedError):
+        core.unapply(str(project), registry_home=registry_home)
+
+
+def test_apply_unapply_round_trip_is_idempotent_on_repeat(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    claude_dir = project / ".claude"
+    claude_dir.mkdir()
+    original = {"permissions": {"allow": ["Read(./custom/**)"]}}
+    (claude_dir / "settings.json").write_text(json.dumps(original, indent=2))
+
+    core.apply(profile.path, str(project), registry_home=registry_home)
+    core.unapply(str(project), registry_home=registry_home)
+
+    assert json.loads((claude_dir / "settings.json").read_text()) == original
+    assert json.loads((registry_home / core.REGISTRY_FILENAME).read_text()) == {}
+
+
+def test_prove_with_target_requires_prior_apply(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+
+    with pytest.raises(core.TargetNotAppliedError):
+        core.prove(profile.path, observed=False, target=str(project), registry_home=registry_home)
+
+
+def test_prove_with_target_reads_the_targets_real_installed_settings(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    core.apply(profile.path, str(project), registry_home=registry_home)
+
+    # Simulate merge-time drift: the installed file no longer matches the
+    # profile directory's own copy verbatim (an operator's extra deny rule
+    # survived the merge). prove(target=...) must test *that* file.
+    installed_path = project / ".claude" / "settings.json"
+    installed = json.loads(installed_path.read_text())
+    installed["permissions"]["deny"].remove("Read(**/.env)")
+    installed_path.write_text(json.dumps(installed, indent=2))
+
+    clean_bill = core.prove(profile.path, observed=False, target=str(project), registry_home=registry_home)
+
+    assert clean_bill.passed is False
+    assert clean_bill.applied_target == str(project)
+    failed = [t for t in clean_bill.self_consistency_trials if t["held"] is False]
+    assert any(t["trial"] == "credential_env" for t in failed)
+
+
+def test_prove_with_target_stamps_registry_proof_date(tmp_path):
+    profile, project, registry_home = _apply_fixture(tmp_path)
+    applied = core.apply(profile.path, str(project), registry_home=registry_home)
+
+    clean_bill = core.prove(profile.path, observed=False, target=str(project), registry_home=registry_home)
+
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert registry[applied.target_id]["proof_date"] == clean_bill.date

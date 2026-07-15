@@ -105,6 +105,89 @@ def test_prove_rejects_non_profile_directory(tmp_path, monkeypatch, capsys):
     assert "does not look like a compiled profile directory" in capsys.readouterr().err
 
 
+def test_apply_prints_three_question_summary_and_installs(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
+    project = tmp_path / "myproject"
+    project.mkdir()
+
+    cli.cmd_apply(level="housecat", target=str(project), observed=False)
+
+    out = capsys.readouterr().out
+    assert f"Applied Housecat profile to {project}." in out
+    assert "What is now protected:" in out
+    assert "From what:" in out
+    assert "Since when:" in out
+    assert (project / ".claude" / "settings.json").exists()
+
+
+def test_apply_reports_merge_when_target_has_existing_settings(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
+    project = tmp_path / "myproject"
+    claude_dir = project / ".claude"
+    claude_dir.mkdir(parents=True)
+    (claude_dir / "settings.json").write_text(json.dumps({"permissions": {"allow": ["Read(./x/**)"]}}))
+    capsys.readouterr()
+
+    cli.cmd_apply(level="housecat", target=str(project), observed=False)
+
+    out = capsys.readouterr().out
+    assert "Backed up prior settings to:" in out
+    assert "What was merged:" in out
+    assert "preserved" in out
+
+
+def test_apply_rejects_unknown_level(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_apply(level="feral", target="/tmp/whatever")
+    assert exc_info.value.code == 1
+    assert 'Missing or unknown --level: "feral"' in capsys.readouterr().err
+
+
+def test_apply_missing_target_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_apply(level="housecat", target=None)
+    assert exc_info.value.code == 1
+    assert "Missing --target" in capsys.readouterr().err
+
+
+def test_unapply_missing_target_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_unapply(target=None)
+    assert exc_info.value.code == 1
+    assert "Missing --target" in capsys.readouterr().err
+
+
+def test_unapply_reports_error_when_target_never_applied(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
+
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_unapply(target=str(tmp_path / "never-applied"))
+    assert exc_info.value.code == 1
+    assert "no applied profile found" in capsys.readouterr().err
+
+
+def test_apply_then_unapply_round_trip_via_cli(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
+    project = tmp_path / "myproject"
+    claude_dir = project / ".claude"
+    claude_dir.mkdir(parents=True)
+    original = {"permissions": {"allow": ["Read(./custom/**)"]}}
+    (claude_dir / "settings.json").write_text(json.dumps(original, indent=2))
+    capsys.readouterr()
+
+    cli.cmd_apply(level="housecat", target=str(project), observed=False)
+    capsys.readouterr()
+
+    cli.cmd_unapply(target=str(project))
+    out = capsys.readouterr().out
+    assert f"Unapplied {project}." in out
+    assert json.loads((claude_dir / "settings.json").read_text()) == original
+
+
 def test_check_prints_matches(monkeypatch, capsys):
     from curiosity_cat import core
     monkeypatch.setattr(core, "_fetch_danger_map_recent",

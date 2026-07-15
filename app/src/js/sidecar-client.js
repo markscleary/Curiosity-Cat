@@ -16,8 +16,17 @@ window.CCAT = (function () {
         return call('compile', { level: level, target: target || 'claude-code', profiles_dir: profilesDir });
       });
     },
-    prove: function (profileDir, observed) {
-      return call('prove', { profile_dir: profileDir, observed: observed });
+    prove: function (profileDir, observed, target) {
+      return call('prove', { profile_dir: profileDir, observed: observed, target: target });
+    },
+    apply: function (profileDir, target) {
+      return call('apply', { profile_dir: profileDir, target: target });
+    },
+    unapply: function (target) {
+      return call('unapply', { target: target });
+    },
+    estate: function () {
+      return call('estate', {});
     },
     listTray: function (profileDir, status) {
       return call('list_tray', { profile_dir: profileDir, status: status });

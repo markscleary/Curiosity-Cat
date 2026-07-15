@@ -10,12 +10,13 @@ parsed at all) so one bad request never kills the connection.
 """
 
 import argparse
+import dataclasses
 import json
 import sys
 
-from curiosity_cat import __version__, card, core, purr
+from curiosity_cat import __version__, card, core, discover, purr
 
-METHODS = ("compile", "prove", "check", "report_close_call",
+METHODS = ("compile", "prove", "apply", "unapply", "estate", "check", "report_close_call",
            "queue_close_call", "list_tray", "submit_approved", "vet", "status",
            "render_share_card", "purr")
 
@@ -30,7 +31,29 @@ def _handle_prove(params):
     profile_dir = params.get("profile_dir")
     if not profile_dir:
         raise ValueError('params.profile_dir is required')
-    return core.to_jsonable(core.prove(profile_dir, observed=params.get("observed")))
+    return core.to_jsonable(core.prove(profile_dir, observed=params.get("observed"), target=params.get("target")))
+
+
+def _handle_apply(params):
+    profile_dir = params.get("profile_dir")
+    target = params.get("target")
+    if not profile_dir:
+        raise ValueError('params.profile_dir is required')
+    if not target:
+        raise ValueError('params.target is required')
+    return core.to_jsonable(core.apply(profile_dir, target))
+
+
+def _handle_unapply(params):
+    target = params.get("target")
+    if not target:
+        raise ValueError('params.target is required')
+    return core.to_jsonable(core.unapply(target))
+
+
+def _handle_estate(params):
+    inventory = discover.build_inventory(roots=params.get("roots"))
+    return dataclasses.asdict(inventory)
 
 
 def _handle_check(params):
@@ -112,6 +135,9 @@ def _handle_status(params):
 DISPATCH = {
     "compile": _handle_compile,
     "prove": _handle_prove,
+    "apply": _handle_apply,
+    "unapply": _handle_unapply,
+    "estate": _handle_estate,
     "check": _handle_check,
     "report_close_call": _handle_report_close_call,
     "queue_close_call": _handle_queue_close_call,

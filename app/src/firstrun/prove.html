@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Curiosity Cat — Proving it holds</title>
+  <title>Curiosity Cat — Assign &amp; Prove</title>
   <link rel="stylesheet" href="../css/app.css" />
 </head>
 <body>
@@ -10,16 +10,30 @@
     <span class="active"></span><span class="active"></span><span class="active"></span>
   </div>
 
-  <h1>Watching the escape attempts</h1>
-  <p class="subtitle">Every trial below is a harmless, sandboxed attempt to break its own fence.</p>
+  <h1>Assign this profile to a target</h1>
+  <p class="subtitle">A compiled profile protects nothing until it's applied somewhere real.</p>
 
-  <div class="card">
+  <div class="card" id="assign-card">
+    <p class="status-line" id="assign-status">
+      Not yet applied to any target — this profile protects nothing until you assign it below.
+    </p>
+    <label for="target-picker">Target</label>
+    <select id="target-picker"></select>
+    <div class="actions">
+      <button id="apply-btn">Apply &amp; Prove</button>
+      <button id="skip-btn" class="secondary">Finish without assigning</button>
+    </div>
+  </div>
+
+  <div class="card" id="trials-card" hidden>
+    <h2>Watching the escape attempts</h2>
     <p class="status-line" id="status">Running trials…</p>
     <ul class="trial-list" id="trial-list"></ul>
   </div>
 
   <div class="card" id="cleanbill-card" hidden>
     <h2 id="cleanbill-heading">Clean Bill</h2>
+    <p class="status-line" id="protection-summary"></p>
     <div class="profile-md" id="cleanbill-md"></div>
     <p class="status-line" id="share-card-status"></p>
     <div class="actions">
@@ -32,10 +46,18 @@
   <script>
     (function () {
       var profileDir = sessionStorage.getItem('ccat_profile_dir');
+      var level = sessionStorage.getItem('ccat_level') || 'housecat';
+
+      var assignStatus = document.getElementById('assign-status');
+      var targetPicker = document.getElementById('target-picker');
+      var applyBtn = document.getElementById('apply-btn');
+      var skipBtn = document.getElementById('skip-btn');
+      var trialsCard = document.getElementById('trials-card');
       var statusEl = document.getElementById('status');
       var trialListEl = document.getElementById('trial-list');
       var cleanbillCard = document.getElementById('cleanbill-card');
       var cleanbillHeading = document.getElementById('cleanbill-heading');
+      var protectionSummary = document.getElementById('protection-summary');
       var cleanbillMdEl = document.getElementById('cleanbill-md');
       var shareCardBtn = document.getElementById('share-card-btn');
       var shareCardStatus = document.getElementById('share-card-status');
@@ -63,30 +85,85 @@
         }, Promise.resolve());
       }
 
+      function finishFirstRun() {
+        return window.CCAT.completeFirstRun()
+          .then(function () { return window.CCAT.openWindow('slider', 'slider.html'); })
+          .then(function () { return window.__TAURI__.window.getCurrentWindow().close(); });
+      }
+
       if (!profileDir) {
-        statusEl.textContent = 'No compiled profile found — go back and compile first.';
+        assignStatus.textContent = 'No compiled profile found — go back and compile first.';
+        applyBtn.disabled = true;
         return;
       }
 
-      window.CCAT.prove(profileDir, true)
-        .then(function (cleanBill) {
-          lastCleanBill = cleanBill;
-          var allTrials = (cleanBill.self_consistency_trials || []).concat(cleanBill.observed_trials || []);
-          return streamTrials(allTrials).then(function () {
-            statusEl.textContent = cleanBill.passed
-              ? 'Clean bill — every wall held.'
-              : 'One or more trials did not hold — see the report below.';
-            cleanbillHeading.textContent = cleanBill.passed ? '✅ Clean Bill' : '⚠️ Clean Bill (with findings)';
-            return window.CCAT.readTextFile(cleanBill.clean_bill_md_path);
+      window.CCAT.estate()
+        .then(function (inventory) {
+          var targets = (inventory.targets || []).filter(function (t) {
+            return t.kind === 'claude-code-project' || t.kind === 'claude-code-global';
+          });
+          if (!targets.length) {
+            assignStatus.textContent = 'No targets discovered yet — this profile protects nothing until ' +
+              'applied. Finish for now and assign it later from the Estate view.';
+            applyBtn.disabled = true;
+            return;
+          }
+          targets.forEach(function (t) {
+            var opt = document.createElement('option');
+            opt.value = t.kind === 'claude-code-global' ? 'global' : t.path;
+            var guarded = t.protection && t.protection.status === 'guarded';
+            opt.textContent = t.label + (guarded ? ' (already guarded)' : '');
+            targetPicker.appendChild(opt);
           });
         })
-        .then(function (md) {
-          cleanbillMdEl.textContent = md;
-          cleanbillCard.hidden = false;
-        })
         .catch(function (err) {
-          statusEl.textContent = 'Prove failed: ' + err;
+          assignStatus.textContent = 'Could not list targets: ' + err;
+          applyBtn.disabled = true;
         });
+
+      applyBtn.addEventListener('click', function () {
+        var target = targetPicker.value;
+        if (!target) return;
+        applyBtn.disabled = true;
+        skipBtn.disabled = true;
+        assignStatus.textContent = 'Applying to ' + target + '…';
+
+        window.CCAT.apply(profileDir, target)
+          .then(function () {
+            trialsCard.hidden = false;
+            return window.CCAT.prove(profileDir, true, target);
+          })
+          .then(function (cleanBill) {
+            lastCleanBill = cleanBill;
+            var allTrials = (cleanBill.self_consistency_trials || []).concat(cleanBill.observed_trials || []);
+            return streamTrials(allTrials).then(function () {
+              statusEl.textContent = cleanBill.passed
+                ? 'Clean bill — every wall held.'
+                : 'One or more trials did not hold — see the report below.';
+              cleanbillHeading.textContent =
+                (cleanBill.passed ? '✅ Clean Bill — ' : '⚠️ Clean Bill (with findings) — ') + target;
+              assignStatus.textContent = 'GUARDED — ' + level + ' profile applied to ' + target + '.';
+              protectionSummary.textContent = 'What is now protected: ' + target + ' (' + level + ' profile). ' +
+                'Since when: ' + (cleanBill.date || 'today') + '.';
+              return window.CCAT.readTextFile(cleanBill.clean_bill_md_path);
+            });
+          })
+          .then(function (md) {
+            cleanbillMdEl.textContent = md;
+            cleanbillCard.hidden = false;
+          })
+          .catch(function (err) {
+            assignStatus.textContent = 'Apply/Prove failed: ' + err;
+          })
+          .finally(function () {
+            applyBtn.disabled = false;
+            skipBtn.disabled = false;
+          });
+      });
+
+      skipBtn.addEventListener('click', function () {
+        finishFirstRun();
+      });
 
       shareCardBtn.addEventListener('click', function () {
         if (!lastCleanBill) return;
@@ -100,11 +177,7 @@
           });
       });
 
-      finishBtn.addEventListener('click', function () {
-        window.CCAT.completeFirstRun()
-          .then(function () { return window.CCAT.openWindow('slider', 'slider.html'); })
-          .then(function () { return window.__TAURI__.window.getCurrentWindow().close(); });
-      });
+      finishBtn.addEventListener('click', finishFirstRun);
     })();
   </script>
 </body>

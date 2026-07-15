@@ -242,6 +242,28 @@ class InvalidProfileError(ValueError):
     """Raised by prove() when profile_dir isn't a compiled profile directory."""
 
 
+class TargetNotAppliedError(ValueError):
+    """Raised by unapply() or prove(target=...) when `target` has no profile
+    currently applied to it — there is no registry entry, or (unapply only)
+    the entry's backup file has since gone missing.
+    """
+
+
+# The Assignment Model's target vocabulary (docs/app/APP_SPEC.md): "global"
+# for the operator's own ~/.claude/settings.json, anything else is a project
+# directory path. Distinct from TARGET_EMITTERS' "claude-code" — that names
+# the *platform* a profile is compiled for; this names *where* it gets
+# installed. apply()/unapply()/prove(target=...) all key off this.
+GLOBAL_TARGET = "global"
+
+# <curiosity-cat-home>/registry.json — the assignment ledger apply() writes
+# and unapply() clears an entry from. discover.py reads the same file (its
+# own REGISTRY_FILENAME, duplicated here rather than imported — discover.py
+# imports resolve_home from this module, so the reverse import would cycle)
+# to report each target's protection state. Keep both filenames equal.
+REGISTRY_FILENAME = "registry.json"
+
+
 @dataclass
 class ProfileDir:
     """Everything compile_profile() wrote, and what level/target produced it."""
@@ -273,6 +295,44 @@ class CleanBill:
     guidance_only: list
     passed: bool
     platform_version: Optional[str]
+    # The Assignment Model target (a project path, or "global") this proof
+    # ran against, or None if it ran against the profile directory in
+    # isolation (no `apply` yet) — see prove()'s `target` parameter. Never
+    # confused with `target` above, which is the compile *platform*
+    # ("claude-code"); this is *where* the proof was observed.
+    applied_target: Optional[str] = None
+
+
+@dataclass
+class ApplyResult:
+    """What apply() did — everything a CLI or app needs to answer the
+    Assignment Model's three questions (what/from what/since when).
+    """
+
+    target: str
+    target_id: str
+    target_kind: str
+    settings_path: str
+    profile_dir: str
+    profile_id: str
+    level: str
+    applied_at: str
+    backup_path: Optional[str]
+    merged: bool
+    merge_report: list
+
+
+@dataclass
+class UnapplyResult:
+    """What unapply() did."""
+
+    target: str
+    target_id: str
+    settings_path: str
+    restored: bool
+    backup_path: Optional[str]
+    restored_from_backup: bool
+    note: str
 
 
 @dataclass
@@ -532,6 +592,281 @@ def compile_profile(level, target, cwd=None, profiles_dir=None):
     )
 
 
+# --- Assign: apply() installs a compiled profile into a target's real
+# settings; unapply() undoes it. Per docs/app/APP_SPEC.md's Assignment
+# Model (c), apply is the only function in this module allowed to touch a
+# target's real configuration — compile_profile(), prove(), and discover()
+# never do.
+
+def _normalize_project_path(target, cwd=None):
+    """A project target as an absolute Path, without resolving symlinks or
+    ".." segments — matching how discover.discover_claude_code_projects()
+    builds its own target paths (plain Path.iterdir() results, never
+    .resolve()'d), so a project target passed here lines up with the same
+    target_id discovery would compute for the same directory.
+    """
+    path = Path(target).expanduser()
+    if not path.is_absolute():
+        path = (Path(cwd) if cwd is not None else Path.cwd()) / path
+    return path
+
+
+def _target_location(target, home_dir=None, cwd=None):
+    """Resolve an Assignment Model target string ("global", or a project
+    directory path) to (target_id, target_kind, installed_settings_path,
+    target_label). target_id matches the keys discover.build_inventory()
+    assigns to the same target, so a registry entry written here is the
+    same one discover()/protection_state_for() reads back.
+    """
+    if target == GLOBAL_TARGET:
+        home = Path(home_dir) if home_dir is not None else Path.home()
+        settings_path = home / ".claude" / "settings.json"
+        target_id = f"claude-code-global:{settings_path}"
+        return target_id, "claude-code-global", settings_path, str(settings_path)
+
+    project_path = _normalize_project_path(target, cwd=cwd)
+    settings_path = project_path / ".claude" / "settings.json"
+    target_id = f"claude-code-project:{project_path}"
+    return target_id, "claude-code-project", settings_path, str(project_path)
+
+
+def _load_registry(home):
+    path = Path(home) / REGISTRY_FILENAME
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return {}
+
+
+def _save_registry(home, registry):
+    path = Path(home) / REGISTRY_FILENAME
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(registry, indent=2) + "\n")
+
+
+def _merge_permission_list(existing_list, compiled_list, label):
+    """Union existing + compiled permission patterns for one bucket
+    (allow/deny/ask), existing first and never dropped. Returns
+    (merged_list, report_lines).
+    """
+    existing_list = list(existing_list or [])
+    added = [p for p in (compiled_list or []) if p not in existing_list]
+    report = []
+    if existing_list:
+        report.append(f"preserved {len(existing_list)} existing permissions.{label} rule(s)")
+    if added:
+        report.append(f"added {len(added)} new permissions.{label} rule(s) from the compiled profile")
+    return existing_list + added, report
+
+
+def _merge_settings_conservative(existing, compiled):
+    """Merge a freshly compiled settings.json into a target's existing one
+    without ever silently dropping anything the operator already had.
+    Returns (merged_settings, report) where report is a list of plain-
+    English lines describing what was kept vs. added — apply() surfaces
+    this so "what was merged" is never left unstated.
+
+    Rules: permission list buckets (allow/deny/ask) are unioned, existing
+    entries first. A scalar the operator already set (permissions.
+    defaultMode, sandbox) is kept as-is rather than overwritten by the
+    compiled value. Hook entries are unioned by command string. Any other
+    top-level key the operator has (env, includes, whatever) passes through
+    untouched.
+    """
+    merged = dict(existing)
+    report = []
+
+    existing_perms = existing.get("permissions") if isinstance(existing.get("permissions"), dict) else {}
+    compiled_perms = compiled.get("permissions", {})
+    merged_perms = dict(existing_perms)
+    for key in ("allow", "deny", "ask"):
+        merged_list, list_report = _merge_permission_list(existing_perms.get(key), compiled_perms.get(key), key)
+        report += list_report
+        if merged_list:
+            merged_perms[key] = merged_list
+
+    if "defaultMode" in existing_perms:
+        report.append(f"kept operator's existing permissions.defaultMode {existing_perms['defaultMode']!r}")
+    elif "defaultMode" in compiled_perms:
+        merged_perms["defaultMode"] = compiled_perms["defaultMode"]
+        report.append(f"set permissions.defaultMode to {compiled_perms['defaultMode']!r} (none was set)")
+    merged["permissions"] = merged_perms
+
+    if "sandbox" in existing:
+        report.append("kept operator's existing sandbox setting")
+    elif "sandbox" in compiled:
+        merged["sandbox"] = compiled["sandbox"]
+        report.append("set sandbox from the compiled profile (none was set)")
+
+    existing_hooks = existing.get("hooks") if isinstance(existing.get("hooks"), dict) else {}
+    compiled_hooks = compiled.get("hooks", {})
+    merged_hooks = dict(existing_hooks)
+    for event_name, compiled_entries in compiled_hooks.items():
+        existing_entries = existing_hooks.get(event_name, [])
+        existing_commands = {h.get("command") for entry in existing_entries for h in entry.get("hooks", [])}
+        new_entries = [e for e in compiled_entries
+                       if not all(h.get("command") in existing_commands for h in e.get("hooks", []))]
+        if existing_entries:
+            report.append(f"preserved {len(existing_entries)} existing hooks.{event_name} entry(ies)"
+                          + (f", added {len(new_entries)} compiled entry(ies)" if new_entries else ""))
+        elif new_entries:
+            report.append(f"added {len(new_entries)} compiled hooks.{event_name} entry(ies) (none existed)")
+        merged_hooks[event_name] = existing_entries + new_entries
+    if merged_hooks:
+        merged["hooks"] = merged_hooks
+
+    extra_keys = sorted(k for k in existing if k not in ("permissions", "sandbox", "hooks"))
+    if extra_keys:
+        report.append(f"preserved operator's own top-level key(s) untouched: {', '.join(extra_keys)}")
+
+    return merged, report
+
+
+def apply(profile_dir, target, home_dir=None, registry_home=None, cwd=None):
+    """Install a compiled profile's settings.json into `target`'s real
+    location — a Claude Code project directory, or the literal string
+    "global" for the operator's own ~/.claude/settings.json.
+
+    Always backs up whatever settings.json already existed at that location
+    to this machine's curiosity-cat home (timestamped, never overwritten)
+    before writing anything. If a settings.json already existed, merges
+    conservatively rather than replacing it outright — see
+    _merge_settings_conservative(); the operator's own rules are never
+    silently dropped, only added to, and what was merged is reported back.
+
+    Records the assignment (target, profile_id, level, applied_at,
+    backup_path) in <curiosity-cat-home>/registry.json, keyed so
+    discover.build_inventory() reports this target GUARDED afterwards.
+    Raises InvalidProfileError if profile_dir isn't a compiled profile
+    directory. Returns an ApplyResult.
+    """
+    profile_dir = Path(profile_dir)
+    manifest_path = profile_dir / "manifest.json"
+    settings_path = profile_dir / "settings.json"
+    if not manifest_path.exists() or not settings_path.exists():
+        raise InvalidProfileError(str(profile_dir))
+
+    manifest = json.loads(manifest_path.read_text())
+    level = manifest.get("level", "unknown")
+    profile_id = profile_dir.name
+    compiled_settings = json.loads(settings_path.read_text())
+
+    target_id, target_kind, installed_settings_path, target_label = _target_location(
+        target, home_dir=home_dir, cwd=cwd)
+    home = Path(registry_home) if registry_home is not None else resolve_home()
+
+    backup_path = None
+    merged = False
+    merge_report = []
+    if installed_settings_path.exists():
+        existing_text = installed_settings_path.read_text()
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        safe_id = target_id.replace(":", "_").replace(os.sep, "_").replace("/", "_")
+        backups_dir = home / "backups" / safe_id
+        backups_dir.mkdir(parents=True, exist_ok=True)
+        backup_path = backups_dir / f"settings.json.{timestamp}.bak"
+        backup_path.write_text(existing_text)
+
+        try:
+            existing_settings = json.loads(existing_text)
+        except json.JSONDecodeError:
+            existing_settings = {}
+            merge_report.append("existing settings.json was not valid JSON — treated as empty; "
+                                 "the original is preserved at the backup path for manual recovery")
+        final_settings, extra_report = _merge_settings_conservative(existing_settings, compiled_settings)
+        merge_report += extra_report
+        merged = True
+    else:
+        final_settings = compiled_settings
+        merge_report.append("no existing settings.json at this target — installed the compiled profile as-is")
+
+    installed_settings_path.parent.mkdir(parents=True, exist_ok=True)
+    installed_settings_path.write_text(json.dumps(final_settings, indent=2) + "\n")
+
+    applied_at = datetime.now(timezone.utc).isoformat()
+
+    registry = _load_registry(home)
+    registry[target_id] = {
+        "target": target_label,
+        "target_kind": target_kind,
+        "profile_id": profile_id,
+        "profile_dir": str(profile_dir),
+        "level": level,
+        "applied_at": applied_at,
+        "backup_path": str(backup_path) if backup_path else None,
+        "settings_path": str(installed_settings_path),
+        "proof_date": None,
+        "merged": merged,
+        "merge_report": merge_report,
+    }
+    _save_registry(home, registry)
+
+    return ApplyResult(
+        target=target_label,
+        target_id=target_id,
+        target_kind=target_kind,
+        settings_path=str(installed_settings_path),
+        profile_dir=str(profile_dir),
+        profile_id=profile_id,
+        level=level,
+        applied_at=applied_at,
+        backup_path=str(backup_path) if backup_path else None,
+        merged=merged,
+        merge_report=merge_report,
+    )
+
+
+def unapply(target, home_dir=None, registry_home=None, cwd=None):
+    """Undo apply(): restore `target`'s settings.json to whatever it was
+    immediately before the most recent apply() (or remove it entirely, if
+    nothing existed there before), and drop the registry entry so
+    discover() reports this target UNGUARDED again.
+
+    Raises TargetNotAppliedError if `target` has no recorded apply, or if
+    its recorded backup file has since gone missing (refuses to guess at a
+    restore in that case). Returns an UnapplyResult.
+    """
+    target_id, target_kind, installed_settings_path, target_label = _target_location(
+        target, home_dir=home_dir, cwd=cwd)
+    home = Path(registry_home) if registry_home is not None else resolve_home()
+
+    registry = _load_registry(home)
+    entry = registry.get(target_id)
+    if entry is None:
+        raise TargetNotAppliedError(f"no applied profile found for target {target!r}")
+
+    backup_path = entry.get("backup_path")
+    if backup_path:
+        backup_file = Path(backup_path)
+        if not backup_file.exists():
+            raise TargetNotAppliedError(
+                f"target {target!r} has a registry entry but its backup file {backup_path} is missing "
+                "— refusing to unapply without a way to restore the pre-apply state")
+        installed_settings_path.write_text(backup_file.read_text())
+        restored_from_backup = True
+        note = f"restored the pre-apply settings.json from backup {backup_path}"
+    else:
+        if installed_settings_path.exists():
+            installed_settings_path.unlink()
+        restored_from_backup = False
+        note = "removed the applied settings.json — there was no settings.json at this target before apply"
+
+    del registry[target_id]
+    _save_registry(home, registry)
+
+    return UnapplyResult(
+        target=target_label,
+        target_id=target_id,
+        settings_path=str(installed_settings_path),
+        restored=True,
+        backup_path=backup_path,
+        restored_from_backup=restored_from_backup,
+        note=note,
+    )
+
+
 def _path_verdict(perms, op, path_str):
     """Would this profile's settings.json deny a Read/Write/Edit of path_str?
 
@@ -770,18 +1105,26 @@ def _spawn_observed_session(argv, cwd, timeout=120):
     return result.stdout
 
 
-def _build_observed_trials(settings_path, perms, observed_root):
-    """Spawn at most one real, non-interactive Claude Code session inside a
-    throwaway sandbox seeded with this profile's own compiled settings.json,
-    and attempt one action the profile declares denied. Unlike
+def _build_observed_trials(settings_path, perms, observed_root, session_cwd=None):
+    """Spawn at most one real, non-interactive Claude Code session and
+    attempt one action the profile declares denied. Unlike
     `_build_self_consistency_trials`, this never re-derives the verdict from
     the rules that generated it — it observes whether the live permission
-    engine actually stopped the agent. Everything happens inside
-    `observed_root`; nothing here ever touches a path outside it. Returns
-    (trials, platform_version): trials is a list of at most one trial dict;
-    platform_version is the live `claude --version` this trial actually ran
-    against, or None if there was no candidate to attempt (no session was
-    spawned, so there is no platform to attribute a version to).
+    engine actually stopped the agent. Returns (trials, platform_version):
+    trials is a list of at most one trial dict; platform_version is the live
+    `claude --version` this trial actually ran against, or None if there was
+    no candidate to attempt (no session was spawned, so there is no
+    platform to attribute a version to).
+
+    `session_cwd`, when given, is a real, already-applied target directory
+    (docs/app/APP_SPEC.md Assignment Model (d)): the session is spawned
+    there with no `--settings` override, so Claude Code's own settings
+    resolution is what loads that directory's installed settings.json —
+    this observes the same file the target's own tools read, not a copy.
+    With no `session_cwd` (the default — no target applied yet), a
+    throwaway sandbox is built under `observed_root` and seeded with a copy
+    of `settings_path`, exactly as before; nothing here ever touches a path
+    outside `observed_root` in that case.
     """
     candidate = _select_observed_candidate(perms)
     if candidate is None:
@@ -789,10 +1132,14 @@ def _build_observed_trials(settings_path, perms, observed_root):
 
     platform_version = _detect_platform_version()
 
-    project_dir = observed_root / "project"
-    (project_dir / ".claude").mkdir(parents=True, exist_ok=True)
-    copied_settings_path = project_dir / ".claude" / "settings.json"
-    shutil.copy2(settings_path, copied_settings_path)
+    if session_cwd is not None:
+        project_dir = Path(session_cwd)
+        copied_settings_path = None
+    else:
+        project_dir = observed_root / "project"
+        (project_dir / ".claude").mkdir(parents=True, exist_ok=True)
+        copied_settings_path = project_dir / ".claude" / "settings.json"
+        shutil.copy2(settings_path, copied_settings_path)
 
     if candidate["kind"] == "bash":
         attempted = candidate["command"]
@@ -806,16 +1153,14 @@ def _build_observed_trials(settings_path, perms, observed_root):
                   f"exactly this absolute path once: `{attempted}`. Do not retry and do not use "
                   "any other tool.")
 
-    argv = [
-        "claude", "-p", prompt,
+    argv = ["claude", "-p", prompt]
+    if copied_settings_path is not None:
         # Absolute path to the copy already sitting in the sandboxed
         # project's own .claude/ dir — not `settings_path` as given to
         # `prove`, which may be relative to the original cwd and would
         # fail to resolve once the session is spawned with `cwd=project_dir`.
-        "--settings", str(copied_settings_path),
-        "--output-format", "json",
-        "--no-session-persistence",
-    ]
+        argv += ["--settings", str(copied_settings_path)]
+    argv += ["--output-format", "json", "--no-session-persistence"]
     stdout = _spawn_observed_session(argv, cwd=project_dir)
     held, detail = _parse_observed_session(stdout)
 
@@ -884,13 +1229,18 @@ def _stop_watcher_listener(proc):
         proc.kill()
 
 
-def _build_hook_roundtrip_trial(settings_path, perms, observed_root):
+def _build_hook_roundtrip_trial(settings_path, perms, observed_root, session_cwd=None):
     """Prove the Watcher round-trip for real: spawn the reference listener,
     run a second live Claude Code session against this profile's own
     compiled settings.json (which now always embeds the PreToolUse/
     PostToolUse hooks) attempting the same denied action `_build_observed_
     trials` proves, and check that the resulting hook event actually
     reached the listener and got queued to a throwaway Mouse Tray.
+
+    `session_cwd` carries the same meaning as in `_build_observed_trials`:
+    a real, already-applied target directory to spawn in with no
+    `--settings` override, so the hooks that fire are the ones actually
+    installed at that target, not a copy's.
 
     Returns None (no trial) if there is no denied action safe to attempt
     live — mirrors `_select_observed_candidate`'s own gating, since this
@@ -915,10 +1265,14 @@ def _build_hook_roundtrip_trial(settings_path, perms, observed_root):
         }
 
     try:
-        project_dir = observed_root / "hook-roundtrip-project"
-        (project_dir / ".claude").mkdir(parents=True, exist_ok=True)
-        copied_settings_path = project_dir / ".claude" / "settings.json"
-        shutil.copy2(settings_path, copied_settings_path)
+        if session_cwd is not None:
+            project_dir = Path(session_cwd)
+            copied_settings_path = None
+        else:
+            project_dir = observed_root / "hook-roundtrip-project"
+            (project_dir / ".claude").mkdir(parents=True, exist_ok=True)
+            copied_settings_path = project_dir / ".claude" / "settings.json"
+            shutil.copy2(settings_path, copied_settings_path)
 
         if candidate["kind"] == "bash":
             attempted = candidate["command"]
@@ -932,12 +1286,10 @@ def _build_hook_roundtrip_trial(settings_path, perms, observed_root):
                       f"exactly this absolute path once: `{attempted}`. Do not retry and do not use "
                       "any other tool.")
 
-        argv = [
-            "claude", "-p", prompt,
-            "--settings", str(copied_settings_path),
-            "--output-format", "json",
-            "--no-session-persistence",
-        ]
+        argv = ["claude", "-p", prompt]
+        if copied_settings_path is not None:
+            argv += ["--settings", str(copied_settings_path)]
+        argv += ["--output-format", "json", "--no-session-persistence"]
         _spawn_observed_session(argv, cwd=project_dir)
 
         tray_path = watcher_profile_dir / TRAY_QUEUE_FILENAME
@@ -1083,7 +1435,7 @@ def _last_known_platform_version(profile_dir):
     return history[-1]["platform_version"] if history else None
 
 
-def prove(profile_dir, observed=None):
+def prove(profile_dir, observed=None, target=None, home_dir=None, registry_home=None, cwd=None):
     """Run escape trials against a compiled profile directory and write a
     dated proof/ report inside it. Returns a CleanBill.
 
@@ -1092,6 +1444,21 @@ def prove(profile_dir, observed=None):
     `claude` binary is on PATH; True forces one attempt; False skips it
     unconditionally. Raises InvalidProfileError if profile_dir doesn't look
     like a directory compile_profile() produced.
+
+    `target` is an Assignment Model target ("global", or a project
+    directory path) that must already have this profile applied via
+    apply(). When given, docs/app/APP_SPEC.md Assignment Model (d) applies:
+    the compiled rules used for self-consistency and the live observed
+    trial are read from the target's own real, currently-installed
+    settings.json (which, after a conservative merge, may differ from
+    profile_dir's own copy) — not a fresh copy in isolation — and the
+    observed session, if any, is spawned against that real installed file
+    via Claude Code's own settings resolution, with no override. The
+    resulting CleanBill's `applied_target` records what was proved, and
+    this profile's registry entry for `target` gets its `proof_date`
+    stamped. Raises TargetNotAppliedError if `target` has no applied
+    profile yet — prove(target=...) certifies a guarded target, not a
+    folder, so there must be something applied to certify.
     """
     profile_dir = Path(profile_dir)
     settings_path = profile_dir / "settings.json"
@@ -1099,11 +1466,28 @@ def prove(profile_dir, observed=None):
     if not settings_path.exists() or not scope_policy_path.exists():
         raise InvalidProfileError(str(profile_dir))
 
-    settings = json.loads(settings_path.read_text())
     scope_policy = json.loads(scope_policy_path.read_text())
-    perms = settings.get("permissions", {})
     level = scope_policy.get("adventure_level", "unknown")
-    target = "claude-code"
+    platform_target = "claude-code"
+
+    registry_home_path = None
+    applied_target_id = None
+    applied_target_label = None
+    session_cwd = None
+    source_settings_path = settings_path
+    if target is not None:
+        applied_target_id, target_kind, installed_settings_path, applied_target_label = _target_location(
+            target, home_dir=home_dir, cwd=cwd)
+        if not installed_settings_path.exists():
+            raise TargetNotAppliedError(
+                f"target {target!r} has no applied profile — run apply() before prove(target=...)")
+        settings = json.loads(installed_settings_path.read_text())
+        source_settings_path = installed_settings_path
+        registry_home_path = Path(registry_home) if registry_home is not None else resolve_home()
+    else:
+        settings = json.loads(settings_path.read_text())
+
+    perms = settings.get("permissions", {})
 
     sandbox_root = Path(tempfile.mkdtemp(prefix="curiosity-cat-prove-"))
     try:
@@ -1122,8 +1506,17 @@ def prove(profile_dir, observed=None):
     else:
         observed_root = Path(tempfile.mkdtemp(prefix="curiosity-cat-prove-observed-"))
         try:
-            observed_trials, platform_version = _build_observed_trials(settings_path, perms, observed_root)
-            hook_roundtrip_trial = _build_hook_roundtrip_trial(settings_path, perms, observed_root)
+            if target is not None:
+                if target_kind == "claude-code-project":
+                    session_cwd = installed_settings_path.parent.parent
+                else:  # claude-code-global — a neutral cwd with no project-level
+                       # settings to shadow the global file being proved.
+                    session_cwd = observed_root / "global-session"
+                    session_cwd.mkdir(parents=True, exist_ok=True)
+            observed_trials, platform_version = _build_observed_trials(
+                source_settings_path, perms, observed_root, session_cwd=session_cwd)
+            hook_roundtrip_trial = _build_hook_roundtrip_trial(
+                source_settings_path, perms, observed_root, session_cwd=session_cwd)
             if hook_roundtrip_trial is not None:
                 observed_trials.append(hook_roundtrip_trial)
         finally:
@@ -1145,7 +1538,8 @@ def prove(profile_dir, observed=None):
     today = date.today().isoformat()
     clean_bill_dict = {
         "level": level,
-        "target": target,
+        "target": platform_target,
+        "applied_target": applied_target_label,
         "profile_dir": str(profile_dir),
         "date": today,
         "sandbox": "throwaway (never the operator's real files or network)",
@@ -1159,15 +1553,21 @@ def prove(profile_dir, observed=None):
     clean_bill_md_path = proof_dir / "CLEAN-BILL.md"
     clean_bill_path.write_text(json.dumps(clean_bill_dict, indent=2) + "\n")
     clean_bill_md_path.write_text(
-        build_clean_bill_md(level, target, self_consistency, observed_trials, observed_note, guidance))
+        build_clean_bill_md(level, platform_target, self_consistency, observed_trials, observed_note, guidance))
 
     failed = [t for t in self_consistency + observed_trials if t.get("held") is False]
 
     _append_wall_history(profile_dir, observed_trials, platform_version, today)
 
+    if applied_target_id is not None:
+        registry = _load_registry(registry_home_path)
+        if applied_target_id in registry:
+            registry[applied_target_id]["proof_date"] = today
+            _save_registry(registry_home_path, registry)
+
     return CleanBill(
         level=level,
-        target=target,
+        target=platform_target,
         profile_dir=str(profile_dir),
         proof_dir=str(proof_dir),
         clean_bill_path=str(clean_bill_path),
@@ -1179,6 +1579,7 @@ def prove(profile_dir, observed=None):
         guidance_only=guidance,
         passed=not failed,
         platform_version=platform_version,
+        applied_target=applied_target_label,
     )
 
 
@@ -1607,6 +2008,6 @@ def to_jsonable(value):
     plain dict) into a plain JSON-serialisable dict, for cli.py and serve.py
     to print/emit.
     """
-    if isinstance(value, (ProfileDir, CleanBill, WhiskerVerdict, VetReport)):
+    if isinstance(value, (ProfileDir, CleanBill, WhiskerVerdict, VetReport, ApplyResult, UnapplyResult)):
         return asdict(value)
     return value

@@ -17,10 +17,11 @@ Four kinds of target:
   - mcp-server           — an MCP server configured in a Claude config file
 
 Per-target protection state comes from a profile registry
-(`<curiosity-cat-home>/registry.json`) that no `apply` command writes yet
-(Assignment Model (c) — apply is a future brief). Until that command
-exists, every target this module finds is honestly reported UNGUARDED —
-never guessed, never defaulted to "probably fine".
+(`<curiosity-cat-home>/registry.json`) that `core.apply()` writes to and
+`core.unapply()` clears entries from (Assignment Model (c)). A target
+absent from the registry — because it was never applied, or was applied
+and then unapplied — is still honestly reported UNGUARDED, never guessed,
+never defaulted to "probably fine".
 """
 
 import json
@@ -38,11 +39,12 @@ from .core import resolve_home
 UNGUARDED = "unguarded"
 GUARDED = "guarded"
 
-# <curiosity-cat-home>/registry.json — the not-yet-built record of which
-# compiled profile is applied to which target. No `apply` command writes
-# this file in this brief, so a missing registry is the expected, normal
-# case: every target reports UNGUARDED, honestly, rather than falling back
-# to an assumed-safe default.
+# <curiosity-cat-home>/registry.json — written by core.apply(), cleared
+# per-entry by core.unapply(). Duplicated as core.REGISTRY_FILENAME (this
+# module imports resolve_home from core, so the reverse import would
+# cycle) — keep both filenames equal. A missing file is still the normal
+# case for a fresh install: every target reports UNGUARDED, honestly,
+# rather than falling back to an assumed-safe default.
 REGISTRY_FILENAME = "registry.json"
 
 

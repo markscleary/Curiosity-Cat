@@ -104,6 +104,50 @@ def test_prove_round_trip_requires_profile_dir():
     assert "error" in response
 
 
+def test_apply_and_unapply_round_trip(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
+    project = tmp_path / "myproject"
+    project.mkdir()
+    compiled = serve.handle_request({
+        "id": 30, "method": "compile", "params": {"level": "housecat", "target": "claude-code"},
+    })["result"]
+
+    apply_response = serve.handle_request({
+        "id": 31, "method": "apply", "params": {"profile_dir": compiled["path"], "target": str(project)},
+    })
+    assert "error" not in apply_response, apply_response.get("error")
+    assert Path(apply_response["result"]["settings_path"]).exists()
+
+    unapply_response = serve.handle_request({
+        "id": 32, "method": "unapply", "params": {"target": str(project)},
+    })
+    assert "error" not in unapply_response, unapply_response.get("error")
+    assert unapply_response["result"]["restored"] is True
+    assert not (project / ".claude" / "settings.json").exists()
+
+
+def test_apply_requires_target():
+    response = serve.handle_request({"id": 33, "method": "apply", "params": {"profile_dir": "/tmp/whatever"}})
+    assert "error" in response
+
+
+def test_unapply_requires_target():
+    response = serve.handle_request({"id": 34, "method": "unapply", "params": {}})
+    assert "error" in response
+
+
+def test_estate_round_trip_lists_discovered_targets(tmp_path, monkeypatch):
+    monkeypatch.setenv("CURIOSITY_CAT_DISCOVER_ROOTS", str(tmp_path))
+    project = tmp_path / "some-project"
+    (project / ".claude").mkdir(parents=True)
+
+    response = serve.handle_request({"id": 35, "method": "estate", "params": {}})
+    assert "error" not in response, response.get("error")
+    labels = [t["label"] for t in response["result"]["targets"]]
+    assert str(project) in labels
+
+
 def test_check_round_trip(monkeypatch):
     monkeypatch.setattr(core, "_fetch_danger_map_recent",
                          lambda limit=50: [{"source": "https://evil.example.com"}])
