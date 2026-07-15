@@ -11,7 +11,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from curiosity_cat import card, core, listen, purr
+from curiosity_cat import card, core, discover, listen, purr
 
 DATA_DIR = core.DATA_DIR
 ROLE_FILES = core.ROLE_FILES
@@ -97,6 +97,8 @@ def cmd_compile(level=None, target=None, profiles_dir=None):
     print(f"  {profile_dir / 'PROFILE.md'}")
     print(f"  {profile_dir / 'manifest.json'}")
     print(f"\nRead {profile_dir / 'PROFILE.md'} first — plain-language summary of what this cat can and cannot do.\n")
+    print("This profile is not yet assigned to any target. It protects nothing until it is "
+          "applied — run \"curiosity-cat estate\" to see what's out there to protect.\n")
 
 
 def cmd_prove(profile=None, observed=None):
@@ -268,6 +270,50 @@ def cmd_purr(profile=None, days=None):
     print()
 
 
+_ESTATE_KIND_LABELS = [
+    ("claude-code-project", "Claude Code projects"),
+    ("claude-code-global", "Claude Code global settings"),
+    ("agent-process", "Agent workspaces"),
+    ("mcp-server", "MCP servers"),
+]
+
+
+def cmd_estate():
+    inventory = discover.build_inventory()
+    print(f"\nCuriosity Cat — Estate ({len(inventory.targets)} target(s) found, "
+          f"discovered {inventory.discovered_at})\n")
+
+    if not inventory.targets:
+        print("No protectable surfaces found. That means nothing here is protected because "
+              f"nothing here was found — widen the search with ${discover.DISCOVER_ROOTS_ENV} "
+              "if this looks wrong.\n")
+        return
+
+    by_kind = {}
+    for t in inventory.targets:
+        by_kind.setdefault(t.kind, []).append(t)
+
+    for kind, label in _ESTATE_KIND_LABELS:
+        targets = by_kind.get(kind)
+        if not targets:
+            continue
+        print(f"{label}:")
+        for t in targets:
+            extra = ""
+            if kind == "agent-process":
+                extra = "  (running now)" if t.detail.get("running") else "  (not running)"
+            elif kind == "mcp-server":
+                extra = f"  ({t.detail.get('scope')})"
+            print(f"  {discover.format_protection(t.protection)} — {t.label}{extra}")
+        print()
+
+    if inventory.worst_state == discover.GUARDED:
+        print("Worst protection state across this estate: GUARDED — every target here has an applied profile.\n")
+    else:
+        print("Worst protection state across this estate: UNGUARDED — at least one target here has "
+              "no profile applied. The tray icon shows this worst case, not the best one.\n")
+
+
 def cmd_stories():
     stories_dir = DATA_DIR / "stories"
     if not stories_dir.exists():
@@ -304,6 +350,7 @@ Usage:
   curiosity-cat card <clean-bill.json> [--out <path>]      Render a Clean Bill share card PNG
   curiosity-cat purr --profile <profile-dir> [--days <n>]  Print this week's Purr digest
   curiosity-cat stories                                    Print the latest story
+  curiosity-cat estate                                     Show every protectable target and its state
 
 Roles (for init --role):
   research     general-safety.md + research-agent.md
@@ -367,6 +414,16 @@ Purr:
   --profile <dir>  A directory produced by "curiosity-cat compile"
   --days <n>       How many days of event history/Mouse Tray to summarise
                     (default 7)
+
+Estate:
+  Prints every protectable target this machine has — Claude Code project
+  directories, the global ~/.claude settings, running agent processes, and
+  configured MCP servers — each with its current, honest protection state.
+  A compiled profile protects nothing until it's applied to a target (see
+  docs/app/APP_SPEC.md's Assignment Model), so every target here reads
+  UNGUARDED until an "apply" command exists and has run against it.
+  Override the project-search roots with $CURIOSITY_CAT_DISCOVER_ROOTS
+  (a PATH-style, colon-separated list) — default is your home directory.
 """)
 
 
@@ -378,7 +435,7 @@ def main():
     )
     parser.add_argument("command", nargs="?",
                          choices=["init", "compile", "prove", "check", "report", "tray", "vet", "listen",
-                                  "card", "purr", "stories"])
+                                  "card", "purr", "stories", "estate"])
     parser.add_argument("candidate", nargs="?")
     parser.add_argument("--role", choices=list(ROLE_FILES.keys()))
     parser.add_argument("--level", choices=LEVELS)
@@ -420,6 +477,8 @@ def main():
         cmd_purr(profile=args.profile, days=args.days)
     elif args.command == "stories":
         cmd_stories()
+    elif args.command == "estate":
+        cmd_estate()
 
 
 if __name__ == "__main__":

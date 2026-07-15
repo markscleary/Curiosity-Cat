@@ -307,3 +307,63 @@ def test_purr_prints_a_digest_for_a_quiet_profile(tmp_path, monkeypatch, capsys)
 
     out = capsys.readouterr().out
     assert "stayed curled up" in out
+
+
+def test_compile_states_plainly_it_is_not_yet_assigned(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path))
+    cli.cmd_compile(level="housecat", target="claude-code")
+
+    out = capsys.readouterr().out
+    assert "not yet assigned to any target" in out
+    assert "protects nothing until it is" in out
+
+
+def test_estate_prints_empty_estate_honestly(monkeypatch, capsys, tmp_path):
+    from curiosity_cat import discover
+    monkeypatch.setattr(discover, "build_inventory",
+                         lambda: discover.Inventory(targets=[], discovered_at="2026-07-15"))
+
+    cli.cmd_estate()
+
+    out = capsys.readouterr().out
+    assert "0 target(s) found" in out
+    assert "No protectable surfaces found" in out
+
+
+def test_estate_prints_targets_grouped_with_worst_state(monkeypatch, capsys):
+    from curiosity_cat import discover
+
+    def _fake_inventory():
+        return discover.Inventory(
+            targets=[
+                discover.Target(
+                    kind="claude-code-project",
+                    id="claude-code-project:/tmp/proj",
+                    label="/tmp/proj",
+                    path="/tmp/proj",
+                    protection=discover.ProtectionState(status=discover.UNGUARDED),
+                ),
+                discover.Target(
+                    kind="mcp-server",
+                    id="mcp-server:user:gemini",
+                    label="gemini",
+                    protection=discover.ProtectionState(status=discover.UNGUARDED),
+                    detail={"scope": "user"},
+                ),
+            ],
+            discovered_at="2026-07-15",
+        )
+
+    monkeypatch.setattr(discover, "build_inventory", _fake_inventory)
+
+    cli.cmd_estate()
+
+    out = capsys.readouterr().out
+    assert "2 target(s) found" in out
+    assert "Claude Code projects:" in out
+    assert "/tmp/proj" in out
+    assert "MCP servers:" in out
+    assert "gemini" in out
+    assert "UNGUARDED" in out
+    assert "Worst protection state across this estate: UNGUARDED" in out
