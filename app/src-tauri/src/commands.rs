@@ -6,6 +6,7 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 const FIRST_RUN_MARKER: &str = "first-run-complete";
 const LAST_PROFILE_FILE: &str = "last-profile.json";
+const SETTINGS_FILE: &str = "settings.json";
 
 /// Generic bridge to the sidecar's line-delimited JSON protocol (APP-1,
 /// curiosity_cat/serve.py METHODS): `invoke('sidecar_call', {method, params})`
@@ -168,5 +169,50 @@ pub fn set_last_profile_dir(app: AppHandle, profile_dir: String) -> Result<(), S
     let contents = serde_json::json!({ "profile_dir": profile_dir }).to_string();
     fs::write(path, contents).map_err(|e| e.to_string())?;
     crate::watcher::restart(&app.state::<WatcherState>(), &profile_dir);
+    Ok(())
+}
+
+fn settings_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
+    let dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("could not resolve app data dir: {e}"))?;
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir.join(SETTINGS_FILE))
+}
+
+/// Reads the Settings window's persisted state (APP-S1: Danger Map
+/// reporting consent, the optional remote-alarm webhook, the chosen and
+/// unlocked skins). Missing or corrupt on disk both read back as an empty
+/// object rather than an error — `settings-store.js`'s `normalizeSettings()`
+/// is the one place that fills in defaults (consent always defaults to
+/// false), so a first launch and a corrupted file behave identically to the
+/// frontend rather than this command guessing at its own fallback shape.
+#[tauri::command]
+pub fn get_settings(app: AppHandle) -> Result<Value, String> {
+    let path = settings_path(&app)?;
+    if !path.exists() {
+        return Ok(Value::Object(Default::default()));
+    }
+    let raw = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    Ok(serde_json::from_str(&raw).unwrap_or(Value::Object(Default::default())))
+}
+
+/// Persists the Settings window's full state, already normalised by
+/// `settings-store.js` before this is called. Written user-only (0o600 on
+/// macOS/Unix): the remote-alarm webhook field can carry a bearer-style
+/// secret in its URL path (e.g. a Slack incoming webhook) — this is local
+/// app data, not a repo or dist file, but there is no reason for it to be
+/// group/world-readable either.
+#[tauri::command]
+pub fn save_settings(app: AppHandle, settings: Value) -> Result<(), String> {
+    let path = settings_path(&app)?;
+    let contents = serde_json::to_string_pretty(&settings).map_err(|e| e.to_string())?;
+    fs::write(&path, contents).map_err(|e| e.to_string())?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o600)).map_err(|e| e.to_string())?;
+    }
     Ok(())
 }

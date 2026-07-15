@@ -68,6 +68,8 @@ fn main() {
             commands::get_last_profile_dir,
             commands::set_last_profile_dir,
             commands::read_text_file,
+            commands::get_settings,
+            commands::save_settings,
             tray::set_tray_state,
         ])
         .run(tauri::generate_context!())

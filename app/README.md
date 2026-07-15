@@ -10,7 +10,40 @@ build (.app + DMG), the Homebrew cask draft, and the updater config —
 everything distribution-shaped short of Apple credentials. Signing and
 notarisation are the one remaining step, blocked on Mark having an Apple
 Developer ID (`docs/app/SIGNING.md`). APP-B1 polished the Feed and gave
-the tray icon a real state machine (see below).
+the tray icon a real state machine. APP-D1/APP-D2 added the Assignment
+Model and the apply verb. APP-F1 added Fleet mode. APP-G1 made the Guard
+Board the landing view. APP-S1 added the Settings window (see below).
+
+## What APP-S1 added
+
+- **A Settings window** (`settings.html`/`js/settings.js`, tray menu's
+  "Settings…"): Danger Map reporting consent (a checkbox, off by default —
+  Network Layer Principle a, "consent as architecture"; enabling it only
+  lets the Mouse Tray *offer* a report to queue, it never submits anything
+  by itself), an optional remote-alarm webhook URL, a skin selector, a
+  read-only display of where this app keeps its data (`get_profiles_dir`),
+  and an "Unapply all / restore backups" safety control — the same action
+  as the Guard Board's "Undo whole fleet" (`fleetUndo()`), surfaced here as
+  an emergency off switch reachable without the full estate list.
+- **`js/settings-store.js`**: a pure, DOM-free module (node-testable,
+  `tests/js/test_settings_store.js`) that owns the shape of `settings.json`
+  and normalises whatever's read back from disk onto safe defaults —
+  `danger_map_consent` in particular must be the literal boolean `true` to
+  count as consent, so a corrupt or unexpected value on disk can never be
+  mistaken for an explicit opt-in.
+- **`get_settings`/`save_settings`** (`commands.rs`): read/write
+  `settings.json` in the app's own `app_data_dir`, written user-only
+  (`0o600` on Unix) since the webhook field can carry a bearer-style secret
+  in its URL path (a Slack incoming webhook, for instance).
+- **The full skin set, ported** (`js/skins.js`): all seven species from
+  `site/js/skins.js`'s en locale (previously only "cat" shipped). Which
+  skins are unlocked is tracked in `settings.json` via
+  `settings-store.js`'s `unlocked_skins`/`unlockSkin()` — v1 ships with only
+  "cat" unlocked; the site's scroll/FAQ-based unlock triggers don't apply
+  to the app shell and aren't ported. The Slider itself
+  (`adventure-slider.js`) still reads `skins.en.cat` directly — wiring the
+  Settings-selected skin into the Slider/other windows is follow-up work,
+  not part of this brief.
 
 ## What APP-B1 added
 
@@ -115,6 +148,7 @@ app/
     feed.html             the Feed — live Watcher stream, Meow blocks (APP-4)
     approval.html          the approval gate's Allow/Deny dialog (APP-4)
     purr.html               This Week's Purr window (APP-5)
+    settings.html            consent, webhook, skins, profile-home, unapply-all (APP-S1)
     firstrun/
       choose.html          screen 1: pick housecat / alleycat / tiger
       compile.html          screen 2: compile via the sidecar
@@ -130,6 +164,8 @@ app/
       tray-state.js                 pure tray state machine, node-testable (APP-B1)
       approval.js                  the approval dialog's Allow/Deny logic (APP-4)
       purr.js                       fetches This Week's Purr once (APP-5)
+      settings.js                    consent/webhook/skin/unapply-all wiring (APP-S1)
+      settings-store.js               settings.json shape + defaults, node-testable (APP-S1)
 ```
 
 ## Prerequisites

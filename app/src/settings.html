@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Curiosity Cat — Settings</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <h1>⚙️ Settings</h1>
+  <p class="subtitle">
+    Nothing here changes what's applied to any target — this is the app's own local configuration.
+  </p>
+
+  <div class="card" id="danger-map-card">
+    <h2>Danger Map reporting</h2>
+    <p class="status-line">
+      Off by default. Nothing about a close call ever leaves this machine without this box checked, and even
+      then only pattern-level fields go out — never prompts, paths, or file contents. Turning this on does not
+      submit anything by itself: it only lets the Mouse Tray offer a report to queue for your review, one at a
+      time, still requiring its own separate approval before it's ever sent.
+    </p>
+    <label class="checkbox-row" for="consent-checkbox">
+      <input type="checkbox" id="consent-checkbox" />
+      Report close calls to the Danger Map
+    </label>
+    <p class="status-line" id="consent-status"></p>
+  </div>
+
+  <div class="card" id="webhook-card">
+    <h2>Remote alarm webhook</h2>
+    <p class="status-line">
+      Optional. When set, a tripwire-class event (the tray going to its "mouse" state) posts to this URL.
+      Leave blank to disable.
+    </p>
+    <label for="webhook-input">Webhook URL</label>
+    <input type="url" id="webhook-input" placeholder="https://example.com/hooks/curiosity-cat" />
+    <div class="actions">
+      <button id="save-webhook-btn">Save</button>
+    </div>
+    <p class="status-line" id="webhook-status"></p>
+  </div>
+
+  <div class="card" id="skin-card">
+    <h2>Skin</h2>
+    <p class="status-line">Pick among the skins you've unlocked. Locked ones show what's still out there to find.</p>
+    <ul class="skin-grid" id="skin-grid"></ul>
+    <p class="status-line" id="skin-status"></p>
+  </div>
+
+  <div class="card" id="profile-home-card">
+    <h2>Where this app keeps its data</h2>
+    <p class="status-line">
+      Profiles this app compiles, plus its own settings and first-run state, live here — a separate directory
+      from the curiosity-cat CLI's own home (see app/README.md, "Where profiles live").
+    </p>
+    <p class="status-line" id="profile-home-path">Loading…</p>
+  </div>
+
+  <div class="card" id="safety-card">
+    <h2>Safety</h2>
+    <p class="status-line">
+      Restores every currently guarded target's pre-apply backup — the same action as the Guard Board's
+      "Undo whole fleet", reachable here too since this is where you'd look for an emergency off switch.
+    </p>
+    <div class="actions">
+      <button id="unapply-all-btn" class="secondary">Unapply all / restore backups</button>
+    </div>
+    <p class="status-line" id="safety-status"></p>
+  </div>
+
+  <div class="modal-overlay" id="confirm-overlay" hidden>
+    <div class="modal card">
+      <h2 id="confirm-title">Confirm</h2>
+      <p class="status-line" id="confirm-body"></p>
+      <ul class="target-list" id="confirm-list"></ul>
+      <div class="actions">
+        <button id="confirm-yes-btn">Confirm</button>
+        <button id="confirm-no-btn" class="secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/settings-store.js"></script>
+  <script src="js/skins.js"></script>
+  <script src="js/sidecar-client.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

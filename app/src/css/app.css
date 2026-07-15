@@ -285,6 +285,87 @@ button.secondary {
 .worst-state-banner.state-guarded { background: var(--green-bg); color: var(--green-ink); }
 .worst-state-banner.state-unguarded { background: var(--red-bg); color: var(--red-ink); }
 
+/* Settings (APP-S1) — consent checkbox, webhook input, skin picker. */
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+input[type="url"],
+input[type="text"] {
+  font: inherit;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+select {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin: 0.5rem 0;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.skin-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skin-grid li {
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: #faf5ec;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.skin-grid li:hover,
+.skin-grid li:focus-visible {
+  border-color: var(--amber-dark);
+  outline: none;
+}
+
+.skin-grid li.selected {
+  background: var(--amber);
+  color: white;
+  border-color: var(--amber-dark);
+}
+
+.skin-grid li.locked {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.skin-grid li.locked:hover {
+  border-color: var(--border);
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

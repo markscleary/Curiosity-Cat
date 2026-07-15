@@ -50,8 +50,12 @@ pub fn build(app: &App) -> tauri::Result<()> {
     let open_slider = MenuItem::with_id(app, "open_slider", "Open Slider", true, None::<&str>)?;
     let open_feed = MenuItem::with_id(app, "open_feed", "Feed", true, None::<&str>)?;
     let open_purr = MenuItem::with_id(app, "open_purr", "This Week's Purr", true, None::<&str>)?;
+    let open_settings = MenuItem::with_id(app, "open_settings", "Settings…", true, None::<&str>)?;
     let quit = PredefinedMenuItem::quit(app, Some("Quit"))?;
-    let menu = Menu::with_items(app, &[&open_board, &open_slider, &open_feed, &open_purr, &quit])?;
+    let menu = Menu::with_items(
+        app,
+        &[&open_board, &open_slider, &open_feed, &open_purr, &open_settings, &quit],
+    )?;
 
     let _tray = TrayIconBuilder::with_id("main")
         .icon(asleep)
@@ -63,6 +67,7 @@ pub fn build(app: &App) -> tauri::Result<()> {
             "open_feed" => crate::commands::show_window(app, "feed", "feed.html"),
             "open_board" => crate::commands::show_window(app, "board", "board.html"),
             "open_purr" => crate::commands::show_window(app, "purr", "purr.html"),
+            "open_settings" => crate::commands::show_window(app, "settings", "settings.html"),
             _ => {}
         })
         .build(app)?;

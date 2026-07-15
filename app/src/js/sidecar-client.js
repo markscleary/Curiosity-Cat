@@ -16,6 +16,9 @@ window.CCAT = (function () {
         return call('compile', { level: level, target: target || 'claude-code', profiles_dir: profilesDir });
       });
     },
+    getProfilesDir: function () {
+      return invoke('get_profiles_dir', {});
+    },
     prove: function (profileDir, observed, target) {
       return call('prove', { profile_dir: profileDir, observed: observed, target: target });
     },
@@ -72,6 +75,12 @@ window.CCAT = (function () {
     },
     readTextFile: function (path) {
       return invoke('read_text_file', { path: path });
+    },
+    getSettings: function () {
+      return invoke('get_settings', {});
+    },
+    saveSettings: function (settings) {
+      return invoke('save_settings', { settings: settings });
     }
   };
 })();
