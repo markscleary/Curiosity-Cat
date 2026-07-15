@@ -188,6 +188,65 @@ def test_apply_then_unapply_round_trip_via_cli(tmp_path, monkeypatch, capsys):
     assert json.loads((claude_dir / "settings.json").read_text()) == original
 
 
+def test_fleet_missing_level_exits_one(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_fleet(level=None)
+    assert exc_info.value.code == 1
+    assert "Missing or unknown --level" in capsys.readouterr().err
+
+
+def test_fleet_no_applicable_targets_exits_one(monkeypatch, capsys):
+    from curiosity_cat import discover
+
+    # An estate that only contains kinds apply_many() can't act on (no
+    # settings.json of their own) — e.g. every project/global target was
+    # somehow absent. cmd_fleet must refuse rather than silently no-op.
+    empty_inventory = discover.Inventory(targets=[], discovered_at="2026-01-01")
+    monkeypatch.setattr(cli.discover, "build_inventory", lambda: empty_inventory)
+
+    with pytest.raises(SystemExit) as exc_info:
+        cli.cmd_fleet(level="housecat")
+    assert exc_info.value.code == 1
+    assert "No applicable targets found" in capsys.readouterr().err
+
+
+def test_fleet_applies_and_proves_every_discovered_project(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path / "cc-home"))
+    monkeypatch.setenv("CURIOSITY_CAT_DISCOVER_ROOTS", str(tmp_path / "estate"))
+    monkeypatch.setenv("HOME", str(tmp_path / "fake-home"))
+    (tmp_path / "fake-home").mkdir()
+    project = tmp_path / "estate" / "myproject"
+    (project / ".claude").mkdir(parents=True)
+
+    cli.cmd_fleet(level="housecat", observed=False)
+
+    out = capsys.readouterr().out
+    assert "Protecting whole fleet" in out
+    assert str(project) in out
+    assert "global" in out
+    assert "Fleet Clean Bill — 2 of 2 target(s) proven clean" in out
+    assert (project / ".claude" / "settings.json").exists()
+    assert (tmp_path / "fake-home" / ".claude" / "settings.json").exists()
+
+
+def test_fleet_undo_restores_and_exits_cleanly(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path / "cc-home"))
+    monkeypatch.setenv("CURIOSITY_CAT_DISCOVER_ROOTS", str(tmp_path / "estate"))
+    monkeypatch.setenv("HOME", str(tmp_path / "fake-home"))
+    (tmp_path / "fake-home").mkdir()
+    project = tmp_path / "estate" / "myproject"
+    (project / ".claude").mkdir(parents=True)
+    cli.cmd_fleet(level="housecat", observed=False)
+    capsys.readouterr()
+
+    cli.cmd_fleet(undo=True)
+
+    out = capsys.readouterr().out
+    assert "Fleet undo" in out
+    assert "2 restored, 0 failed" in out
+    assert not (project / ".claude" / "settings.json").exists()
+
+
 def test_check_prints_matches(monkeypatch, capsys):
     from curiosity_cat import core
     monkeypatch.setattr(core, "_fetch_danger_map_recent",

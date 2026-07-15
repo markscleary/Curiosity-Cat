@@ -867,6 +867,222 @@ def unapply(target, home_dir=None, registry_home=None, cwd=None):
     )
 
 
+# --- Fleet mode: apply_many()/unapply_many() protect (or unprotect) an
+# entire estate in one motion. Neither is a new enforcement mechanism —
+# both are a loop over the same apply()/prove()/unapply() this module
+# already exposes, one target at a time, so every honesty guarantee those
+# three already carry (backup before write, conservative merge, per-target
+# registry entry) applies here unchanged. What Fleet mode adds is: one
+# target's failure never aborts the rest (Assignment Model (b) — protection
+# state is per-target, never folded into one flag, and that includes
+# failure), and a single fleet-wide Clean Bill summarising what happened
+# across all of them.
+
+@dataclass
+class FleetTargetOutcome:
+    """One target's own result within an apply_many()/unapply_many() run."""
+
+    target: str
+    ok: bool
+    apply_result: Optional[ApplyResult] = None
+    clean_bill: Optional[CleanBill] = None
+    unapply_result: Optional[UnapplyResult] = None
+    error: Optional[str] = None
+
+
+@dataclass
+class FleetResult:
+    """What apply_many() did across every requested target — the fleet
+    Clean Bill: N agents, N walls proven, one date (docs/app/APP_SPEC.md
+    Network Layer Principle f's fleet-level drift signal, surfaced here as
+    a single applied-and-proved-together summary rather than one target at
+    a time). `outcomes` keeps every target's own individual result (and any
+    per-target error) fully visible — nothing here folds per-target detail
+    away, only adds a summary on top of it.
+    """
+
+    level: str
+    date: str
+    profile_dir: str
+    outcomes: list
+    agents_proven: int
+    agents_failed: int
+    walls_proven: int
+    fleet_clean_bill_path: str
+    fleet_clean_bill_md_path: str
+
+
+@dataclass
+class FleetUnapplyOutcome:
+    """One target's own result within an unapply_many() run."""
+
+    target: str
+    ok: bool
+    unapply_result: Optional[UnapplyResult] = None
+    error: Optional[str] = None
+
+
+@dataclass
+class FleetUnapplyResult:
+    """What unapply_many() did — Fleet mode's "Undo whole fleet"."""
+
+    date: str
+    outcomes: list
+    restored: int
+    failed: int
+
+
+FLEET_CLEAN_BILLS_DIRNAME = "fleet-clean-bills"
+
+
+def build_fleet_clean_bill_md(level, today, outcomes, agents_proven, walls_proven):
+    lines = [
+        f"# Fleet Clean Bill of Health — {level}",
+        "",
+        f"Applied and proved {len(outcomes)} target(s) on {today}.",
+        "",
+        "## Targets",
+        "",
+    ]
+    for o in outcomes:
+        if o.ok and o.clean_bill:
+            verdict = "clean bill — every tested wall held" if o.clean_bill.passed else "applied, but findings — see its own Clean Bill"
+            lines.append(f"- **{o.target}** — {verdict} ({o.clean_bill.clean_bill_md_path}).")
+        else:
+            lines.append(f"- **{o.target}** — FAILED: {o.error}")
+
+    lines += [
+        "",
+        "## Verdict",
+        "",
+        f"{agents_proven} of {len(outcomes)} target(s) proven clean, {walls_proven} wall(s) held across them.",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def apply_many(level, targets, observed=None, home_dir=None, registry_home=None, cwd=None, profiles_dir=None):
+    """Protect a whole fleet in one motion: compile `level` once, then
+    apply + prove it against every target in `targets`, in order.
+
+    Mirrors what a single `apply()` + `prove(target=...)` call already
+    does for one target — same backup-before-write, same conservative
+    merge, same per-target registry entry — just run once per target.
+    One target's failure (a bad path, a missing backup, a wall that didn't
+    hold) is recorded on that target's own FleetTargetOutcome and never
+    stops the rest of the fleet from being attempted.
+
+    Raises InvalidLevelError for an unknown level, same as compile_profile()
+    — checked once, up front, since every target in the run would fail
+    identically. Returns a FleetResult and writes a fleet-wide Clean Bill
+    (fleet-clean-bill.json / FLEET-CLEAN-BILL.md) under this machine's
+    curiosity-cat home, alongside each target's own per-target Clean Bill
+    (already written by the prove() call inside this loop).
+    """
+    profile = compile_profile(level, "claude-code", profiles_dir=profiles_dir)
+
+    outcomes = []
+    for target in targets:
+        try:
+            apply_result = apply(profile.path, target, home_dir=home_dir, registry_home=registry_home, cwd=cwd)
+            clean_bill = prove(profile.path, observed=observed, target=target,
+                                home_dir=home_dir, registry_home=registry_home, cwd=cwd)
+            outcomes.append(FleetTargetOutcome(target=target, ok=True,
+                                                apply_result=apply_result, clean_bill=clean_bill))
+        except Exception as exc:  # noqa: BLE001 - one target's failure must never abort the rest of the fleet
+            outcomes.append(FleetTargetOutcome(target=target, ok=False, error=str(exc)))
+
+    agents_proven = sum(1 for o in outcomes if o.ok and o.clean_bill.passed)
+    walls_proven = sum(
+        sum(1 for t in (o.clean_bill.self_consistency_trials + o.clean_bill.observed_trials) if t.get("held") is True)
+        for o in outcomes if o.ok
+    )
+
+    home = Path(registry_home) if registry_home is not None else resolve_home()
+    fleet_root = home / FLEET_CLEAN_BILLS_DIRNAME
+    fleet_root.mkdir(parents=True, exist_ok=True)
+    today = date.today().isoformat()
+    base_name = f"fleet-{level}-{date.today().strftime('%Y%m%d')}"
+    fleet_dir = fleet_root / base_name
+    suffix = 2
+    while fleet_dir.exists():
+        fleet_dir = fleet_root / f"{base_name}-v{suffix}"
+        suffix += 1
+    fleet_dir.mkdir(parents=True)
+
+    fleet_dict = {
+        "level": level,
+        "date": today,
+        "profile_dir": str(profile.path),
+        "targets_requested": len(outcomes),
+        "agents_proven": agents_proven,
+        "agents_failed": len(outcomes) - agents_proven,
+        "walls_proven": walls_proven,
+        "outcomes": [
+            {
+                "target": o.target,
+                "ok": o.ok,
+                "error": o.error,
+                "clean_bill_md_path": o.clean_bill.clean_bill_md_path if o.clean_bill else None,
+                "passed": o.clean_bill.passed if o.clean_bill else None,
+            }
+            for o in outcomes
+        ],
+    }
+    fleet_clean_bill_path = fleet_dir / "fleet-clean-bill.json"
+    fleet_clean_bill_md_path = fleet_dir / "FLEET-CLEAN-BILL.md"
+    fleet_clean_bill_path.write_text(json.dumps(fleet_dict, indent=2) + "\n")
+    fleet_clean_bill_md_path.write_text(
+        build_fleet_clean_bill_md(level, today, outcomes, agents_proven, walls_proven))
+
+    return FleetResult(
+        level=level,
+        date=today,
+        profile_dir=str(profile.path),
+        outcomes=outcomes,
+        agents_proven=agents_proven,
+        agents_failed=len(outcomes) - agents_proven,
+        walls_proven=walls_proven,
+        fleet_clean_bill_path=str(fleet_clean_bill_path),
+        fleet_clean_bill_md_path=str(fleet_clean_bill_md_path),
+    )
+
+
+def unapply_many(targets=None, home_dir=None, registry_home=None, cwd=None):
+    """Undo-all: unapply every target in `targets`, restoring each one's
+    pre-apply backup (see unapply()). With `targets=None` (Fleet mode's
+    "Undo whole fleet"), targets are read back from the registry itself —
+    every target currently recorded GUARDED — rather than requiring the
+    caller to already know the full list.
+
+    One target's failure (most likely a missing backup file — see
+    unapply()'s TargetNotAppliedError) never stops the rest of the fleet
+    from being restored. Returns a FleetUnapplyResult.
+    """
+    home = Path(registry_home) if registry_home is not None else resolve_home()
+    if targets is None:
+        registry = _load_registry(home)
+        targets = [
+            GLOBAL_TARGET if entry.get("target_kind") == "claude-code-global" else entry.get("target")
+            for entry in registry.values()
+        ]
+
+    outcomes = []
+    for target in targets:
+        try:
+            result = unapply(target, home_dir=home_dir, registry_home=registry_home, cwd=cwd)
+            outcomes.append(FleetUnapplyOutcome(target=target, ok=True, unapply_result=result))
+        except Exception as exc:  # noqa: BLE001 - one target's failure must never abort the rest of the undo
+            outcomes.append(FleetUnapplyOutcome(target=target, ok=False, error=str(exc)))
+
+    restored = sum(1 for o in outcomes if o.ok)
+    return FleetUnapplyResult(
+        date=date.today().isoformat(),
+        outcomes=outcomes,
+        restored=restored,
+        failed=len(outcomes) - restored,
+    )
+
+
 def _path_verdict(perms, op, path_str):
     """Would this profile's settings.json deny a Read/Write/Edit of path_str?
 
@@ -2008,6 +2224,7 @@ def to_jsonable(value):
     plain dict) into a plain JSON-serialisable dict, for cli.py and serve.py
     to print/emit.
     """
-    if isinstance(value, (ProfileDir, CleanBill, WhiskerVerdict, VetReport, ApplyResult, UnapplyResult)):
+    if isinstance(value, (ProfileDir, CleanBill, WhiskerVerdict, VetReport, ApplyResult, UnapplyResult,
+                          FleetResult, FleetUnapplyResult)):
         return asdict(value)
     return value

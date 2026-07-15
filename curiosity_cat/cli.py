@@ -185,6 +185,74 @@ def cmd_unapply(target=None):
     print(f"  {result.note}\n")
 
 
+def _fleet_applicable_targets(inventory):
+    """Discovered targets apply_many() can actually install into: a Claude
+    Code project directory, or the literal "global" for the operator's own
+    settings. Agent-workspace and MCP-server targets are real, discovered
+    targets too (curiosity-cat estate), but neither has a settings.json of
+    its own for apply() to write into, so Fleet mode only ever touches the
+    two kinds it can act on.
+    """
+    targets = []
+    for t in inventory.targets:
+        if t.kind == "claude-code-project":
+            targets.append(t.path)
+        elif t.kind == "claude-code-global":
+            targets.append(core.GLOBAL_TARGET)
+    return targets
+
+
+def cmd_fleet(level=None, observed=None, undo=False):
+    if undo:
+        result = core.unapply_many()
+        print(f"\nFleet undo — {len(result.outcomes)} target(s), {result.date}.\n")
+        for o in result.outcomes:
+            if o.ok:
+                print(f"  [ok]     {o.target} — {o.unapply_result.note}")
+            else:
+                print(f"  [FAILED] {o.target} — {o.error}")
+        print(f"\n{result.restored} restored, {result.failed} failed.\n")
+        if result.failed:
+            sys.exit(1)
+        return
+
+    if not level or level not in LEVELS:
+        print(f'Missing or unknown --level: "{level}"', file=sys.stderr)
+        print(f'Valid levels: {", ".join(LEVELS)}', file=sys.stderr)
+        sys.exit(1)
+
+    inventory = discover.build_inventory()
+    targets = _fleet_applicable_targets(inventory)
+    if not targets:
+        print('\nNo applicable targets found — nothing to protect. Run "curiosity-cat estate" '
+              "to see what's out there.\n", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"\nProtecting whole fleet — {len(targets)} target(s) at "
+          f"{core.LEVEL_POLICY[level]['label']} level. Backing up each target's existing settings first.\n")
+    for t in targets:
+        print(f"  - {t}")
+
+    result = core.apply_many(level, targets, observed=observed)
+
+    print(f"\nApplied and proved {len(result.outcomes)} target(s):")
+    for o in result.outcomes:
+        if o.ok:
+            status = "clean bill" if o.clean_bill.passed else "applied, but findings — see its Clean Bill"
+            print(f"  [ok]     {o.target} — {status}")
+        else:
+            print(f"  [FAILED] {o.target} — {o.error}")
+
+    print(f"\nFleet Clean Bill — {result.agents_proven} of {len(result.outcomes)} target(s) proven clean, "
+          f"{result.walls_proven} wall(s) held, {result.date}.")
+    print(f"  {result.fleet_clean_bill_md_path}\n")
+
+    if result.agents_failed:
+        print(f"{result.agents_failed} target(s) did not come back with a clean bill — see above.\n",
+              file=sys.stderr)
+        sys.exit(1)
+
+
 def cmd_prove(profile=None, observed=None, target=None):
     if not profile:
         print('Missing --profile <profile-dir>', file=sys.stderr)
@@ -432,6 +500,10 @@ Usage:
   curiosity-cat apply --level <level> --target <path|global> [--no-observed]
                                                              Compile, apply, and prove in one motion
   curiosity-cat unapply --target <path|global>              Undo apply — restore the pre-apply backup
+  curiosity-cat fleet --level <level> [--no-observed]        Discover every target, apply and prove
+                                                             <level> to all of them in one motion
+  curiosity-cat fleet --undo                                Undo-all — restore every currently guarded
+                                                             target's pre-apply backup
   curiosity-cat check <candidate>                          Look up a URL/source against the Danger Map
   curiosity-cat report                                     Show how to submit a close call to the Danger Map
   curiosity-cat tray --profile <profile-dir> [--approve <ids>]
@@ -496,6 +568,20 @@ Unapply:
   Restores the target's pre-apply settings.json from its backup (or removes
   it, if there was nothing there before) and clears the registry entry.
 
+Fleet:
+  --level <level>  Which adventure level to compile and apply to every
+                   discovered target (see Levels below).
+  --no-observed    Passed through to each target's prove step (see Prove above).
+  --undo           Undo the whole fleet instead — restores every currently
+                   guarded target's pre-apply backup and clears its registry
+                   entry. Ignores --level.
+  Runs "curiosity-cat estate" discovery, then applies and proves <level>
+  against every Claude Code project and the global settings it finds —
+  same backup-and-merge guarantees as a single "apply", once per target.
+  One target failing never stops the rest; the summary and a fleet-wide
+  Clean Bill (fleet-clean-bill.json / FLEET-CLEAN-BILL.md) report every
+  target's own outcome.
+
 Check:
   <candidate>      A URL, domain, or other source string to look up against
                    the community Danger Map's recent close calls.
@@ -548,8 +634,8 @@ def main():
         add_help=False,
     )
     parser.add_argument("command", nargs="?",
-                         choices=["init", "compile", "prove", "apply", "unapply", "check", "report", "tray",
-                                  "vet", "listen", "card", "purr", "stories", "estate"])
+                         choices=["init", "compile", "prove", "apply", "unapply", "fleet", "check", "report",
+                                  "tray", "vet", "listen", "card", "purr", "stories", "estate"])
     parser.add_argument("candidate", nargs="?")
     parser.add_argument("--role", choices=list(ROLE_FILES.keys()))
     parser.add_argument("--level", choices=LEVELS)
@@ -562,6 +648,7 @@ def main():
     parser.add_argument("--profile")
     parser.add_argument("--profiles-dir")
     parser.add_argument("--no-observed", action="store_true")
+    parser.add_argument("--undo", action="store_true")
     parser.add_argument("--approve")
     parser.add_argument("--recompile", action="store_true")
     parser.add_argument("--out")
@@ -584,6 +671,8 @@ def main():
         cmd_apply(level=args.level, target=args.target, observed=(False if args.no_observed else None))
     elif args.command == "unapply":
         cmd_unapply(target=args.target)
+    elif args.command == "fleet":
+        cmd_fleet(level=args.level, observed=(False if args.no_observed else None), undo=args.undo)
     elif args.command == "check":
         cmd_check(candidate=args.candidate)
     elif args.command == "report":

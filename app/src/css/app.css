@@ -193,3 +193,38 @@ button.secondary {
 .approval-actions button.deny:hover {
   background: #b91c1c;
 }
+
+.target-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.target-list li {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #faf5ec;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 41, 55, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal-overlay .modal {
+  max-width: 480px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  margin-bottom: 0;
+}

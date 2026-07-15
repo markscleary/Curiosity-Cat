@@ -25,6 +25,12 @@ window.CCAT = (function () {
     unapply: function (target) {
       return call('unapply', { target: target });
     },
+    fleet: function (level, observed, targets) {
+      return call('fleet', { level: level, observed: observed, targets: targets });
+    },
+    fleetUndo: function (targets) {
+      return call('fleet_undo', { targets: targets });
+    },
     estate: function () {
       return call('estate', {});
     },

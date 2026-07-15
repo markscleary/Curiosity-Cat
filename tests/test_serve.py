@@ -137,6 +137,65 @@ def test_unapply_requires_target():
     assert "error" in response
 
 
+def test_fleet_round_trip_discovers_and_applies_to_the_estate(tmp_path, monkeypatch):
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path / "cc-home"))
+    monkeypatch.setenv("CURIOSITY_CAT_DISCOVER_ROOTS", str(tmp_path / "estate"))
+    monkeypatch.setenv("HOME", str(tmp_path / "fake-home"))
+    (tmp_path / "fake-home").mkdir()
+    project = tmp_path / "estate" / "myproject"
+    (project / ".claude").mkdir(parents=True)
+
+    response = serve.handle_request({
+        "id": 40, "method": "fleet", "params": {"level": "housecat", "observed": False},
+    })
+
+    assert "error" not in response, response.get("error")
+    result = response["result"]
+    assert result["agents_proven"] == 2
+    assert result["agents_failed"] == 0
+    targets = {o["target"] for o in result["outcomes"]}
+    assert str(project) in targets
+    assert "global" in targets
+    assert (project / ".claude" / "settings.json").exists()
+
+
+def test_fleet_round_trip_with_explicit_targets_skips_discovery(tmp_path, monkeypatch):
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path / "cc-home"))
+    project = tmp_path / "myproject"
+    project.mkdir()
+
+    response = serve.handle_request({
+        "id": 41, "method": "fleet",
+        "params": {"level": "housecat", "observed": False, "targets": [str(project)]},
+    })
+
+    assert "error" not in response, response.get("error")
+    assert response["result"]["agents_proven"] == 1
+    assert (project / ".claude" / "settings.json").exists()
+
+
+def test_fleet_round_trip_requires_level():
+    response = serve.handle_request({"id": 42, "method": "fleet", "params": {}})
+    assert "error" in response
+
+
+def test_fleet_undo_round_trip_restores_every_applied_target(tmp_path, monkeypatch):
+    monkeypatch.setenv("CURIOSITY_CAT_HOME", str(tmp_path / "cc-home"))
+    project = tmp_path / "myproject"
+    project.mkdir()
+    serve.handle_request({
+        "id": 43, "method": "fleet",
+        "params": {"level": "housecat", "observed": False, "targets": [str(project)]},
+    })
+
+    response = serve.handle_request({"id": 44, "method": "fleet_undo", "params": {}})
+
+    assert "error" not in response, response.get("error")
+    assert response["result"]["restored"] == 1
+    assert response["result"]["failed"] == 0
+    assert not (project / ".claude" / "settings.json").exists()
+
+
 def test_estate_round_trip_lists_discovered_targets(tmp_path, monkeypatch):
     monkeypatch.setenv("CURIOSITY_CAT_DISCOVER_ROOTS", str(tmp_path))
     project = tmp_path / "some-project"

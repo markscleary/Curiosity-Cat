@@ -16,8 +16,8 @@ import sys
 
 from curiosity_cat import __version__, card, core, discover, purr
 
-METHODS = ("compile", "prove", "apply", "unapply", "estate", "check", "report_close_call",
-           "queue_close_call", "list_tray", "submit_approved", "vet", "status",
+METHODS = ("compile", "prove", "apply", "unapply", "fleet", "fleet_undo", "estate", "check",
+           "report_close_call", "queue_close_call", "list_tray", "submit_approved", "vet", "status",
            "render_share_card", "purr")
 
 
@@ -49,6 +49,34 @@ def _handle_unapply(params):
     if not target:
         raise ValueError('params.target is required')
     return core.to_jsonable(core.unapply(target))
+
+
+def _fleet_applicable_targets(inventory):
+    """Same rule cli.py's fleet command uses: only the two discovered
+    target kinds apply_many() can actually install a settings.json into.
+    """
+    targets = []
+    for t in inventory.targets:
+        if t.kind == "claude-code-project":
+            targets.append(t.path)
+        elif t.kind == "claude-code-global":
+            targets.append(core.GLOBAL_TARGET)
+    return targets
+
+
+def _handle_fleet(params):
+    level = params.get("level")
+    if not level:
+        raise ValueError('params.level is required')
+    targets = params.get("targets")
+    if targets is None:
+        inventory = discover.build_inventory(roots=params.get("roots"))
+        targets = _fleet_applicable_targets(inventory)
+    return core.to_jsonable(core.apply_many(level, targets, observed=params.get("observed")))
+
+
+def _handle_fleet_undo(params):
+    return core.to_jsonable(core.unapply_many(targets=params.get("targets")))
 
 
 def _handle_estate(params):
@@ -137,6 +165,8 @@ DISPATCH = {
     "prove": _handle_prove,
     "apply": _handle_apply,
     "unapply": _handle_unapply,
+    "fleet": _handle_fleet,
+    "fleet_undo": _handle_fleet_undo,
     "estate": _handle_estate,
     "check": _handle_check,
     "report_close_call": _handle_report_close_call,

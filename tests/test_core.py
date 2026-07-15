@@ -867,3 +867,174 @@ def test_prove_with_target_stamps_registry_proof_date(tmp_path):
 
     registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
     assert registry[applied.target_id]["proof_date"] == clean_bill.date
+
+
+# --- Fleet: apply_many()/unapply_many() ---
+
+def _fleet_fixture(tmp_path):
+    registry_home = tmp_path / "cc-home"
+    profiles_dir = tmp_path / "profiles"
+    project1 = tmp_path / "project1"
+    project1.mkdir()
+    project2 = tmp_path / "project2"
+    project2.mkdir()
+    return registry_home, profiles_dir, project1, project2
+
+
+def test_apply_many_backs_up_each_targets_existing_settings(tmp_path):
+    registry_home, profiles_dir, project1, project2 = _fleet_fixture(tmp_path)
+    claude_dir1 = project1 / ".claude"
+    claude_dir1.mkdir()
+    original1 = {"permissions": {"allow": ["Read(./custom-one/**)"]}}
+    (claude_dir1 / "settings.json").write_text(json.dumps(original1))
+    claude_dir2 = project2 / ".claude"
+    claude_dir2.mkdir()
+    original2 = {"permissions": {"allow": ["Read(./custom-two/**)"]}}
+    (claude_dir2 / "settings.json").write_text(json.dumps(original2))
+
+    result = core.apply_many("housecat", [str(project1), str(project2)], observed=False,
+                              registry_home=registry_home, profiles_dir=profiles_dir)
+
+    assert len(result.outcomes) == 2
+    assert result.agents_proven == 2
+    assert result.agents_failed == 0
+    assert all(o.ok for o in result.outcomes)
+
+    originals = {str(project1): original1, str(project2): original2}
+    for outcome in result.outcomes:
+        backup_path = Path(outcome.apply_result.backup_path)
+        assert backup_path.exists()
+        assert json.loads(backup_path.read_text()) == originals[outcome.target]
+        # Every backup lives under curiosity-cat's own home, never inside
+        # the target it backs up — same invariant a single apply() gives.
+        assert registry_home in backup_path.parents
+
+    # The operator's own pre-existing rule survives the conservative merge
+    # at each target — same guarantee a single apply() gives, per-target.
+    assert "Read(./custom-one/**)" in json.loads((claude_dir1 / "settings.json").read_text())["permissions"]["allow"]
+    assert "Read(./custom-two/**)" in json.loads((claude_dir2 / "settings.json").read_text())["permissions"]["allow"]
+
+    assert Path(result.fleet_clean_bill_path).exists()
+    assert Path(result.fleet_clean_bill_md_path).exists()
+    fleet_dict = json.loads(Path(result.fleet_clean_bill_path).read_text())
+    assert fleet_dict["agents_proven"] == 2
+    assert fleet_dict["targets_requested"] == 2
+
+
+def test_apply_many_one_target_failing_never_stops_the_rest(tmp_path):
+    registry_home, profiles_dir, project1, _project2 = _fleet_fixture(tmp_path)
+    not_a_directory = tmp_path / "not-a-directory.txt"
+    not_a_directory.write_text("this is a file, not a project directory")
+
+    result = core.apply_many("housecat", [str(project1), str(not_a_directory)], observed=False,
+                              registry_home=registry_home, profiles_dir=profiles_dir)
+
+    assert len(result.outcomes) == 2
+    by_target = {o.target: o for o in result.outcomes}
+
+    good = by_target[str(project1)]
+    assert good.ok is True
+    assert good.error is None
+    assert (project1 / ".claude" / "settings.json").exists()
+
+    bad = by_target[str(not_a_directory)]
+    assert bad.ok is False
+    assert bad.error
+    assert bad.apply_result is None
+    assert bad.clean_bill is None
+
+    assert result.agents_proven == 1
+    assert result.agents_failed == 1
+
+    # The fleet-wide Clean Bill still reports both targets, the failure
+    # included, rather than silently dropping the one that failed.
+    fleet_dict = json.loads(Path(result.fleet_clean_bill_path).read_text())
+    assert fleet_dict["targets_requested"] == 2
+    assert fleet_dict["agents_proven"] == 1
+    fleet_targets = {o["target"]: o for o in fleet_dict["outcomes"]}
+    assert fleet_targets[str(not_a_directory)]["ok"] is False
+    assert fleet_targets[str(project1)]["ok"] is True
+
+
+def test_apply_many_rejects_unknown_level(tmp_path):
+    registry_home, profiles_dir, project1, _project2 = _fleet_fixture(tmp_path)
+    with pytest.raises(core.InvalidLevelError):
+        core.apply_many("not-a-real-level", [str(project1)], observed=False,
+                         registry_home=registry_home, profiles_dir=profiles_dir)
+
+
+def test_unapply_many_restores_every_currently_guarded_target(tmp_path):
+    registry_home, profiles_dir, project1, project2 = _fleet_fixture(tmp_path)
+    apply_result = core.apply_many("housecat", [str(project1), str(project2)], observed=False,
+                                    registry_home=registry_home, profiles_dir=profiles_dir)
+    assert apply_result.agents_proven == 2
+
+    result = core.unapply_many(registry_home=registry_home)
+
+    assert result.restored == 2
+    assert result.failed == 0
+    assert not (project1 / ".claude" / "settings.json").exists()
+    assert not (project2 / ".claude" / "settings.json").exists()
+    assert json.loads((registry_home / core.REGISTRY_FILENAME).read_text()) == {}
+
+
+def test_unapply_many_one_target_failing_never_stops_the_rest(tmp_path):
+    registry_home, profiles_dir, project1, project2 = _fleet_fixture(tmp_path)
+    # project1 needs a pre-apply backup to sabotage below — give it a real
+    # pre-existing settings.json, so apply() actually records a backup_path.
+    claude_dir1 = project1 / ".claude"
+    claude_dir1.mkdir()
+    (claude_dir1 / "settings.json").write_text(json.dumps({"permissions": {"allow": ["Read(./x/**)"]}}))
+
+    core.apply_many("housecat", [str(project1), str(project2)], observed=False,
+                     registry_home=registry_home, profiles_dir=profiles_dir)
+
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    project1_entry = registry[f"claude-code-project:{project1}"]
+    Path(project1_entry["backup_path"]).unlink()  # sabotage one target's undo
+
+    result = core.unapply_many(registry_home=registry_home)
+
+    assert result.restored == 1
+    assert result.failed == 1
+    by_target = {o.target: o for o in result.outcomes}
+    assert by_target[str(project1)].ok is False
+    assert by_target[str(project1)].error
+    assert by_target[str(project2)].ok is True
+    # The one that failed keeps its registry entry (unapply() never clears
+    # it without a successful restore) — still reported GUARDED, honestly.
+    registry_after = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert f"claude-code-project:{project1}" in registry_after
+    assert f"claude-code-project:{project2}" not in registry_after
+
+
+def test_unapply_many_explicit_targets_bypasses_the_registry(tmp_path):
+    registry_home, profiles_dir, project1, project2 = _fleet_fixture(tmp_path)
+    core.apply_many("housecat", [str(project1), str(project2)], observed=False,
+                     registry_home=registry_home, profiles_dir=profiles_dir)
+
+    result = core.unapply_many(targets=[str(project1)], registry_home=registry_home)
+
+    assert result.restored == 1
+    assert not (project1 / ".claude" / "settings.json").exists()
+    # project2 was never named — still guarded afterwards.
+    registry_after = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert f"claude-code-project:{project2}" in registry_after
+
+
+def test_apply_many_and_unapply_many_reconstruct_global_target_correctly(tmp_path):
+    registry_home, profiles_dir, project1, _project2 = _fleet_fixture(tmp_path)
+    home_dir = tmp_path / "operator-home"
+
+    core.apply_many("housecat", [core.GLOBAL_TARGET], observed=False,
+                     registry_home=registry_home, profiles_dir=profiles_dir, home_dir=home_dir)
+    assert (home_dir / ".claude" / "settings.json").exists()
+
+    # unapply_many() with targets=None must reconstruct the literal
+    # "global" target string from the registry's target_kind, not reuse
+    # the stored target label (which is the settings path, not "global").
+    result = core.unapply_many(registry_home=registry_home, home_dir=home_dir)
+
+    assert result.restored == 1
+    assert result.failed == 0
+    assert not (home_dir / ".claude" / "settings.json").exists()
