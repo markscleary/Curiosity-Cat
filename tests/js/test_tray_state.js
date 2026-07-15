@@ -112,3 +112,28 @@ test('advance: processes a mixed batch of fixtures in order, ending on the worst
   const result = trayState.advance(0, batch);
   assert.equal(result.state, trayState.STATE_MOUSE);
 });
+
+test('advance: an unguarded board floors a quiet estate to hackles, not asleep', () => {
+  const result = trayState.advance(0, [], true);
+  assert.equal(result.state, trayState.STATE_HACKLES);
+});
+
+test('advance: an unguarded board floors a mild ears-up reading up to hackles', () => {
+  const result = trayState.advance(0, [eventEntry(1, 'allowed')], true);
+  assert.equal(result.state, trayState.STATE_HACKLES);
+});
+
+test('advance: an unguarded board never demotes a real mouse-grade reading', () => {
+  const result = trayState.advance(0, [eventEntry(1, 'denied', 'unsafe-url')], true);
+  assert.equal(result.state, trayState.STATE_MOUSE);
+});
+
+test('advance: a guarded board leaves a quiet estate at asleep as before', () => {
+  const result = trayState.advance(0, [], false);
+  assert.equal(result.state, trayState.STATE_ASLEEP);
+});
+
+test('advance: boardUnguarded defaults to false when omitted (existing callers unaffected)', () => {
+  const result = trayState.advance(0, []);
+  assert.equal(result.state, trayState.STATE_ASLEEP);
+});

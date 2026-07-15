@@ -126,7 +126,8 @@ pub fn is_first_run(app: AppHandle) -> Result<bool, String> {
 }
 
 /// Called from the Clean Bill screen once the first-run journey completes,
-/// so the tray click path opens straight to the Slider from then on.
+/// so the tray's own menu leads with the Guard Board (the app's landing
+/// view, APP-G1) from then on rather than the first-run flow again.
 #[tauri::command]
 pub fn complete_first_run(app: AppHandle) -> Result<(), String> {
     fs::write(marker_path(&app)?, b"").map_err(|e| e.to_string())

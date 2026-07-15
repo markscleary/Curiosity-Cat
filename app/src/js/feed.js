@@ -4,13 +4,19 @@
 // event, Meow-spec three-sentence blocks laid out as distinct lines for
 // denied events, tray icon state (app/src-tauri/src/tray.rs) driven off
 // what just arrived via the tray-state.js state machine, and the approval
-// gate's native dialog opened for any pending held event.
+// gate's native dialog opened for any pending held event. Also polls the
+// Guard Board's estate (curiosity_cat/discover.py, via CCAT.estate()) on a
+// slower interval, since this hidden window is the app's one always-on
+// background webview and so the natural place to keep the tray floored at
+// hackles while any target is unguarded (Assignment Model (f)) — see
+// tray-state.js's boardUnguarded floor.
 (function () {
   'use strict';
 
   var WATCHER_ORIGIN = 'http://127.0.0.1:8377';
   var POLL_MS = 1500;
   var IDLE_RESET_MS = 8000;
+  var BOARD_POLL_MS = 5000;
 
   var statusEl = document.getElementById('status');
   var listEl = document.getElementById('feed-list');
@@ -22,6 +28,15 @@
   // (and the feed's --pitch glow) hot across multiple 1.5s polls, not
   // just within a single one — see tray-state.js's DECAY.
   var trayHeat = 0;
+  // The Guard Board's worst_state, refreshed every BOARD_POLL_MS. Starts
+  // false (not yet known) rather than true, so a slow first estate() call
+  // never flashes a false alarm before it resolves.
+  var boardUnguarded = false;
+
+  function setTray(state, pitch) {
+    document.documentElement.style.setProperty('--pitch', pitch.toFixed(3));
+    window.CCAT.setTrayState(state).catch(function () {});
+  }
 
   function verdictClass(entry) {
     if (entry.kind === 'hold') {
@@ -70,17 +85,34 @@
   function driveTrayState(newEntries) {
     if (!newEntries.length) return;
 
-    var result = window.CCatTrayState.advance(trayHeat, newEntries);
+    var result = window.CCatTrayState.advance(trayHeat, newEntries, boardUnguarded);
     trayHeat = result.heat;
-    document.documentElement.style.setProperty('--pitch', result.pitch.toFixed(3));
-    window.CCAT.setTrayState(result.state).catch(function () {});
+    setTray(result.state, result.pitch);
 
     if (idleTimer) clearTimeout(idleTimer);
     idleTimer = setTimeout(function () {
       trayHeat = 0;
-      document.documentElement.style.setProperty('--pitch', '0');
-      window.CCAT.setTrayState('asleep').catch(function () {});
+      var idle = window.CCatTrayState.advance(0, [], boardUnguarded);
+      setTray(idle.state, idle.pitch);
     }, IDLE_RESET_MS);
+  }
+
+  function pollBoardState() {
+    window.CCAT.estate()
+      .then(function (inventory) {
+        var nextUnguarded = inventory.worst_state !== 'guarded';
+        if (nextUnguarded === boardUnguarded) return;
+        boardUnguarded = nextUnguarded;
+        // Re-apply the floor at the current heat immediately, rather than
+        // waiting for the next Watcher event, so applying/undoing a profile
+        // on the Guard Board is reflected on the tray right away.
+        var result = window.CCatTrayState.advance(trayHeat, [], boardUnguarded);
+        setTray(result.state, result.pitch);
+      })
+      .catch(function () {
+        // Estate read failed (engine not up yet, etc.) — leave the last
+        // known boardUnguarded alone rather than guessing either way.
+      });
   }
 
   function openApprovalDialogsFor(newEntries) {
@@ -130,4 +162,6 @@
 
   poll();
   setInterval(poll, POLL_MS);
+  pollBoardState();
+  setInterval(pollBoardState, BOARD_POLL_MS);
 })();

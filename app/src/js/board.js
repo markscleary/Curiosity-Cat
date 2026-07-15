@@ -14,6 +14,7 @@
   'use strict';
 
   var estateStatus = document.getElementById('estate-status');
+  var worstStateBanner = document.getElementById('worst-state-banner');
   var targetListEl = document.getElementById('target-list');
   var levelPicker = document.getElementById('fleet-level');
   var protectBtn = document.getElementById('protect-fleet-btn');
@@ -28,7 +29,21 @@
   var confirmYesBtn = document.getElementById('confirm-yes-btn');
   var confirmNoBtn = document.getElementById('confirm-no-btn');
 
+  var detailOverlay = document.getElementById('detail-overlay');
+  var detailTitle = document.getElementById('detail-title');
+  var detailStatus = document.getElementById('detail-status');
+  var detailFromWhat = document.getElementById('detail-from-what');
+  var detailCloseBtn = document.getElementById('detail-close-btn');
+
   var lastInventory = null;
+
+  // discover.Target.kind -> a short label for the row's kind badge.
+  var KIND_LABELS = {
+    'claude-code-project': 'Project',
+    'claude-code-global': 'Global',
+    'agent-process': 'Agent',
+    'mcp-server': 'MCP Server',
+  };
 
   // Mirrors curiosity_cat.discover.format_protection() — the same
   // what/from-what/since-when sentence, rendered here instead of read back
@@ -41,6 +56,20 @@
     var since = protection.applied_at ? ' since ' + protection.applied_at : ' (apply date unknown)';
     var proof = protection.proof_date ? ', last proved ' + protection.proof_date : ', never proved';
     return 'GUARDED — ' + (protection.level || 'unknown-level') + ' profile applied' + since + proof;
+  }
+
+  // Assignment Model (e): what/from-what/since-when must always be
+  // answerable, in plain colour-coded state — three buckets, never a bare
+  // "protected". A guarded-but-never-proved target reads as a distinct
+  // amber state rather than green, since Assignment Model (d)/(e) treat an
+  // un-proved apply as an honest but incomplete claim.
+  function stateClass(protection) {
+    if (!protection || protection.status !== 'guarded') return 'state-unguarded';
+    return protection.proof_date ? 'state-guarded' : 'state-guarded-unproven';
+  }
+
+  function statePillText(protection) {
+    return protection && protection.status === 'guarded' ? 'GUARDED' : 'UNGUARDED';
   }
 
   // The two discovered target kinds Fleet mode can actually act on — same
@@ -61,32 +90,136 @@
     return out;
   }
 
+  // Assignment Model (a)/(e): what a drill-down honestly says a target is
+  // protected from. For an unguarded target there is nothing to describe —
+  // just the same honest sentence the row itself shows. For a guarded one,
+  // read back the compiled profile's own PROFILE.md (build_profile_md() in
+  // curiosity_cat/core.py) rather than re-deriving a wall list here: that
+  // file is written at compile time from the same policy the applied
+  // settings.json was compiled from, in C-Cat's own voice, so this reuses
+  // the engine's honesty layer instead of risking it drifting out of sync.
+  function showTargetDetail(target) {
+    var protection = target.protection;
+    detailTitle.textContent = target.label;
+    detailStatus.textContent = formatProtection(protection);
+    detailFromWhat.innerHTML = '';
+
+    if (!protection || protection.status !== 'guarded' || !protection.profile_dir) {
+      detailOverlay.hidden = false;
+      return;
+    }
+
+    var pre = document.createElement('pre');
+    pre.className = 'profile-md';
+    pre.textContent = 'Loading what this profile protects against…';
+    detailFromWhat.appendChild(pre);
+    detailOverlay.hidden = false;
+
+    var profileMdPath = protection.profile_dir.replace(/\/+$/, '') + '/PROFILE.md';
+    window.CCAT.readTextFile(profileMdPath)
+      .then(function (text) {
+        pre.textContent = text;
+      })
+      .catch(function (err) {
+        pre.textContent = 'Could not read this profile\'s PROFILE.md: ' + err;
+      });
+  }
+
+  function hideTargetDetail() {
+    detailOverlay.hidden = true;
+  }
+
+  detailCloseBtn.addEventListener('click', hideTargetDetail);
+  detailOverlay.addEventListener('click', function (ev) {
+    if (ev.target === detailOverlay) hideTargetDetail();
+  });
+
   function renderTargetList(inventory) {
     targetListEl.innerHTML = '';
     var targets = inventory.targets || [];
     if (!targets.length) {
       var empty = document.createElement('li');
       empty.className = 'feed-empty';
-      empty.textContent = 'No protectable surfaces found yet.';
+      empty.textContent = 'No protectable surfaces found yet — nothing here to guard, honestly.';
       targetListEl.appendChild(empty);
       return;
     }
     targets.forEach(function (t) {
       var li = document.createElement('li');
-      li.textContent = t.label + ' — ' + formatProtection(t.protection);
+      li.className = 'target-row';
+      li.tabIndex = 0;
+      li.setAttribute('role', 'button');
+      li.setAttribute('aria-label', t.label + ' — ' + formatProtection(t.protection));
+
+      var kind = document.createElement('span');
+      kind.className = 'target-kind';
+      kind.textContent = KIND_LABELS[t.kind] || t.kind;
+
+      var name = document.createElement('span');
+      name.className = 'target-name';
+      name.textContent = t.label;
+
+      var pill = document.createElement('span');
+      pill.className = 'target-pill ' + stateClass(t.protection);
+      pill.textContent = statePillText(t.protection);
+
+      var level = document.createElement('span');
+      level.className = 'target-level';
+      level.textContent = (t.protection && t.protection.level) || '—';
+
+      var proof = document.createElement('span');
+      proof.className = 'target-proof';
+      proof.textContent = t.protection && t.protection.proof_date
+        ? 'proved ' + t.protection.proof_date
+        : 'never proved';
+
+      li.appendChild(kind);
+      li.appendChild(name);
+      li.appendChild(pill);
+      li.appendChild(level);
+      li.appendChild(proof);
+
+      li.addEventListener('click', function () { showTargetDetail(t); });
+      li.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          showTargetDetail(t);
+        }
+      });
+
       targetListEl.appendChild(li);
     });
+  }
+
+  function renderWorstStateBanner(inventory) {
+    var worst = inventory.worst_state;
+    worstStateBanner.hidden = false;
+    if (worst === 'guarded') {
+      worstStateBanner.textContent = 'Worst state on the board: GUARDED — every discovered target has an applied profile.';
+      worstStateBanner.className = 'worst-state-banner state-guarded';
+    } else {
+      worstStateBanner.textContent = 'Worst state on the board: UNGUARDED — at least one discovered target has no applied profile.';
+      worstStateBanner.className = 'worst-state-banner state-unguarded';
+    }
   }
 
   function loadEstate() {
     return window.CCAT.estate()
       .then(function (inventory) {
         lastInventory = inventory;
-        estateStatus.textContent = (inventory.targets || []).length + ' target(s) found, discovered ' +
-          inventory.discovered_at + '.';
+        var targets = inventory.targets || [];
+        estateStatus.textContent = targets.length
+          ? targets.length + ' target(s) found, discovered ' + inventory.discovered_at + '.'
+          : 'Discovery ran on ' + inventory.discovered_at + ' and found nothing yet to protect.';
         renderTargetList(inventory);
+        if (targets.length) {
+          renderWorstStateBanner(inventory);
+        } else {
+          worstStateBanner.hidden = true;
+        }
       })
       .catch(function (err) {
+        worstStateBanner.hidden = true;
         estateStatus.textContent = 'Could not load the estate: ' + err;
       });
   }

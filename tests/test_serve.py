@@ -9,7 +9,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from curiosity_cat import core, serve
+from curiosity_cat import core, discover, serve
 
 
 def test_status_round_trip():
@@ -205,6 +205,9 @@ def test_estate_round_trip_lists_discovered_targets(tmp_path, monkeypatch):
     assert "error" not in response, response.get("error")
     labels = [t["label"] for t in response["result"]["targets"]]
     assert str(project) in labels
+    # worst_state is a property on Inventory, not a dataclass field — the app's
+    # tray icon (Assignment Model (f)) reads it, so it must survive the wire.
+    assert response["result"]["worst_state"] == discover.UNGUARDED
 
 
 def test_check_round_trip(monkeypatch):

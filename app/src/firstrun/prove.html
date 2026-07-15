@@ -85,9 +85,13 @@
         }, Promise.resolve());
       }
 
+      // The Guard Board is the app's landing view (APP-G1) — first run
+      // hands off to it rather than the Slider, so the very first thing the
+      // operator sees afterwards is the honest what/from-what/since-when
+      // state of everything just discovered, not another action screen.
       function finishFirstRun() {
         return window.CCAT.completeFirstRun()
-          .then(function () { return window.CCAT.openWindow('slider', 'slider.html'); })
+          .then(function () { return window.CCAT.openWindow('board', 'board.html'); })
           .then(function () { return window.__TAURI__.window.getCurrentWindow().close(); });
       }
 

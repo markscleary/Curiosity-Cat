@@ -7,6 +7,14 @@
   --bg: #fffaf3;
   --card: #ffffff;
   --border: #ecdfcb;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --green-ink: #166534;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --red-ink: #991b1b;
+  --amber-bg: #fef3c7;
+  --amber-ink: #92400e;
   /* Feed urgency, 0..1 — set live by feed.js from tray-state.js's heat
      score. Rises as events land closer to the fence line (more/closer
      denials), eases back down once things go quiet. */
@@ -210,6 +218,72 @@ button.secondary {
   border: 1px solid var(--border);
   font-size: 0.85rem;
 }
+
+/* Guard Board rows — one target per row, colour-coded, one click to drill
+   into what/from-what/since-when (docs/app/APP_SPEC.md Assignment Model
+   (e)). Extends the plain .target-list li above with a clickable grid of
+   kind/name/state/level/proof-date cells. */
+.target-list li.target-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.target-list li.target-row:hover,
+.target-list li.target-row:focus-visible {
+  border-color: var(--amber-dark);
+  outline: none;
+}
+
+.target-kind {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  min-width: 5.5em;
+}
+
+.target-name {
+  flex: 1 1 auto;
+  min-width: 10em;
+  word-break: break-all;
+}
+
+.target-level,
+.target-proof {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.target-pill {
+  flex: 0 0 auto;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.target-pill.state-guarded { background: var(--green-bg); color: var(--green-ink); }
+.target-pill.state-guarded-unproven { background: var(--amber-bg); color: var(--amber-ink); }
+.target-pill.state-unguarded { background: var(--red-bg); color: var(--red-ink); }
+
+.worst-state-banner {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.worst-state-banner.state-guarded { background: var(--green-bg); color: var(--green-ink); }
+.worst-state-banner.state-unguarded { background: var(--red-bg); color: var(--red-ink); }
 
 .modal-overlay {
   position: fixed;

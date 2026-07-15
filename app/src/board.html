@@ -9,10 +9,12 @@
   <h1>🐾 Guard Board</h1>
   <p class="subtitle">
     Every target this machine can protect, and its honest state — what's guarded, from what, since when.
+    Click any row for the full answer.
   </p>
 
   <div class="card" id="estate-card">
     <p class="status-line" id="estate-status">Loading estate…</p>
+    <p class="worst-state-banner" id="worst-state-banner" hidden></p>
     <ul class="target-list" id="target-list"></ul>
   </div>
 
@@ -34,6 +36,17 @@
     </div>
     <p class="status-line" id="fleet-status"></p>
     <ul class="trial-list" id="fleet-results" hidden></ul>
+  </div>
+
+  <div class="modal-overlay" id="detail-overlay" hidden>
+    <div class="modal card">
+      <h2 id="detail-title">Target</h2>
+      <p class="status-line" id="detail-status"></p>
+      <div id="detail-from-what"></div>
+      <div class="actions">
+        <button id="detail-close-btn" class="secondary">Close</button>
+      </div>
+    </div>
   </div>
 
   <div class="modal-overlay" id="confirm-overlay" hidden>

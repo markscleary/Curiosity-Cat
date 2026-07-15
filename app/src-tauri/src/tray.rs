@@ -43,12 +43,15 @@ pub fn build(app: &App) -> tauri::Result<()> {
     let icons = load_icons();
     let asleep = icons.0.get(STATE_ASLEEP).expect("asleep icon loaded").clone();
 
+    // Guard Board leads the menu — it's the app's landing view (APP-G1):
+    // opening the app should answer what/from-what/since-when before
+    // anything else, not default to the Slider.
+    let open_board = MenuItem::with_id(app, "open_board", "Guard Board", true, None::<&str>)?;
     let open_slider = MenuItem::with_id(app, "open_slider", "Open Slider", true, None::<&str>)?;
     let open_feed = MenuItem::with_id(app, "open_feed", "Feed", true, None::<&str>)?;
-    let open_board = MenuItem::with_id(app, "open_board", "Guard Board", true, None::<&str>)?;
     let open_purr = MenuItem::with_id(app, "open_purr", "This Week's Purr", true, None::<&str>)?;
     let quit = PredefinedMenuItem::quit(app, Some("Quit"))?;
-    let menu = Menu::with_items(app, &[&open_slider, &open_feed, &open_board, &open_purr, &quit])?;
+    let menu = Menu::with_items(app, &[&open_board, &open_slider, &open_feed, &open_purr, &quit])?;
 
     let _tray = TrayIconBuilder::with_id("main")
         .icon(asleep)

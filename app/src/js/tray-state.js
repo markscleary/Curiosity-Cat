@@ -1,9 +1,11 @@
-// Curiosity Cat — tray icon state machine (APP-B1). Pure decision logic,
-// no DOM and no Tauri: given a batch of new Watcher events, folds them
-// onto a running "heat" score and picks the tray glyph
+// Curiosity Cat — tray icon state machine (APP-B1, floor added APP-G1).
+// Pure decision logic, no DOM and no Tauri: given a batch of new Watcher
+// events, folds them onto a running "heat" score and picks the tray glyph
 // (asleep/ears-up/hackles/mouse, tray.rs's STATE_* constants) plus a 0..1
-// pitch the Feed can use to intensify its own colouring. Kept apart from
-// feed.js so this can run under plain Node (tests/js/test_tray_state.js)
+// pitch the Feed can use to intensify its own colouring. Also takes the
+// Guard Board's worst_state as a floor (Assignment Model (f)) so the tray
+// never reads calmer than hackles while any target is unguarded. Kept apart
+// from feed.js so this can run under plain Node (tests/js/test_tray_state.js)
 // without a browser or webview.
 (function (global) {
   'use strict';
@@ -38,6 +40,16 @@
   var THRESHOLD_HACKLES = 1.5;
   var THRESHOLD_EARS_UP = 0.5;
 
+  // Severity order for the Guard Board floor below — an unguarded estate
+  // (docs/app/APP_SPEC.md Assignment Model (f): "the tray icon reflects the
+  // worst protection state across all targets") is never allowed to read as
+  // calmer than hackles, no matter how quiet Watcher activity has been.
+  var SEVERITY = {};
+  SEVERITY[STATE_ASLEEP] = 0;
+  SEVERITY[STATE_EARS_UP] = 1;
+  SEVERITY[STATE_HACKLES] = 2;
+  SEVERITY[STATE_MOUSE] = 3;
+
   /**
    * The tray state a single event entry (the Watcher listener's /events
    * shape: {kind, status, event: {verdict, threat_class, ...}}) maps to
@@ -70,14 +82,26 @@
    * `pitch` is heat normalised to 0..1 against the mouse threshold, for
    * the Feed to use as a continuous intensity signal (e.g. a CSS custom
    * property) alongside the discrete glyph.
+   *
+   * `boardUnguarded` (optional, default false) is the Guard Board's own
+   * worst_state — true if any discovered target is UNGUARDED, or there are
+   * no targets at all (discover.Inventory.worst_state). When true, the
+   * returned state is floored at hackles: activity alone is never allowed
+   * to read as calmer than that while the estate itself is unprotected. A
+   * real mouse/hackles-grade activity state is never demoted by this floor
+   * — only asleep/ears-up get raised.
    */
-  function advance(heat, entries) {
+  function advance(heat, entries, boardUnguarded) {
     var current = heat || 0;
     entries.forEach(function (entry) {
       current = current * DECAY + (WEIGHT[stateForEntry(entry)] || 0);
     });
+    var state = stateForHeat(current);
+    if (boardUnguarded && SEVERITY[state] < SEVERITY[STATE_HACKLES]) {
+      state = STATE_HACKLES;
+    }
     return {
-      state: stateForHeat(current),
+      state: state,
       heat: current,
       pitch: Math.max(0, Math.min(1, current / THRESHOLD_MOUSE)),
     };

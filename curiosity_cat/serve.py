@@ -81,7 +81,12 @@ def _handle_fleet_undo(params):
 
 def _handle_estate(params):
     inventory = discover.build_inventory(roots=params.get("roots"))
-    return dataclasses.asdict(inventory)
+    # dataclasses.asdict() only serialises fields, not @property — worst_state
+    # is a property (see discover.Inventory), so it has to be added explicitly
+    # or the app's tray icon (Assignment Model (f)) would have nothing to read.
+    result = dataclasses.asdict(inventory)
+    result["worst_state"] = inventory.worst_state
+    return result
 
 
 def _handle_check(params):
