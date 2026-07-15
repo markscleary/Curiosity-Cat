@@ -91,13 +91,19 @@ class _EventLog:
         self._next_id = 1
         self._entries = collections.deque(maxlen=maxlen)
 
-    def add(self, event, text, kind="event", status=None):
+    def add(self, event, text, kind="event", status=None, lines=None):
         with self._lock:
             entry = {
                 "id": self._next_id,
                 "received_at": datetime.now(timezone.utc).isoformat(),
                 "event": event,
                 "meow": text,
+                # One string, or three for a denied block — see
+                # meow.format_event_lines. Additive to "meow" (the joined
+                # text), so the Feed can lay a block out as distinct lines
+                # ("what tried / why no / what to do") without the app
+                # reimplementing meow.py's wording itself.
+                "meow_lines": lines if lines is not None else [text],
                 "kind": kind,
                 "status": status,
             }
@@ -273,7 +279,9 @@ class WatcherHandler(BaseHTTPRequestHandler):
         text = meow.format_event(event)
         print(text)
         sys.stdout.flush()
-        self._event_log().add(event, text, kind="event", status=event.get("verdict"))
+        self._event_log().add(
+            event, text, kind="event", status=event.get("verdict"), lines=meow.format_event_lines(event)
+        )
         _append_event_history(self.server.profile_dir, event)
 
         if _should_queue(event):

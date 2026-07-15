@@ -5,11 +5,31 @@ APP-3 (see `../docs/app/APP_SPEC.md`, Shell section) built the tray icon
 state machine, the Slider window, and the first-run journey, plus a
 read-only Feed stub. APP-4 made the Feed live, enforced the Meow spec
 app-wide, and wired the approval gate. APP-5 added share-card export and
-the weekly Purr. APP-6 (this brief) built the PyInstaller sidecar, an
-unsigned release build (.app + DMG), the Homebrew cask draft, and the
-updater config — everything distribution-shaped short of Apple
-credentials. Signing and notarisation are the one remaining step, blocked
-on Mark having an Apple Developer ID (`docs/app/SIGNING.md`).
+the weekly Purr. APP-6 built the PyInstaller sidecar, an unsigned release
+build (.app + DMG), the Homebrew cask draft, and the updater config —
+everything distribution-shaped short of Apple credentials. Signing and
+notarisation are the one remaining step, blocked on Mark having an Apple
+Developer ID (`docs/app/SIGNING.md`). APP-B1 polished the Feed and gave
+the tray icon a real state machine (see below).
+
+## What APP-B1 added
+
+- **A real tray state machine** (`js/tray-state.js`): a pure, DOM-free
+  module — testable under plain Node (`tests/js/test_tray_state.js`, `node
+  --test tests/js`) — that folds each poll's new Watcher events onto a
+  decaying "heat" score and picks the tray glyph
+  (`asleep`/`ears-up`/`hackles`/`mouse`) plus a 0..1 `pitch`. A burst of
+  close calls compounds (pitch/urgency rises "as events approach the fence
+  line"); one stray allowed event right after doesn't instantly cool the
+  tray back down. `feed.js` sets `--pitch` as a CSS custom property each
+  poll, so the Feed card itself glows hotter red the closer things get to
+  the fence, not just the tray glyph.
+- **A more readable Feed**: the Watcher listener's `/events` response now
+  carries `meow_lines` alongside `meow` (`meow.format_event_lines`,
+  additive — never a second source of truth for the wording, still
+  `meow.py` only) so a denied block's three sentences (what tried / why no
+  / what to do) render as three separate paragraphs instead of one dense
+  run-on line.
 
 ## What APP-4 added
 
@@ -101,7 +121,8 @@ app/
     js/
       adventure-slider.js       ported slider drag/click/keyboard behaviour
       sidecar-client.js          thin wrapper over the sidecar_call Tauri command
-      feed.js                     polls the Watcher listener, drives tray state (APP-4)
+      feed.js                     polls the Watcher listener, drives tray state (APP-4/APP-B1)
+      tray-state.js                 pure tray state machine, node-testable (APP-B1)
       approval.js                  the approval dialog's Allow/Deny logic (APP-4)
       purr.js                       fetches This Week's Purr once (APP-5)
 ```

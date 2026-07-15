@@ -224,6 +224,26 @@ def test_get_events_returns_recent_events_and_supports_since(running_listener):
     assert entries_since == []
 
 
+def test_get_events_includes_meow_lines_split_for_denied_blocks(running_listener):
+    server, _profile = running_listener
+    allowed = {
+        "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Read",
+        "input_digest": "abc12345:{}", "verdict": "allowed", "profile_id": "housecat",
+    }
+    denied = {
+        "ts": "2026-07-10T00:00:00+00:00", "session": "s1", "tool": "Bash",
+        "input_digest": "abc12345:{}", "verdict": "denied", "threat_class": "unauthorized-tool-use",
+        "profile_id": "housecat",
+    }
+    _post(server, "/event", allowed)
+    _post(server, "/event", denied)
+    status, entries = _get(server, "/events")
+    assert status == 200
+    assert entries[0]["meow_lines"] == [entries[0]["meow"]]
+    assert len(entries[1]["meow_lines"]) == 3
+    assert " ".join(entries[1]["meow_lines"]) == entries[1]["meow"]
+
+
 def test_hold_resolves_to_allow_when_decision_posted(running_listener):
     server, _profile = running_listener
     event = {

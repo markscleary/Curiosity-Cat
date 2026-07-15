@@ -88,3 +88,15 @@ def format_event(event):
     if event.get("verdict") == "denied":
         return block(event)
     return line(event)
+
+
+def format_event_lines(event):
+    """Same rendering contract as format_event, but as a list of strings
+    (one, or three for a denied block) rather than pre-joined text — for a
+    surface like the app Feed that wants to lay a block's three sentences
+    out as distinct lines instead of one run-on paragraph, without
+    reimplementing the Meow-voice wording itself.
+    """
+    if event.get("verdict") == "denied":
+        return block_sentences(event)
+    return [line(event)]

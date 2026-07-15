@@ -73,6 +73,19 @@ def test_format_event_renders_allowed_and_held_as_line():
     assert meow.format_event(held) == meow.line(held)
 
 
+def test_format_event_lines_returns_three_for_denied():
+    event = {"tool": "Bash", "verdict": "denied", "threat_class": "unsafe-url"}
+    assert meow.format_event_lines(event) == meow.block_sentences(event)
+    assert len(meow.format_event_lines(event)) == 3
+
+
+def test_format_event_lines_returns_one_for_allowed_and_held():
+    allowed = {"tool": "Read", "verdict": "allowed"}
+    held = {"tool": "Bash", "verdict": "held"}
+    assert meow.format_event_lines(allowed) == [meow.line(allowed)]
+    assert meow.format_event_lines(held) == [meow.line(held)]
+
+
 def test_never_leaks_input_digest_or_raw_payload():
     event = {
         "tool": "Bash", "verdict": "denied", "threat_class": "credential-exposure",

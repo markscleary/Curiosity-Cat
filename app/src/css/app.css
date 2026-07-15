@@ -7,6 +7,10 @@
   --bg: #fffaf3;
   --card: #ffffff;
   --border: #ecdfcb;
+  /* Feed urgency, 0..1 — set live by feed.js from tray-state.js's heat
+     score. Rises as events land closer to the fence line (more/closer
+     denials), eases back down once things go quiet. */
+  --pitch: 0;
 }
 
 * {
@@ -36,6 +40,8 @@ h1, h2, h3 {
   border-radius: 10px;
   padding: 1.25rem;
   margin-bottom: 1rem;
+  transition: box-shadow 0.4s ease;
+  box-shadow: 0 0 calc(var(--pitch) * 16px) rgba(220, 38, 38, calc(var(--pitch) * 0.55));
 }
 
 button {
@@ -146,8 +152,12 @@ button.secondary {
   font-size: 0.88rem;
 }
 
-.feed-item .meow {
-  white-space: pre-wrap;
+.feed-item .meow p {
+  margin: 0 0 0.35em;
+}
+
+.feed-item .meow p:last-child {
+  margin-bottom: 0;
 }
 
 .feed-item .meta {

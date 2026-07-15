@@ -1,9 +1,10 @@
 // Curiosity Cat — the Feed (the Bell). Polls the Watcher listener
 // (curiosity_cat/listen.py, spawned by the shell as its own process — see
 // app/src-tauri/src/watcher.rs) directly over HTTP: one human sentence per
-// event, Meow-spec three-sentence blocks for denied events, tray icon
-// state driven off what just arrived, and the approval gate's native
-// dialog opened for any pending held event.
+// event, Meow-spec three-sentence blocks laid out as distinct lines for
+// denied events, tray icon state (app/src-tauri/src/tray.rs) driven off
+// what just arrived via the tray-state.js state machine, and the approval
+// gate's native dialog opened for any pending held event.
 (function () {
   'use strict';
 
@@ -17,6 +18,10 @@
   var lastSeenMaxId = 0;
   var openApprovalIds = {};
   var idleTimer = null;
+  // Carries over between polls so a burst of close calls keeps the tray
+  // (and the feed's --pitch glow) hot across multiple 1.5s polls, not
+  // just within a single one — see tray-state.js's DECAY.
+  var trayHeat = 0;
 
   function verdictClass(entry) {
     if (entry.kind === 'hold') {
@@ -40,42 +45,40 @@
     entries.slice().reverse().forEach(function (entry) {
       var div = document.createElement('div');
       div.className = 'feed-item ' + verdictClass(entry);
-      var meta = '#' + entry.id + ' · ' + (entry.status || (entry.event || {}).verdict || '?') + ' · ' + entry.received_at;
-      div.innerHTML = '<div class="meow">' + escapeHtml(entry.meow) + '</div>' +
-        '<div class="meta">' + escapeHtml(meta) + '</div>';
+
+      var meowDiv = document.createElement('div');
+      meowDiv.className = 'meow';
+      // A denied block is three sentences (what tried / why no / what to
+      // do) — one paragraph each, so it reads as a short explanation
+      // rather than a single dense log line.
+      (entry.meow_lines || [entry.meow]).forEach(function (sentence) {
+        var p = document.createElement('p');
+        p.textContent = sentence;
+        meowDiv.appendChild(p);
+      });
+
+      var metaDiv = document.createElement('div');
+      metaDiv.className = 'meta';
+      metaDiv.textContent = '#' + entry.id + ' · ' + (entry.status || (entry.event || {}).verdict || '?') + ' · ' + entry.received_at;
+
+      div.appendChild(meowDiv);
+      div.appendChild(metaDiv);
       listEl.appendChild(div);
     });
-  }
-
-  function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text == null ? '' : String(text);
-    return div.innerHTML;
   }
 
   function driveTrayState(newEntries) {
     if (!newEntries.length) return;
 
-    var state = null; // priority: mouse > hackles > ears-up
-    newEntries.forEach(function (entry) {
-      var event = entry.event || {};
-      var candidate = null;
-      if (entry.kind === 'hold' && entry.status === 'pending') {
-        candidate = 'ears-up';
-      } else if (event.verdict === 'denied') {
-        candidate = event.threat_class ? 'mouse' : 'hackles';
-      } else {
-        candidate = 'ears-up';
-      }
-      var rank = { 'mouse': 3, 'hackles': 2, 'ears-up': 1 };
-      if (!state || rank[candidate] > rank[state]) state = candidate;
-    });
-
-    if (!state) return;
-    window.CCAT.setTrayState(state).catch(function () {});
+    var result = window.CCatTrayState.advance(trayHeat, newEntries);
+    trayHeat = result.heat;
+    document.documentElement.style.setProperty('--pitch', result.pitch.toFixed(3));
+    window.CCAT.setTrayState(result.state).catch(function () {});
 
     if (idleTimer) clearTimeout(idleTimer);
     idleTimer = setTimeout(function () {
+      trayHeat = 0;
+      document.documentElement.style.setProperty('--pitch', '0');
       window.CCAT.setTrayState('asleep').catch(function () {});
     }, IDLE_RESET_MS);
   }
