@@ -8,7 +8,7 @@
 </head>
 <body>
   <h1>🐱 Curiosity Cat</h1>
-  <p class="subtitle">Pick how far this agent gets to roam.</p>
+  <p class="subtitle">Pick how far this agent gets to roam — the fence line below moves as you drag.</p>
 
   <div class="card">
     <div class="adventure-slider">
@@ -29,6 +29,9 @@
       <div class="slider-desc"></div>
     </div>
 
+    <p class="status-line">This is what this level's fence looks like — inside is where the cat is free to roam, outside is where it can't go. Nothing here is real yet: compiling only writes a profile file, it doesn't guard anything until it's applied to a target.</p>
+    <div class="territory-diagram" id="territory-diagram"></div>
+
     <div class="actions">
       <button id="compile-btn">Compile</button>
       <span class="status-line" id="status"></span>
@@ -36,12 +39,20 @@
   </div>
 
   <div class="card" id="profile-card" hidden>
-    <h2>PROFILE.md</h2>
-    <div class="profile-md" id="profile-md"></div>
+    <p class="status-line" id="not-applied-note">
+      Compiled, not applied — this profile protects nothing until it's assigned to a target from the Guard Board.
+    </p>
+    <h2>What can this cat do?</h2>
+    <div class="whatcan-panel" id="whatcan-panel"></div>
+    <details>
+      <summary>Raw PROFILE.md</summary>
+      <div class="profile-md" id="profile-md"></div>
+    </details>
   </div>
 
   <script src="js/skins.js"></script>
   <script src="js/adventure-slider.js"></script>
+  <script src="js/territory-map.js"></script>
   <script src="js/sidecar-client.js"></script>
   <script src="js/slider-page.js"></script>
 </body>

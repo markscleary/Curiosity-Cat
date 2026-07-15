@@ -31,8 +31,10 @@
 
   var detailOverlay = document.getElementById('detail-overlay');
   var detailTitle = document.getElementById('detail-title');
-  var detailStatus = document.getElementById('detail-status');
-  var detailFromWhat = document.getElementById('detail-from-what');
+  var detailExplain = document.getElementById('detail-explain');
+  var detailTerritory = document.getElementById('detail-territory');
+  var detailWhatcanWrap = document.getElementById('detail-whatcan-wrap');
+  var detailWhatcan = document.getElementById('detail-whatcan');
   var detailCloseBtn = document.getElementById('detail-close-btn');
 
   var lastInventory = null;
@@ -92,36 +94,63 @@
 
   // Assignment Model (a)/(e): what a drill-down honestly says a target is
   // protected from. For an unguarded target there is nothing to describe —
-  // just the same honest sentence the row itself shows. For a guarded one,
-  // read back the compiled profile's own PROFILE.md (build_profile_md() in
-  // curiosity_cat/core.py) rather than re-deriving a wall list here: that
-  // file is written at compile time from the same policy the applied
-  // settings.json was compiled from, in C-Cat's own voice, so this reuses
-  // the engine's honesty layer instead of risking it drifting out of sync.
+  // just the same honest sentence the row itself shows, as an explain block
+  // whose "from what"/"since when" openly read "nothing" rather than being
+  // left blank. For a guarded one, read back the compiled profile's own
+  // PROFILE.md (build_profile_md() in curiosity_cat/core.py) rather than
+  // re-deriving a wall list here: that file is written at compile time from
+  // the same policy the applied settings.json was compiled from, in C-Cat's
+  // own voice, so this reuses the engine's honesty layer instead of risking
+  // it drifting out of sync. parseProfileMd() (territory-map.js) turns that
+  // same text into the territory diagram's fence and the What-can-do panel,
+  // so all three — explain block, diagram, panel — trace back to one file.
   function showTargetDetail(target) {
     var protection = target.protection;
     detailTitle.textContent = target.label;
-    detailStatus.textContent = formatProtection(protection);
-    detailFromWhat.innerHTML = '';
+    detailTerritory.hidden = true;
+    detailWhatcanWrap.hidden = true;
 
     if (!protection || protection.status !== 'guarded' || !protection.profile_dir) {
+      window.CCAT_renderExplainBlock(detailExplain, {
+        what: 'nothing — no profile applied to ' + target.label,
+        fromWhat: 'nothing — this target is unguarded',
+        sinceWhen: 'never applied'
+      });
       detailOverlay.hidden = false;
       return;
     }
 
-    var pre = document.createElement('pre');
-    pre.className = 'profile-md';
-    pre.textContent = 'Loading what this profile protects against…';
-    detailFromWhat.appendChild(pre);
+    window.CCAT_renderExplainBlock(detailExplain, {
+      what: (protection.level || 'unknown-level') + ' profile, applied to ' + target.label,
+      fromWhat: 'loading…',
+      sinceWhen: protection.applied_at || 'apply date unknown'
+    });
+    if (protection.level && window.CCatTerritory.TERRITORY_DATA[protection.level]) {
+      window.CCAT_renderTerritoryDiagram(detailTerritory, protection.level);
+      detailTerritory.hidden = false;
+    }
     detailOverlay.hidden = false;
 
     var profileMdPath = protection.profile_dir.replace(/\/+$/, '') + '/PROFILE.md';
     window.CCAT.readTextFile(profileMdPath)
       .then(function (text) {
-        pre.textContent = text;
+        window.CCAT_renderWhatCanDo(detailWhatcan, text);
+        detailWhatcanWrap.hidden = false;
+        var parsed = window.CCatTerritory.parseProfileMd(text);
+        var fromWhat = parsed.cannot.map(function (b) { return b.text; }).join(' ') || 'unknown';
+        window.CCAT_renderExplainBlock(detailExplain, {
+          what: (protection.level || 'unknown-level') + ' profile, applied to ' + target.label,
+          fromWhat: fromWhat,
+          sinceWhen: (protection.applied_at || 'apply date unknown') +
+            (protection.proof_date ? ', last proved ' + protection.proof_date : ', never proved')
+        });
       })
       .catch(function (err) {
-        pre.textContent = 'Could not read this profile\'s PROFILE.md: ' + err;
+        window.CCAT_renderExplainBlock(detailExplain, {
+          what: (protection.level || 'unknown-level') + ' profile, applied to ' + target.label,
+          fromWhat: 'could not read this profile\'s PROFILE.md: ' + err,
+          sinceWhen: protection.applied_at || 'apply date unknown'
+        });
       });
   }
 

@@ -383,3 +383,121 @@ select {
   overflow: auto;
   margin-bottom: 0;
 }
+
+/* Explanation layer (APP-T1) — territory diagram, the what/from-what/
+   since-when explain block, and the "What can this cat do?" panel. Shared
+   across the Slider, first-run, and the Guard Board's target detail. */
+.territory-diagram {
+  margin: 0.75rem 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.territory-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.explain-block {
+  margin: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.explain-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  background: #faf5ec;
+  border: 1px solid var(--border);
+}
+
+.explain-row dt {
+  flex: 0 0 6.5em;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--amber-dark);
+}
+
+.explain-row dd {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.whatcan-panel {
+  margin: 0.75rem 0;
+}
+
+.whatcan-summary {
+  font-style: italic;
+  color: var(--muted);
+  margin: 0 0 0.6rem;
+}
+
+.whatcan-heading {
+  font-size: 0.85rem;
+  margin: 0.9rem 0 0.35rem;
+}
+
+.whatcan-heading:first-of-type {
+  margin-top: 0;
+}
+
+.whatcan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.whatcan-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  background: #faf5ec;
+  border: 1px solid var(--border);
+}
+
+.whatcan-item-sub {
+  margin-left: 1.5rem;
+  background: transparent;
+  border-style: dashed;
+}
+
+.whatcan-item code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82em;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+}
+
+.whatcan-marker {
+  flex: 0 0 auto;
+  font-weight: 700;
+  width: 1.2em;
+  text-align: center;
+}
+
+.whatcan-can .whatcan-marker { color: var(--green); }
+.whatcan-cannot .whatcan-marker { color: var(--red); }
+.whatcan-ask .whatcan-marker { color: var(--amber-ink); }
+
+.whatcan-cannot { border-left: 3px solid var(--red); }
+.whatcan-ask { border-left: 3px solid var(--amber); }
+.whatcan-can { border-left: 3px solid var(--green); }

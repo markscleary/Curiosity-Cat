@@ -41,8 +41,12 @@
   <div class="modal-overlay" id="detail-overlay" hidden>
     <div class="modal card">
       <h2 id="detail-title">Target</h2>
-      <p class="status-line" id="detail-status"></p>
-      <div id="detail-from-what"></div>
+      <div id="detail-explain"></div>
+      <div class="territory-diagram" id="detail-territory" hidden></div>
+      <div id="detail-whatcan-wrap" hidden>
+        <h3>What can this cat do?</h3>
+        <div class="whatcan-panel" id="detail-whatcan"></div>
+      </div>
       <div class="actions">
         <button id="detail-close-btn" class="secondary">Close</button>
       </div>
@@ -61,6 +65,7 @@
     </div>
   </div>
 
+  <script src="js/territory-map.js"></script>
   <script src="js/sidecar-client.js"></script>
   <script src="js/board.js"></script>
 </body>

@@ -12,7 +12,51 @@ notarisation are the one remaining step, blocked on Mark having an Apple
 Developer ID (`docs/app/SIGNING.md`). APP-B1 polished the Feed and gave
 the tray icon a real state machine. APP-D1/APP-D2 added the Assignment
 Model and the apply verb. APP-F1 added Fleet mode. APP-G1 made the Guard
-Board the landing view. APP-S1 added the Settings window (see below).
+Board the landing view. APP-S1 added the Settings window. APP-T1 added the
+explanation layer — territory diagrams, explain blocks, and the What-can-do
+panel (see below).
+
+## What APP-T1 added
+
+The explanation layer: every surface that shows a protection claim now
+answers what/from what/since when in the same place, not just in prose.
+
+- **`js/territory-map.js`**: a pure, DOM-free core (node-testable,
+  `tests/js/test_territory_map.js`) with three parts. (1) `TERRITORY_DATA`,
+  a small deliberate mirror of `curiosity_cat/core.py`'s `LEVEL_POLICY`
+  abstract knobs (read/write scope, web allowlist or wide-open, ask-first
+  Bash commands) — the three adventure levels are fixed product decisions,
+  not user-configurable, so this mirror is kept in sync by hand, the same
+  justification `core.py` already gives for its own `WATCHER_HOST`/
+  `WATCHER_PORT` duplication. (2) `buildTerritorySvg(level)`, an original
+  inline `<svg>` — no external or copyrighted assets — drawing the fence
+  line: a dashed rect sized to that level's actual reach, the always-off-
+  limits band (credentials, SSH keys, sudo, `rm -rf`) that holds at every
+  level, allowed web domains as flags on marked trails outside the fence,
+  and an open edge instead of a fence line for Tiger's wide-open web. (3)
+  `parseProfileMd(text)` / `buildWhatCanDoHtml(parsed)`, which turn the
+  engine's own already-compiled `PROFILE.md` text (`build_profile_md()` in
+  `curiosity_cat/core.py`) into the "What can this cat do?" panel by
+  restructuring it, never rewording it — so that panel's wording can never
+  drift from the compiled product. `buildExplainBlockHtml()` renders the
+  what/from-what/since-when triplet Assignment Model (e) requires, with an
+  honest "unknown" for any field a caller doesn't supply rather than a
+  blank one.
+- **Wired in everywhere a level or a protection claim is shown**: the
+  Slider (`slider.html`/`js/slider-page.js`) shows the territory diagram
+  live as the handle moves, and the What-can-do panel once a profile is
+  compiled (behind the raw `PROFILE.md` text, now in a `<details>`); first
+  run's `choose.html` shows the same live diagram before the operator ever
+  commits to a level; `prove.html`'s Clean Bill card adds the explain
+  block, territory diagram, and What-can-do panel once a profile is
+  actually applied and proved; the Guard Board's target detail modal
+  (`board.js`'s `showTargetDetail`) replaced its raw `PROFILE.md` dump with
+  the same three pieces, deriving "from what" from the same parsed
+  `cannot` list for both guarded and (honestly) unguarded targets.
+- **Onboarding copy pass**: first run's `choose.html`/`compile.html`/
+  `prove.html` microcopy leans further into C-Cat voice (the fence, the
+  yard, "the cat actually lives" there) established by `curiosity_cat/
+  meow.py`, without changing any of the honesty-layer wording itself.
 
 ## What APP-S1 added
 
@@ -166,6 +210,8 @@ app/
       purr.js                       fetches This Week's Purr once (APP-5)
       settings.js                    consent/webhook/skin/unapply-all wiring (APP-S1)
       settings-store.js               settings.json shape + defaults, node-testable (APP-S1)
+      territory-map.js                  territory diagram SVG, PROFILE.md parser,
+                                        explain block — node-testable (APP-T1)
 ```
 
 ## Prerequisites

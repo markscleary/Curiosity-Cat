@@ -11,7 +11,7 @@
   </div>
 
   <h1>Assign this profile to a target</h1>
-  <p class="subtitle">A compiled profile protects nothing until it's applied somewhere real.</p>
+  <p class="subtitle">A compiled profile protects nothing until it's applied somewhere real — the fence only holds once it's built where the cat actually lives.</p>
 
   <div class="card" id="assign-card">
     <p class="status-line" id="assign-status">
@@ -27,14 +27,21 @@
 
   <div class="card" id="trials-card" hidden>
     <h2>Watching the escape attempts</h2>
+    <p class="status-line">Every trial below is this cat actually testing the fence — not a simulation. A "held" line is the fence winning.</p>
     <p class="status-line" id="status">Running trials…</p>
     <ul class="trial-list" id="trial-list"></ul>
   </div>
 
   <div class="card" id="cleanbill-card" hidden>
     <h2 id="cleanbill-heading">Clean Bill</h2>
-    <p class="status-line" id="protection-summary"></p>
-    <div class="profile-md" id="cleanbill-md"></div>
+    <div id="protection-explain"></div>
+    <div class="territory-diagram" id="cleanbill-territory"></div>
+    <h3>What can this cat do?</h3>
+    <div class="whatcan-panel" id="cleanbill-whatcan"></div>
+    <details>
+      <summary>Raw PROFILE.md</summary>
+      <div class="profile-md" id="cleanbill-md"></div>
+    </details>
     <p class="status-line" id="share-card-status"></p>
     <div class="actions">
       <button id="share-card-btn" class="secondary">Save share card</button>
@@ -42,6 +49,7 @@
     </div>
   </div>
 
+  <script src="../js/territory-map.js"></script>
   <script src="../js/sidecar-client.js"></script>
   <script>
     (function () {
@@ -57,7 +65,9 @@
       var trialListEl = document.getElementById('trial-list');
       var cleanbillCard = document.getElementById('cleanbill-card');
       var cleanbillHeading = document.getElementById('cleanbill-heading');
-      var protectionSummary = document.getElementById('protection-summary');
+      var protectionExplainEl = document.getElementById('protection-explain');
+      var cleanbillTerritoryEl = document.getElementById('cleanbill-territory');
+      var cleanbillWhatcanEl = document.getElementById('cleanbill-whatcan');
       var cleanbillMdEl = document.getElementById('cleanbill-md');
       var shareCardBtn = document.getElementById('share-card-btn');
       var shareCardStatus = document.getElementById('share-card-status');
@@ -147,10 +157,31 @@
               cleanbillHeading.textContent =
                 (cleanBill.passed ? '✅ Clean Bill — ' : '⚠️ Clean Bill (with findings) — ') + target;
               assignStatus.textContent = 'GUARDED — ' + level + ' profile applied to ' + target + '.';
-              protectionSummary.textContent = 'What is now protected: ' + target + ' (' + level + ' profile). ' +
-                'Since when: ' + (cleanBill.date || 'today') + '.';
-              return window.CCAT.readTextFile(cleanBill.clean_bill_md_path);
+              window.CCAT_renderTerritoryDiagram(cleanbillTerritoryEl, level);
+
+              var profileMdPath = profileDir.replace(/\/+$/, '') + '/PROFILE.md';
+              return window.CCAT.readTextFile(profileMdPath)
+                .then(function (profileMd) {
+                  window.CCAT_renderWhatCanDo(cleanbillWhatcanEl, profileMd);
+                  var parsed = window.CCatTerritory.parseProfileMd(profileMd);
+                  var fromWhat = parsed.cannot.map(function (b) { return b.text; }).join(' ') || 'unknown';
+                  window.CCAT_renderExplainBlock(protectionExplainEl, {
+                    what: level + ' profile, applied to ' + target,
+                    fromWhat: fromWhat,
+                    sinceWhen: cleanBill.date || 'today'
+                  });
+                })
+                .catch(function (err) {
+                  window.CCAT_renderWhatCanDo(cleanbillWhatcanEl, '');
+                  window.CCAT_renderExplainBlock(protectionExplainEl, {
+                    what: level + ' profile, applied to ' + target,
+                    sinceWhen: cleanBill.date || 'today'
+                  });
+                });
             });
+          })
+          .then(function () {
+            return window.CCAT.readTextFile(lastCleanBill.clean_bill_md_path);
           })
           .then(function (md) {
             cleanbillMdEl.textContent = md;

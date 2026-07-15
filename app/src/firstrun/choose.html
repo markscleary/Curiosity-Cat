@@ -12,7 +12,7 @@
   </div>
 
   <h1>🐱 Welcome to Curiosity Cat</h1>
-  <p class="subtitle">Every agent gets to choose how brave it's allowed to be. Start here.</p>
+  <p class="subtitle">Every cat gets a fence, not a leash. Drag the slider to see how far this one's allowed to roam before you commit to anything.</p>
 
   <div class="card">
     <div class="adventure-slider">
@@ -33,19 +33,26 @@
       <div class="slider-desc"></div>
     </div>
 
+    <p class="status-line">Inside the dashed line is where this cat can go. Outside is where the fence holds — every level, no exceptions, keeps credentials and destructive commands off the table.</p>
+    <div class="territory-diagram" id="territory-diagram"></div>
+
     <div class="actions">
-      <button id="continue-btn">Continue</button>
+      <button id="continue-btn">This one — compile it</button>
     </div>
   </div>
 
   <script src="../js/skins.js"></script>
   <script src="../js/adventure-slider.js"></script>
+  <script src="../js/territory-map.js"></script>
   <script>
     (function () {
       var level = window.CC_LEVELS[0];
+      var territoryDiagramEl = document.getElementById('territory-diagram');
       window.CCAT_initSlider(document.querySelector('.adventure-slider'), 0, function (_pos, chosen) {
         level = chosen;
+        window.CCAT_renderTerritoryDiagram(territoryDiagramEl, level);
       });
+      window.CCAT_renderTerritoryDiagram(territoryDiagramEl, level);
       document.getElementById('continue-btn').addEventListener('click', function () {
         sessionStorage.setItem('ccat_level', level);
         location.href = 'compile.html';
