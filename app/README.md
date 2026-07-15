@@ -108,6 +108,9 @@ app/
     icons/              app icon set (32/128/128@2x + icon.icns)
     tauri.conf.json
   src/                 static frontend, no bundler — served directly as frontendDist
+    board.html            the Guard Board — the estate list + whole-fleet
+                          protect/undo actions, the app's landing view
+                          (APP-G1, tray menu's "Guard Board")
     slider.html          the Slider window
     feed.html             the Feed — live Watcher stream, Meow blocks (APP-4)
     approval.html          the approval gate's Allow/Deny dialog (APP-4)
@@ -115,12 +118,14 @@ app/
     firstrun/
       choose.html          screen 1: pick housecat / alleycat / tiger
       compile.html          screen 2: compile via the sidecar
-      prove.html             screen 3: stream trials live, end on Clean Bill,
+      prove.html             screen 3: pick a discovered target, apply,
+                              stream trials live, end on Clean Bill,
                               export a share card (APP-5)
     css/adventure-slider.css   ported verbatim from site/css/adventure-slider.css
     js/
       adventure-slider.js       ported slider drag/click/keyboard behaviour
       sidecar-client.js          thin wrapper over the sidecar_call Tauri command
+      board.js                    Guard Board: estate list, fleet-wide protect/undo (APP-F1/APP-G1)
       feed.js                     polls the Watcher listener, drives tray state (APP-4/APP-B1)
       tray-state.js                 pure tray state machine, node-testable (APP-B1)
       approval.js                  the approval dialog's Allow/Deny logic (APP-4)
@@ -175,6 +180,27 @@ without a local Python install would have a working Slider/Feed but no
 live watcher. Packaging that as a second sidecar is follow-up work, not
 part of this brief.
 
+## Dev launch
+
+Build the sidecar once (see above — re-run it after changing
+`curiosity_cat/serve.py` or its dependencies), then:
+
+```sh
+cd app
+npx --yes @tauri-apps/cli@2 dev
+```
+
+This runs the same Rust shell — tray, sidecar, watcher, first-run routing —
+against `src/` directly. There's no `devUrl`/bundler step; `build.frontendDist`
+(`../src`) is the only frontend source for both dev and release builds, so
+`tauri dev` serves those static files as-is with no HMR — edit
+`src/**/*.html`/`*.js`, then reopen the window (tray menu, or quit/relaunch)
+to see the change. Rust changes under `src-tauri/` are picked up
+automatically: `tauri dev` recompiles and relaunches the app on save.
+`curiosity-cat` itself (the Watcher listener `watcher.rs` spawns) still
+needs to be on `PATH` for the Feed to go live — `pip install -e .` from the
+repo root, same as any other local run of the CLI.
+
 ## Building
 
 ```sh
@@ -217,5 +243,57 @@ Not done in this brief — blocked on Mark obtaining an Apple Developer ID
 On first launch (no `first-run-complete` marker in the app's data dir), the
 app opens straight to `firstrun/choose.html` instead of just sitting in the
 tray. `firstrun/prove.html`'s "Meet your cat" button marks first-run
-complete and opens the Slider window; from then on the tray icon is the
+complete and opens the Guard Board; from then on the tray icon is the
 only way in.
+
+## Where profiles live
+
+Two separate "home" directories exist — easy to conflate, since both hold a
+`profiles/` directory produced by the same `core.compile_profile()`:
+
+- **The `curiosity-cat` CLI's own default home**
+  (`curiosity_cat/core.py` `resolve_home()`), used for any terminal-run CLI
+  command that doesn't pass `--profiles-dir`: first `$CURIOSITY_CAT_HOME` if
+  set, else an already-existing `./curiosity-cat` in a writable cwd, else
+  `~/Library/Application Support/Curiosity Cat` on macOS.
+  `profiles/`, `standing-orders/`, `policies/`, `quarantine/`, `logs/`, and
+  `registry.json` all live under here.
+- **The app's own data dir** — a Tauri `app_data_dir()`, which on macOS
+  resolves from `tauri.conf.json`'s `identifier`
+  (`online.curiositycat.shell`) to
+  `~/Library/Application Support/online.curiositycat.shell/`. Every
+  `compile` call the app makes passes this directory explicitly as
+  `profiles_dir` (`commands.rs`'s `profiles_dir_path`, via
+  `sidecar-client.js`) rather than letting `ccat-engine` fall back to its
+  own cwd-derived default — a Finder launch gives the sidecar process cwd
+  `/` (read-only), which is the bug this explicit pass-through avoids. So
+  profiles compiled by the app land under
+  `.../online.curiositycat.shell/profiles/`, a different directory tree
+  from the CLI's own home, even though it's the same `compile_profile()`
+  underneath. `first-run-complete` and `last-profile.json`
+  (`commands.rs`'s `marker_path`/`last_profile_path`) live alongside it.
+
+Point either one anywhere with `$CURIOSITY_CAT_HOME` (CLI) or by inspecting
+`get_profiles_dir`'s return value (app, e.g. via the Feed/board's dev
+console) — there is no cross-linking between the two by default.
+
+## Command map: discover / apply / fleet / prove
+
+Every verb below exists twice: once as a `curiosity-cat` CLI subcommand
+(`curiosity_cat/cli.py`) for terminal use, once as a `ccat-engine` sidecar
+JSON-RPC method (`curiosity_cat/serve.py`'s `METHODS`) the app calls via
+`sidecar-client.js`/`window.CCAT.*`. Both paths call the same `core.py`
+functions.
+
+| Concept  | CLI                                                          | Sidecar (`window.CCAT.*`)         | Driven from (app)                          | What it does |
+|----------|---------------------------------------------------------------|-------------------------------------|---------------------------------------------|--------------|
+| Discover | `curiosity-cat estate`                                       | `estate()`                          | Guard Board (`board.js`) on load; `firstrun/prove.html`'s target picker | Lists every protectable target (Claude Code projects, `~/.claude` global, agent processes, MCP servers) and its guarded/unguarded state. Read-only. |
+| Apply    | `curiosity-cat apply --level <l> --target <path\|global>`    | `apply(profileDir, target)`         | `firstrun/prove.html`'s "Apply" button (single target, first run) | Installs a compiled profile's `settings.json` into one target (backing up whatever was there), then proves it. |
+| Fleet    | `curiosity-cat fleet --level <l> [--undo]`                   | `fleet(level, observed, targets)` / `fleetUndo(targets)` | Guard Board's "Protect whole fleet" / "Undo whole fleet" buttons | Applies-and-proves `<level>` against every discovered, applicable target in one pass, or restores every guarded target's pre-apply backup. |
+| Prove    | `curiosity-cat prove --profile <dir> [--target <path\|global>]` | `prove(profileDir, observed, target)` | `firstrun/prove.html`, right after Apply     | Runs self-consistency + (unless skipped) one live observed trial, writing a Clean Bill. |
+
+`unapply` (`curiosity-cat unapply --target ...` / `unapply(target)`)
+restores a single target's pre-apply backup, the one-target counterpart to
+Fleet's `--undo` — implemented in `sidecar-client.js` but not yet wired to
+any app screen (no per-target undo button exists outside Fleet's
+whole-estate undo).
