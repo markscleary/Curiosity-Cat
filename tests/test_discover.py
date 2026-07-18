@@ -91,7 +91,75 @@ def test_discover_global_claude_settings_reports_missing(tmp_path):
     assert result["exists"] is False
 
 
-# --- (c) running agent processes ----------------------------------------
+# --- (c) live Hermes agents -----------------------------------------------
+
+def test_discover_hermes_agents_marks_running_and_not_running(tmp_path):
+    profiles_root = tmp_path / "hermes-profiles"
+    quin = profiles_root / "quin"
+    heavy = profiles_root / "heavy"
+    quin.mkdir(parents=True)
+    heavy.mkdir(parents=True)
+
+    process_lines = [
+        "/Users/mark/.hermes/hermes-agent/venv/bin/python -m hermes_cli.main "
+        "--profile quin gateway run --replace",
+    ]
+
+    agents = discover.discover_hermes_agents(profiles_root=profiles_root, process_lines=process_lines)
+
+    by_id = {a["agent_id"]: a for a in agents}
+    assert by_id["quin"]["running"] is True
+    assert by_id["quin"]["profile_dir"] == str(quin)
+    assert by_id["heavy"]["running"] is False
+
+
+def test_discover_hermes_agents_does_not_false_positive_on_dashboard_open_profile(tmp_path):
+    """The Hermes dashboard process carries an unrelated agent name in
+    `--open-profile <name>` on the `dashboard` subcommand — confirmed live
+    via `ps -axo command`. A substring match on the agent id would
+    misreport that as a running gateway; the anchored regex must not.
+    """
+    profiles_root = tmp_path / "hermes-profiles"
+    (profiles_root / "deep-dive").mkdir(parents=True)
+
+    process_lines = [
+        "/Users/mark/.hermes/hermes-agent/venv/bin/python3 -m hermes_cli.main -p default dashboard "
+        "--port 9119 --host 0.0.0.0 --open-profile deep-dive --no-open --skip-build",
+    ]
+
+    agents = discover.discover_hermes_agents(profiles_root=profiles_root, process_lines=process_lines)
+
+    assert agents[0]["running"] is False
+
+
+def test_discover_hermes_agents_missing_root_returns_empty(tmp_path):
+    missing = tmp_path / "no-such-dir"
+    agents = discover.discover_hermes_agents(profiles_root=missing, process_lines=[])
+    assert agents == []
+
+
+def test_discover_hermes_agents_ignores_plain_files(tmp_path):
+    profiles_root = tmp_path / "hermes-profiles"
+    profiles_root.mkdir()
+    (profiles_root / "not-a-dir.txt").write_text("hi")
+    (profiles_root / "real-agent").mkdir()
+
+    agents = discover.discover_hermes_agents(profiles_root=profiles_root, process_lines=[])
+
+    assert [a["agent_id"] for a in agents] == ["real-agent"]
+
+
+def test_discover_hermes_agents_env_override(tmp_path, monkeypatch):
+    profiles_root = tmp_path / "env-hermes-profiles"
+    (profiles_root / "quin").mkdir(parents=True)
+    monkeypatch.setenv(discover.HERMES_PROFILES_ROOT_ENV, str(profiles_root))
+
+    agents = discover.discover_hermes_agents(process_lines=[])
+
+    assert [a["agent_id"] for a in agents] == ["quin"]
+
+
+# --- (d) legacy OpenClaw agent processes ----------------------------------
 
 def test_discover_agent_processes_marks_running_and_not_running(tmp_path):
     workspace_root = tmp_path / "workspace"
@@ -126,7 +194,7 @@ def test_discover_agent_processes_ignores_plain_files(tmp_path):
     assert [a["agent_id"] for a in agents] == ["real-agent"]
 
 
-# --- (d) configured MCP servers ------------------------------------------
+# --- (e) configured MCP servers ------------------------------------------
 
 def test_discover_mcp_servers_reads_user_and_project_local_scope(tmp_path):
     claude_json = tmp_path / ".claude.json"
@@ -253,6 +321,9 @@ def test_build_inventory_assembles_all_target_kinds_unguarded(tmp_path):
     workspace_root = tmp_path / "workspace"
     (workspace_root / "quin").mkdir(parents=True)
 
+    hermes_profiles_root = tmp_path / "hermes-profiles"
+    (hermes_profiles_root / "quin").mkdir(parents=True)
+
     claude_json = tmp_path / ".claude.json"
     claude_json.write_text(json.dumps({"mcpServers": {"gemini": {"type": "stdio", "command": "npx"}}}))
 
@@ -266,10 +337,11 @@ def test_build_inventory_assembles_all_target_kinds_unguarded(tmp_path):
         process_lines=[],
         claude_json_path=claude_json,
         registry_home=registry_home,
+        hermes_profiles_root=hermes_profiles_root,
     )
 
     kinds = {t.kind for t in inventory.targets}
-    assert kinds == {"claude-code-project", "claude-code-global", "agent-process", "mcp-server"}
+    assert kinds == {"claude-code-project", "claude-code-global", "hermes-agent", "agent-process", "mcp-server"}
     assert all(not t.protection.guarded for t in inventory.targets)
     assert inventory.worst_state == discover.UNGUARDED
 
@@ -281,15 +353,20 @@ def test_build_inventory_worst_state_guarded_only_when_every_target_guarded(tmp_
     home_dir.mkdir()
     workspace_root = tmp_path / "workspace"
     workspace_root.mkdir()
+    hermes_profiles_root = tmp_path / "hermes-profiles"
+    hermes_agent_dir = hermes_profiles_root / "quin"
+    hermes_agent_dir.mkdir(parents=True)
     claude_json = tmp_path / "no-claude.json"
     registry_home = tmp_path / "cc-home"
     registry_home.mkdir()
 
     target_id = f"claude-code-project:{project}"
     global_id = f"claude-code-global:{home_dir / '.claude' / 'settings.json'}"
+    hermes_id = f"hermes-agent:{hermes_agent_dir}"
     (registry_home / discover.REGISTRY_FILENAME).write_text(json.dumps({
         target_id: {"level": "housecat", "applied_at": "2026-07-01"},
         global_id: {"level": "housecat", "applied_at": "2026-07-01"},
+        hermes_id: {"level": "housecat", "applied_at": "2026-07-01"},
     }))
 
     inventory = discover.build_inventory(
@@ -299,6 +376,7 @@ def test_build_inventory_worst_state_guarded_only_when_every_target_guarded(tmp_
         process_lines=[],
         claude_json_path=claude_json,
         registry_home=registry_home,
+        hermes_profiles_root=hermes_profiles_root,
     )
 
     assert inventory.worst_state == discover.GUARDED

@@ -869,6 +869,186 @@ def test_prove_with_target_stamps_registry_proof_date(tmp_path):
     assert registry[applied.target_id]["proof_date"] == clean_bill.date
 
 
+# --- Assign: apply()/unapply()/prove() against a Hermes target -------------
+#
+# Every test here uses a throwaway tmp_path as the Hermes profiles root —
+# never the real ~/.hermes/profiles on this machine (docs/app/APP_SPEC.md's
+# build brief is explicit that real apply happens later with Mark, one
+# agent first).
+
+def _hermes_fixture(tmp_path, level="housecat"):
+    profile = core.compile_profile(level, "claude-code", cwd=tmp_path)
+    hermes_root = tmp_path / "hermes-profiles"
+    (hermes_root / "quin").mkdir(parents=True)
+    registry_home = tmp_path / "cc-home"
+    return profile, hermes_root, registry_home
+
+
+def test_apply_to_hermes_target_installs_under_curiosity_cat_subdir(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+
+    result = core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    installed_path = hermes_root / "quin" / core.HERMES_CURIOSITY_CAT_SUBDIR / "settings.json"
+    assert installed_path.exists()
+    assert json.loads(installed_path.read_text()) == json.loads(Path(profile.settings_path).read_text())
+    assert result.settings_path == str(installed_path)
+    assert result.target_kind == "hermes-agent"
+    assert result.target == "hermes:quin"
+    assert result.backup_path is None
+
+    # Never touches anything else already sitting in the agent's profile dir.
+    assert sorted(p.name for p in (hermes_root / "quin").iterdir()) == [core.HERMES_CURIOSITY_CAT_SUBDIR]
+
+
+def test_apply_to_hermes_target_default_root_honours_home_patch(tmp_path, monkeypatch):
+    """With no hermes_profiles_root override and no $HERMES_PROFILES_ROOT,
+    apply() falls back to Path.home()/.hermes/profiles — proof that a test
+    patching Path.home() (as every other test here does via
+    hermes_profiles_root=) fully controls where a Hermes apply can write,
+    so nothing in this suite can ever reach the real ~/.hermes/profiles.
+    """
+    profile = core.compile_profile("housecat", "claude-code", cwd=tmp_path)
+    fake_home = tmp_path / "fake-home"
+    (fake_home / ".hermes" / "profiles" / "quin").mkdir(parents=True)
+    registry_home = tmp_path / "cc-home"
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: fake_home))
+    monkeypatch.delenv("HERMES_PROFILES_ROOT", raising=False)
+
+    core.apply(profile.path, "hermes:quin", registry_home=registry_home)
+
+    installed = fake_home / ".hermes" / "profiles" / "quin" / core.HERMES_CURIOSITY_CAT_SUBDIR / "settings.json"
+    assert installed.exists()
+
+
+def test_apply_to_hermes_target_backs_up_existing_curiosity_cat_profile(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+    subdir = hermes_root / "quin" / core.HERMES_CURIOSITY_CAT_SUBDIR
+    subdir.mkdir(parents=True)
+    original = {"permissions": {"allow": ["Read(./custom/**)"]}}
+    (subdir / "settings.json").write_text(json.dumps(original, indent=2))
+
+    result = core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    assert result.backup_path is not None
+    assert json.loads(Path(result.backup_path).read_text()) == original
+    assert result.merged is True
+
+
+def test_apply_to_hermes_target_records_registry_entry_matching_discover_target_id(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path, level="tiger")
+
+    result = core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    entry = registry[result.target_id]
+    assert entry["level"] == "tiger"
+
+    from curiosity_cat import discover
+    inventory = discover.build_inventory(
+        roots=[str(tmp_path / "no-such-root")],
+        home_dir=tmp_path / "no-such-home",
+        workspace_root=tmp_path / "no-such-openclaw",
+        process_lines=[],
+        claude_json_path=tmp_path / "no-such-claude.json",
+        registry_home=registry_home,
+        hermes_profiles_root=hermes_root,
+    )
+    hermes_targets = {t.id: t for t in inventory.targets if t.kind == "hermes-agent"}
+    assert result.target_id in hermes_targets
+    assert hermes_targets[result.target_id].protection.guarded is True
+    assert hermes_targets[result.target_id].protection.level == "tiger"
+
+
+def test_unapply_hermes_target_restores_backup_and_clears_registry(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+    subdir = hermes_root / "quin" / core.HERMES_CURIOSITY_CAT_SUBDIR
+    subdir.mkdir(parents=True)
+    original = {"permissions": {"allow": ["Read(./custom/**)"]}}
+    (subdir / "settings.json").write_text(json.dumps(original, indent=2))
+
+    applied = core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+    result = core.unapply("hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    assert result.restored_from_backup is True
+    assert json.loads((subdir / "settings.json").read_text()) == original
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert applied.target_id not in registry
+
+
+def test_prove_with_hermes_target_requires_prior_apply(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+
+    with pytest.raises(core.TargetNotAppliedError):
+        core.prove(profile.path, target="hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+
+def test_prove_with_hermes_target_skips_observed_trial_honestly(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+    core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    clean_bill = core.prove(profile.path, target="hermes:quin",
+                             registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    assert clean_bill.applied_target == "hermes:quin"
+    assert clean_bill.observed_trials == []
+    assert "Hermes agents run via the hermes gateway" in clean_bill.observed_note
+    assert len(clean_bill.self_consistency_trials) > 0
+    assert clean_bill.passed is True
+
+
+def test_prove_with_hermes_target_forced_observed_still_skips(tmp_path):
+    """Even --no-observed's opposite (observed=True) never spawns a live
+    `claude -p` session against a Hermes target — there is nothing real
+    for it to observe yet (see core.HERMES_CURIOSITY_CAT_SUBDIR)."""
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+    core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    clean_bill = core.prove(profile.path, observed=True, target="hermes:quin",
+                             registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    assert clean_bill.observed_trials == []
+    assert clean_bill.observed_note is not None
+
+
+def test_prove_with_hermes_target_reads_the_agents_real_installed_settings(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+    core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    installed_path = hermes_root / "quin" / core.HERMES_CURIOSITY_CAT_SUBDIR / "settings.json"
+    installed = json.loads(installed_path.read_text())
+    installed["permissions"]["deny"].remove("Read(**/.env)")
+    installed_path.write_text(json.dumps(installed, indent=2))
+
+    clean_bill = core.prove(profile.path, target="hermes:quin",
+                             registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    assert clean_bill.passed is False
+    failed = [t for t in clean_bill.self_consistency_trials if t["held"] is False]
+    assert any(t["trial"] == "credential_env" for t in failed)
+
+
+def test_prove_with_hermes_target_stamps_registry_proof_date(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+    applied = core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    clean_bill = core.prove(profile.path, target="hermes:quin",
+                             registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    registry = json.loads((registry_home / core.REGISTRY_FILENAME).read_text())
+    assert registry[applied.target_id]["proof_date"] == clean_bill.date
+
+
+def test_apply_unapply_hermes_round_trip_never_touches_other_agents(tmp_path):
+    profile, hermes_root, registry_home = _hermes_fixture(tmp_path)
+    (hermes_root / "explorer").mkdir(parents=True)
+
+    core.apply(profile.path, "hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+    core.unapply("hermes:quin", registry_home=registry_home, hermes_profiles_root=hermes_root)
+
+    assert list((hermes_root / "explorer").iterdir()) == []
+
+
 # --- Fleet: apply_many()/unapply_many() ---
 
 def _fleet_fixture(tmp_path):

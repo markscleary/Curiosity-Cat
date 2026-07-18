@@ -132,7 +132,7 @@ def cmd_apply(level=None, target=None, observed=None):
         print(f'Valid levels: {", ".join(LEVELS)}', file=sys.stderr)
         sys.exit(1)
     if not target:
-        print('Missing --target <path|global>', file=sys.stderr)
+        print('Missing --target <path|global|hermes:agent-id>', file=sys.stderr)
         sys.exit(1)
 
     profile = core.compile_profile(level, "claude-code")
@@ -172,7 +172,7 @@ def cmd_apply(level=None, target=None, observed=None):
 
 def cmd_unapply(target=None):
     if not target:
-        print('Missing --target <path|global>', file=sys.stderr)
+        print('Missing --target <path|global|hermes:agent-id>', file=sys.stderr)
         sys.exit(1)
 
     try:
@@ -192,6 +192,14 @@ def _fleet_applicable_targets(inventory):
     targets too (curiosity-cat estate), but neither has a settings.json of
     its own for apply() to write into, so Fleet mode only ever touches the
     two kinds it can act on.
+
+    hermes-agent targets are deliberately excluded here too, even though
+    core.apply() can now install into one ("hermes:<agent-id>", see
+    core.HERMES_TARGET_PREFIX): these are live, running gateways for a real
+    agent fleet, and docs/app/APP_SPEC.md's build brief is explicit that
+    real apply happens later with Mark, one agent first — never Fleet
+    mode's "apply to everything discovered" blast radius as a side effect
+    of this brief.
     """
     targets = []
     for t in inventory.targets:
@@ -429,7 +437,8 @@ def cmd_purr(profile=None, days=None):
 _ESTATE_KIND_LABELS = [
     ("claude-code-project", "Claude Code projects"),
     ("claude-code-global", "Claude Code global settings"),
-    ("agent-process", "Agent workspaces"),
+    ("hermes-agent", "Hermes agents"),
+    ("agent-process", "Agent workspaces (legacy OpenClaw)"),
     ("mcp-server", "MCP servers"),
 ]
 
@@ -456,7 +465,7 @@ def cmd_estate():
         print(f"{label}:")
         for t in targets:
             extra = ""
-            if kind == "agent-process":
+            if kind in ("hermes-agent", "agent-process"):
                 extra = "  (running now)" if t.detail.get("running") else "  (not running)"
             elif kind == "mcp-server":
                 extra = f"  ({t.detail.get('scope')})"
@@ -495,11 +504,11 @@ Usage:
   curiosity-cat init [--role <role>]                       Scaffold standing orders
   curiosity-cat compile --level <level> --target <target> [--profiles-dir <dir>]
                                                              Compile a dated profile
-  curiosity-cat prove --profile <profile-dir> [--no-observed] [--target <path|global>]
+  curiosity-cat prove --profile <profile-dir> [--no-observed] [--target <path|global|hermes:agent-id>]
                                                              Run escape trials against a compiled profile
-  curiosity-cat apply --level <level> --target <path|global> [--no-observed]
+  curiosity-cat apply --level <level> --target <path|global|hermes:agent-id> [--no-observed]
                                                              Compile, apply, and prove in one motion
-  curiosity-cat unapply --target <path|global>              Undo apply — restore the pre-apply backup
+  curiosity-cat unapply --target <path|global|hermes:agent-id>              Undo apply — restore the pre-apply backup
   curiosity-cat fleet --level <level> [--no-observed]        Discover every target, apply and prove
                                                              <level> to all of them in one motion
   curiosity-cat fleet --undo                                Undo-all — restore every currently guarded
@@ -544,7 +553,7 @@ Prove:
                    session spawned in a throwaway sandbox to attempt one denied
                    action for real). On by default when a `claude` binary is on
                    PATH; skipped with a note otherwise.
-  --target <path|global>
+  --target <path|global|hermes:agent-id>
                    Prove against a target's real, applied settings.json instead
                    of the profile directory in isolation — requires "apply" to
                    have already run against this target. The Clean Bill records
@@ -553,9 +562,14 @@ Prove:
 
 Apply:
   --level <level>  Which adventure level to compile and apply (see Levels below).
-  --target <path|global>
-                   Where to install it: a Claude Code project directory, or the
-                   literal word "global" for ~/.claude/settings.json.
+  --target <path|global|hermes:agent-id>
+                   Where to install it: a Claude Code project directory, the
+                   literal word "global" for ~/.claude/settings.json, or
+                   "hermes:<agent-id>" for a live Hermes gateway's profile
+                   directory (an agent-id from "curiosity-cat estate"'s Hermes
+                   agents list). A Hermes target has no live observed trial yet
+                   — only self-consistency checks run; see "curiosity-cat prove"
+                   output for the honest note.
   --no-observed    Passed through to the prove step (see Prove above).
   Compiles a fresh profile, installs it into the target's real settings.json
   (always backing up whatever was there first, merging conservatively if
@@ -563,7 +577,7 @@ Apply:
   three-question summary: what is now protected, from what, since when.
 
 Unapply:
-  --target <path|global>
+  --target <path|global|hermes:agent-id>
                    The target to restore — same values as "apply --target".
   Restores the target's pre-apply settings.json from its backup (or removes
   it, if there was nothing there before) and clears the registry entry.
@@ -617,13 +631,16 @@ Purr:
 
 Estate:
   Prints every protectable target this machine has — Claude Code project
-  directories, the global ~/.claude settings, running agent processes, and
-  configured MCP servers — each with its current, honest protection state.
-  A compiled profile protects nothing until it's applied to a target (see
+  directories, the global ~/.claude settings, live Hermes agents, legacy
+  OpenClaw agent workspaces (if that root still exists), and configured MCP
+  servers — each with its current, honest protection state. A compiled
+  profile protects nothing until it's applied to a target (see
   docs/app/APP_SPEC.md's Assignment Model), so every target here reads
   UNGUARDED until "curiosity-cat apply --target <path>" has run against it.
   Override the project-search roots with $CURIOSITY_CAT_DISCOVER_ROOTS
   (a PATH-style, colon-separated list) — default is your home directory.
+  Override the Hermes profiles root with $HERMES_PROFILES_ROOT — default is
+  ~/.hermes/profiles.
 """)
 
 

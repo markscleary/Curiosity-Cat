@@ -8,12 +8,18 @@ compiled profile protects nothing until applied to a target, so before
 there *is* to protect. Nothing in this module compiles, applies, or writes
 anything — it only looks and reports what it finds.
 
-Four kinds of target:
+Five kinds of target:
   - claude-code-project — a directory containing a `.claude/` subdirectory
   - claude-code-global   — the operator's `~/.claude/settings.json`
-  - agent-process        — a workspace directory under an agent-fleet root
-                            (e.g. ~/.openclaw/workspace/<agent-id>), cross-
-                            referenced against the live process list
+  - hermes-agent         — an agent profile directory under the live Hermes
+                            fleet root (e.g. ~/.hermes/profiles/<agent-id>),
+                            cross-referenced against the live process list.
+                            This is the live fleet as of 15 Jul 2026 — see
+                            docs/app/APP_SPEC.md's Assignment Model.
+  - agent-process        — a workspace directory under the retired OpenClaw
+                            root (e.g. ~/.openclaw/workspace/<agent-id>),
+                            kept as a legacy fallback: contributes nothing
+                            when that root doesn't exist on disk.
   - mcp-server           — an MCP server configured in a Claude config file
 
 Per-target protection state comes from a profile registry
@@ -26,6 +32,7 @@ never defaulted to "probably fine".
 
 import json
 import os
+import re
 import subprocess
 from dataclasses import dataclass, field
 from datetime import date
@@ -218,18 +225,6 @@ def discover_global_claude_settings(home_dir=None):
     return {"path": str(settings_path), "exists": settings_path.exists()}
 
 
-# --- (c) running agent processes ----------------------------------------
-
-WORKSPACE_ROOT_ENV = "OPENCLAW_WORKSPACE_ROOT"
-
-
-def _default_workspace_root():
-    override = os.environ.get(WORKSPACE_ROOT_ENV)
-    if override:
-        return Path(override).expanduser()
-    return Path.home() / ".openclaw" / "workspace"
-
-
 def _read_process_command_lines():
     """Best-effort live process command lines (`ps -axo command`). Never
     raises: a missing `ps`, a permission error, or a timeout just means no
@@ -244,11 +239,102 @@ def _read_process_command_lines():
     return result.stdout.splitlines()
 
 
+# --- (c) live Hermes agents ----------------------------------------------
+#
+# The live fleet as of 15 Jul 2026: six Hermes gateways (deep-dive,
+# explorer, front-page, greg, principal, quin), each with a profile
+# directory under ~/.hermes/profiles/<agent-id>, replacing the retired
+# OpenClaw harness below. `core.py` installs into this same root under
+# apply()'s "hermes:<agent-id>" target — HERMES_PROFILES_ROOT_ENV and its
+# default are duplicated there (core.py can't import this module without a
+# cycle, same reasoning as REGISTRY_FILENAME above) — keep both in sync.
+
+HERMES_PROFILES_ROOT_ENV = "HERMES_PROFILES_ROOT"
+
+
+def _default_hermes_profiles_root():
+    override = os.environ.get(HERMES_PROFILES_ROOT_ENV)
+    if override:
+        return Path(override).expanduser()
+    return Path.home() / ".hermes" / "profiles"
+
+
+def _hermes_gateway_running(agent_id, lines):
+    """Is a live `hermes gateway run` process bound to `agent_id`?
+
+    Confirmed live signature (`ps -axo command`):
+      .../hermes-agent/venv/bin/python -m hermes_cli.main --profile
+      <agent-id> gateway run --replace
+
+    Matched with a regex anchored on `--profile <agent-id> gateway run`
+    rather than a bare substring test: the Hermes dashboard process runs
+    with `--open-profile <agent-id>` on an unrelated `dashboard`
+    subcommand, and a substring match would misreport that as a running
+    gateway.
+    """
+    pattern = re.compile(r"--profile\s+" + re.escape(agent_id) + r"\s+gateway\s+run\b")
+    return any(pattern.search(line) for line in lines)
+
+
+def discover_hermes_agents(profiles_root=None, process_lines=None):
+    """Agent profile directories under `profiles_root` (default
+    ~/.hermes/profiles, override via $HERMES_PROFILES_ROOT), each
+    cross-referenced against the live process list to say whether that
+    agent's gateway is actually running right now.
+
+    `process_lines` overrides the process list (for tests); defaults to a
+    real `ps -axo command` read. A profile directory existing on disk with
+    no matching gateway process is reported not-running, honestly, rather
+    than omitted — it is still a target with a protection state, whether
+    or not its gateway happens to be up at this exact moment.
+
+    Returns a list of dicts: agent_id, profile_dir, running.
+    """
+    profiles_root = Path(profiles_root) if profiles_root is not None else _default_hermes_profiles_root()
+    if not profiles_root.is_dir():
+        return []
+
+    lines = process_lines if process_lines is not None else _read_process_command_lines()
+
+    agents = []
+    for entry in sorted(profiles_root.iterdir()):
+        if not entry.is_dir():
+            continue
+        agents.append({
+            "agent_id": entry.name,
+            "profile_dir": str(entry),
+            "running": _hermes_gateway_running(entry.name, lines),
+        })
+    return agents
+
+
+# --- (d) legacy OpenClaw agent processes ----------------------------------
+#
+# The retired harness this module scanned before the live fleet moved to
+# Hermes (see (c) above). Kept only as a fallback: discover_agent_processes
+# contributes nothing once ~/.openclaw/workspace (or its override) no
+# longer exists, which is already this machine's normal case.
+
+WORKSPACE_ROOT_ENV = "OPENCLAW_WORKSPACE_ROOT"
+
+
+def _default_workspace_root():
+    override = os.environ.get(WORKSPACE_ROOT_ENV)
+    if override:
+        return Path(override).expanduser()
+    return Path.home() / ".openclaw" / "workspace"
+
+
 def discover_agent_processes(workspace_root=None, process_lines=None):
     """Agent workspace directories under `workspace_root` (default
     ~/.openclaw/workspace, override via $OPENCLAW_WORKSPACE_ROOT), each
     cross-referenced against the live process list to say whether an agent
     process is actually running against that workspace right now.
+
+    Legacy fallback (see module docstring): the retired OpenClaw harness
+    this checked before the live fleet moved to Hermes (c). Returns []
+    outright when `workspace_root` doesn't exist, which is already this
+    machine's normal case — see discover_hermes_agents for the live source.
 
     `process_lines` overrides the process list (for tests); defaults to a
     real `ps -axo command` read. A workspace directory existing on disk
@@ -274,7 +360,7 @@ def discover_agent_processes(workspace_root=None, process_lines=None):
     return agents
 
 
-# --- (d) configured MCP servers -----------------------------------------
+# --- (e) configured MCP servers -----------------------------------------
 
 def _read_json(path):
     try:
@@ -351,7 +437,8 @@ def discover_mcp_servers(project_dirs=None, claude_json_path=None):
 
 def build_inventory(roots=None, max_depth=DEFAULT_MAX_DEPTH, home_dir=None,
                      workspace_root=None, process_lines=None,
-                     claude_json_path=None, registry_home=None):
+                     claude_json_path=None, registry_home=None,
+                     hermes_profiles_root=None):
     """The estate: every protectable surface this machine has, each with
     its current, honest, per-target protection state. Returns an
     Inventory. Nothing here writes anything — see docs/app/APP_SPEC.md's
@@ -359,6 +446,10 @@ def build_inventory(roots=None, max_depth=DEFAULT_MAX_DEPTH, home_dir=None,
     """
     registry = _load_registry(registry_home)
     targets = []
+    # Resolved once and shared with discover_hermes_agents below — both
+    # sources cross-reference the same live process list, so there is no
+    # reason to shell out to `ps` twice per estate build.
+    process_lines = process_lines if process_lines is not None else _read_process_command_lines()
 
     project_dirs = discover_claude_code_projects(roots=roots, max_depth=max_depth)
     for project_dir in project_dirs:
@@ -381,6 +472,17 @@ def build_inventory(roots=None, max_depth=DEFAULT_MAX_DEPTH, home_dir=None,
         detail={"exists": global_settings["exists"]},
         protection=protection_state_for(global_id, registry),
     ))
+
+    for agent in discover_hermes_agents(profiles_root=hermes_profiles_root, process_lines=process_lines):
+        target_id = f"hermes-agent:{agent['profile_dir']}"
+        targets.append(Target(
+            kind="hermes-agent",
+            id=target_id,
+            label=agent["agent_id"],
+            path=agent["profile_dir"],
+            detail={"running": agent["running"]},
+            protection=protection_state_for(target_id, registry),
+        ))
 
     for agent in discover_agent_processes(workspace_root=workspace_root, process_lines=process_lines):
         target_id = f"agent-process:{agent['workspace']}"

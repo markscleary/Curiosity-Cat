@@ -250,11 +250,34 @@ class TargetNotAppliedError(ValueError):
 
 
 # The Assignment Model's target vocabulary (docs/app/APP_SPEC.md): "global"
-# for the operator's own ~/.claude/settings.json, anything else is a project
+# for the operator's own ~/.claude/settings.json, "hermes:<agent-id>" for a
+# live Hermes gateway's profile directory, anything else is a project
 # directory path. Distinct from TARGET_EMITTERS' "claude-code" — that names
 # the *platform* a profile is compiled for; this names *where* it gets
 # installed. apply()/unapply()/prove(target=...) all key off this.
 GLOBAL_TARGET = "global"
+
+# HERMES_PROFILES_ROOT_ENV and its default are duplicated from discover.py
+# (that module imports resolve_home from here, so the reverse import would
+# cycle) — keep both in sync. discover.discover_hermes_agents() enumerates
+# the same root; a Hermes target's target_id computed below must match the
+# target_id discover.build_inventory() assigns the same profile directory,
+# or a registry entry written here would never read back as GUARDED there.
+HERMES_TARGET_PREFIX = "hermes:"
+HERMES_PROFILES_ROOT_ENV = "HERMES_PROFILES_ROOT"
+
+# The subdirectory apply() installs a compiled profile's settings.json into,
+# inside a Hermes agent's own profile directory — curiosity-cat's own
+# namespace there, never anything hermes_cli itself reads or writes.
+# Hermes agents run their own gateway loop (hermes_cli), not Claude Code, so
+# there is no existing "real settings file" of the target's own to install
+# into the way a project's .claude/settings.json or the global
+# ~/.claude/settings.json already are; this is the applied location until
+# a real Hermes-side enforcement hook exists to point at instead. See
+# prove()'s handling of target_kind == "hermes-agent" for the honesty
+# consequence: no live observed trial runs against it yet, only
+# self-consistency.
+HERMES_CURIOSITY_CAT_SUBDIR = "curiosity-cat-profile"
 
 # <curiosity-cat-home>/registry.json — the assignment ledger apply() writes
 # and unapply() clears an entry from. discover.py reads the same file (its
@@ -611,18 +634,34 @@ def _normalize_project_path(target, cwd=None):
     return path
 
 
-def _target_location(target, home_dir=None, cwd=None):
-    """Resolve an Assignment Model target string ("global", or a project
-    directory path) to (target_id, target_kind, installed_settings_path,
-    target_label). target_id matches the keys discover.build_inventory()
-    assigns to the same target, so a registry entry written here is the
-    same one discover()/protection_state_for() reads back.
+def _default_hermes_profiles_root():
+    override = os.environ.get(HERMES_PROFILES_ROOT_ENV)
+    if override:
+        return Path(override).expanduser()
+    return Path.home() / ".hermes" / "profiles"
+
+
+def _target_location(target, home_dir=None, cwd=None, hermes_profiles_root=None):
+    """Resolve an Assignment Model target string ("global", a project
+    directory path, or "hermes:<agent-id>") to (target_id, target_kind,
+    installed_settings_path, target_label). target_id matches the keys
+    discover.build_inventory() assigns to the same target, so a registry
+    entry written here is the same one discover()/protection_state_for()
+    reads back.
     """
     if target == GLOBAL_TARGET:
         home = Path(home_dir) if home_dir is not None else Path.home()
         settings_path = home / ".claude" / "settings.json"
         target_id = f"claude-code-global:{settings_path}"
         return target_id, "claude-code-global", settings_path, str(settings_path)
+
+    if target.startswith(HERMES_TARGET_PREFIX):
+        agent_id = target[len(HERMES_TARGET_PREFIX):]
+        root = Path(hermes_profiles_root) if hermes_profiles_root is not None else _default_hermes_profiles_root()
+        profile_dir = root / agent_id
+        settings_path = profile_dir / HERMES_CURIOSITY_CAT_SUBDIR / "settings.json"
+        target_id = f"hermes-agent:{profile_dir}"
+        return target_id, "hermes-agent", settings_path, target
 
     project_path = _normalize_project_path(target, cwd=cwd)
     settings_path = project_path / ".claude" / "settings.json"
@@ -724,10 +763,13 @@ def _merge_settings_conservative(existing, compiled):
     return merged, report
 
 
-def apply(profile_dir, target, home_dir=None, registry_home=None, cwd=None):
+def apply(profile_dir, target, home_dir=None, registry_home=None, cwd=None, hermes_profiles_root=None):
     """Install a compiled profile's settings.json into `target`'s real
-    location — a Claude Code project directory, or the literal string
-    "global" for the operator's own ~/.claude/settings.json.
+    location — a Claude Code project directory, the literal string "global"
+    for the operator's own ~/.claude/settings.json, or "hermes:<agent-id>"
+    for a live Hermes gateway's profile directory (installed under that
+    profile's own HERMES_CURIOSITY_CAT_SUBDIR — see that constant's comment
+    for why this isn't a real Hermes enforcement point yet).
 
     Always backs up whatever settings.json already existed at that location
     to this machine's curiosity-cat home (timestamped, never overwritten)
@@ -754,7 +796,7 @@ def apply(profile_dir, target, home_dir=None, registry_home=None, cwd=None):
     compiled_settings = json.loads(settings_path.read_text())
 
     target_id, target_kind, installed_settings_path, target_label = _target_location(
-        target, home_dir=home_dir, cwd=cwd)
+        target, home_dir=home_dir, cwd=cwd, hermes_profiles_root=hermes_profiles_root)
     home = Path(registry_home) if registry_home is not None else resolve_home()
 
     backup_path = None
@@ -818,7 +860,7 @@ def apply(profile_dir, target, home_dir=None, registry_home=None, cwd=None):
     )
 
 
-def unapply(target, home_dir=None, registry_home=None, cwd=None):
+def unapply(target, home_dir=None, registry_home=None, cwd=None, hermes_profiles_root=None):
     """Undo apply(): restore `target`'s settings.json to whatever it was
     immediately before the most recent apply() (or remove it entirely, if
     nothing existed there before), and drop the registry entry so
@@ -829,7 +871,7 @@ def unapply(target, home_dir=None, registry_home=None, cwd=None):
     restore in that case). Returns an UnapplyResult.
     """
     target_id, target_kind, installed_settings_path, target_label = _target_location(
-        target, home_dir=home_dir, cwd=cwd)
+        target, home_dir=home_dir, cwd=cwd, hermes_profiles_root=hermes_profiles_root)
     home = Path(registry_home) if registry_home is not None else resolve_home()
 
     registry = _load_registry(home)
@@ -1651,7 +1693,8 @@ def _last_known_platform_version(profile_dir):
     return history[-1]["platform_version"] if history else None
 
 
-def prove(profile_dir, observed=None, target=None, home_dir=None, registry_home=None, cwd=None):
+def prove(profile_dir, observed=None, target=None, home_dir=None, registry_home=None, cwd=None,
+          hermes_profiles_root=None):
     """Run escape trials against a compiled profile directory and write a
     dated proof/ report inside it. Returns a CleanBill.
 
@@ -1661,16 +1704,19 @@ def prove(profile_dir, observed=None, target=None, home_dir=None, registry_home=
     unconditionally. Raises InvalidProfileError if profile_dir doesn't look
     like a directory compile_profile() produced.
 
-    `target` is an Assignment Model target ("global", or a project
-    directory path) that must already have this profile applied via
-    apply(). When given, docs/app/APP_SPEC.md Assignment Model (d) applies:
-    the compiled rules used for self-consistency and the live observed
-    trial are read from the target's own real, currently-installed
-    settings.json (which, after a conservative merge, may differ from
-    profile_dir's own copy) — not a fresh copy in isolation — and the
-    observed session, if any, is spawned against that real installed file
-    via Claude Code's own settings resolution, with no override. The
-    resulting CleanBill's `applied_target` records what was proved, and
+    `target` is an Assignment Model target ("global", a project directory
+    path, or "hermes:<agent-id>") that must already have this profile
+    applied via apply(). When given, docs/app/APP_SPEC.md Assignment Model
+    (d) applies: the compiled rules used for self-consistency are read from
+    the target's own real, currently-installed settings.json (which, after
+    a conservative merge, may differ from profile_dir's own copy) — not a
+    fresh copy in isolation. For a Claude Code target, the live observed
+    trial is spawned against that same installed file via Claude Code's own
+    settings resolution, with no override. A Hermes target has no such
+    live session to observe yet — see HERMES_CURIOSITY_CAT_SUBDIR's
+    comment — so only self-consistency runs, and the observed trial is
+    honestly reported as skipped rather than run against the wrong thing.
+    The resulting CleanBill's `applied_target` records what was proved, and
     this profile's registry entry for `target` gets its `proof_date`
     stamped. Raises TargetNotAppliedError if `target` has no applied
     profile yet — prove(target=...) certifies a guarded target, not a
@@ -1689,11 +1735,12 @@ def prove(profile_dir, observed=None, target=None, home_dir=None, registry_home=
     registry_home_path = None
     applied_target_id = None
     applied_target_label = None
+    target_kind = None
     session_cwd = None
     source_settings_path = settings_path
     if target is not None:
         applied_target_id, target_kind, installed_settings_path, applied_target_label = _target_location(
-            target, home_dir=home_dir, cwd=cwd)
+            target, home_dir=home_dir, cwd=cwd, hermes_profiles_root=hermes_profiles_root)
         if not installed_settings_path.exists():
             raise TargetNotAppliedError(
                 f"target {target!r} has no applied profile — run apply() before prove(target=...)")
@@ -1712,13 +1759,20 @@ def prove(profile_dir, observed=None, target=None, home_dir=None, registry_home=
         shutil.rmtree(sandbox_root, ignore_errors=True)
     guidance = _build_guidance_trials(scope_policy)
 
-    run_observed = observed if observed is not None else shutil.which("claude") is not None
+    hermes_target = target_kind == "hermes-agent"
+    run_observed = (observed if observed is not None else shutil.which("claude") is not None) and not hermes_target
     observed_trials = []
     observed_note = None
     platform_version = None
     if not run_observed:
-        observed_note = ("Observed trial skipped (--no-observed)." if observed is False else
-                          "Observed trial skipped — no `claude` binary found on PATH.")
+        if hermes_target:
+            observed_note = ("Observed trial skipped — Hermes agents run via the hermes gateway, not a "
+                              "live `claude -p` session, so there is nothing to observe live against "
+                              "this target yet. Only self-consistency checks against the applied "
+                              "settings.json are proven today.")
+        else:
+            observed_note = ("Observed trial skipped (--no-observed)." if observed is False else
+                              "Observed trial skipped — no `claude` binary found on PATH.")
     else:
         observed_root = Path(tempfile.mkdtemp(prefix="curiosity-cat-prove-observed-"))
         try:
