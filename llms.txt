@@ -26,10 +26,16 @@ No install is required for the minimum useful deployment — paste
 ## Core commands
 
 ```bash
+curiosity-cat init [--role <role>]
 curiosity-cat compile --level <housecat|alleycat|tiger> --target claude-code
 curiosity-cat prove --profile ./curiosity-cat/profiles/<level>-<target>-<YYYYMMDD>
 curiosity-cat report
+curiosity-cat stories
 ```
+
+`init` scaffolds standing orders, policies, quarantine and logs
+directories into `./curiosity-cat/` — the plain-text-only deployment path,
+no compile step required.
 
 `compile` turns an adventure level (housecat = cautious, alleycat =
 balanced, tiger = daring) into a versioned profile directory containing
@@ -46,6 +52,8 @@ neither is claimed as the other.
 
 `report` submits a close-call to the Danger Map (consent-gated,
 anonymised, structured — no free text, no raw URLs, no identity data).
+
+`stories` prints the latest Nine Lives story shipped with the package.
 
 ## Key URLs
 
@@ -71,6 +79,7 @@ compiled Claude Code profile mechanically enforces a deny rule.
 "Observed-deny" (a live trial actually blocked) and "self-consistency"
 (the compiled file matches what the compiler intended) are always kept
 distinct — see `prove`'s output above. Roadmap items (enforcement for
-frameworks beyond Claude Code, the desktop app, scheduled re-proving,
+frameworks beyond Claude Code, the macOS app, scheduled re-proving,
 enterprise tiers) are described on the site's Roadmap Honesty section as
-plans, not shipped features.
+plans, not shipped features. The macOS app is in final testing, not yet
+shipped.

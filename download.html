@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download — Curiosity Cat for macOS (Coming Soon)</title>
+  <meta name="description" content="The Curiosity Cat macOS app — fleet discovery, one-click profile assignment, a live guard board — is in final testing. Not yet shipped." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://curiositycat.online/download.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Curiosity Cat" />
+  <meta property="og:url" content="https://curiositycat.online/download.html" />
+  <meta property="og:title" content="Download — Curiosity Cat for macOS (Coming Soon)" />
+  <meta property="og:description" content="The Curiosity Cat macOS app — fleet discovery, one-click profile assignment, a live guard board — is in final testing. Not yet shipped." />
+  <meta property="og:image" content="https://curiositycat.online/site/ss-logo-amber.png" />
+  <meta property="og:image:width" content="3380" />
+  <meta property="og:image:height" content="1066" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Download — Curiosity Cat for macOS (Coming Soon)" />
+  <meta name="twitter:description" content="The Curiosity Cat macOS app — fleet discovery, one-click profile assignment, a live guard board — is in final testing. Not yet shipped." />
+  <meta name="twitter:image" content="https://curiositycat.online/site/ss-logo-amber.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-raised: #111111;
+      --bg-card: #161616;
+      --amber: #f59e0b;
+      --amber-dim: #b97d09;
+      --white: #f5f5f0;
+      --muted: #888880;
+      --border: rgba(245, 158, 11, 0.2);
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 { font-family: 'Playfair Display', serif; line-height: 1.2; }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
+
+    nav {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.08);
+    }
+
+    .nav-brand { font-family: 'Playfair Display', serif; color: var(--amber); text-decoration: none; font-size: 1.1rem; }
+    .nav-back { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.03em; }
+    .nav-back:hover { color: var(--amber); }
+
+    .coming-soon-banner {
+      background: rgba(245, 158, 11, 0.08);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--amber);
+      text-transform: uppercase;
+    }
+
+    header.hero { padding: 4rem 0 3rem; text-align: center; }
+    header.hero h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); margin-bottom: 1rem; }
+    header.hero h1 span { color: var(--amber); }
+    header.hero p { color: var(--muted); font-size: 1.2rem; max-width: 560px; margin: 0 auto; }
+
+    .status-pill {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--amber);
+      background: var(--bg-card);
+    }
+
+    section.block { padding: 3rem 0; border-top: 1px solid rgba(255,255,255,0.06); }
+    .block-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.75rem;
+    }
+    .block h2 { font-size: clamp(1.5rem, 4vw, 2.1rem); margin-bottom: 1rem; }
+    .block p.lead { color: #ccc; font-size: 1.1rem; margin-bottom: 1.5rem; max-width: 640px; }
+
+    /* Requirements */
+    .reqs { list-style: none; display: grid; gap: 0.75rem; max-width: 480px; }
+    .reqs li {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      font-size: 1rem;
+      color: #ccc;
+    }
+    .reqs li strong { color: var(--white); min-width: 130px; flex-shrink: 0; }
+
+    /* Install steps */
+    .steps { counter-reset: step; list-style: none; max-width: 640px; }
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding: 0 0 1.75rem 3rem;
+      color: #ccc;
+      font-size: 1.05rem;
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1.9rem;
+      height: 1.9rem;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--amber);
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .steps li:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 0.95rem;
+      top: 1.9rem;
+      bottom: 0;
+      width: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+    .steps li strong { color: var(--white); }
+    .steps code { font-family: 'Courier New', Courier, monospace; color: var(--amber); font-size: 0.92em; }
+
+    /* Screenshot placeholders */
+    .screenshots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+    .screenshot-placeholder {
+      aspect-ratio: 16 / 10;
+      border: 1px dashed rgba(245, 158, 11, 0.35);
+      border-radius: 10px;
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 1.5rem;
+    }
+    .screenshot-placeholder .icon { font-size: 2.2rem; opacity: 0.6; }
+    .screenshot-placeholder .caption { font-size: 0.9rem; font-weight: 600; color: #aaa; }
+    .screenshot-placeholder .sub { font-size: 0.8rem; color: var(--muted); }
+
+    /* Checksum block */
+    .checksum-block {
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      margin-top: 1rem;
+      max-width: 680px;
+    }
+    .checksum-row { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1.1rem; }
+    .checksum-row:last-child { margin-bottom: 0; }
+    .checksum-row .file { font-size: 0.9rem; color: #aaa; font-weight: 600; }
+    .checksum-row .hash {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.88rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .checksum-row .hash .pending { color: var(--amber-dim); font-style: italic; }
+
+    .note {
+      font-size: 0.95rem;
+      color: var(--muted);
+      border-left: 3px solid var(--amber);
+      padding: 0.75rem 1.25rem;
+      background: rgba(245, 158, 11, 0.05);
+      margin: 1.5rem 0;
+      max-width: 640px;
+    }
+    .note strong { color: var(--amber); }
+
+    .cta-row { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.8rem;
+      border-radius: 4px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--amber); color: #0a0a0a; }
+    .btn-primary:hover { background: #fbbf24; }
+    .btn-disabled {
+      background: var(--bg-card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      cursor: not-allowed;
+    }
+    .btn-secondary { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.25); }
+    .btn-secondary:hover { border-color: var(--amber); color: var(--amber); }
+
+    .breathe { padding: 3rem 0; text-align: center; }
+    .breathe p { color: var(--muted); font-style: italic; font-family: 'Playfair Display', serif; font-size: 1.3rem; max-width: 520px; margin: 0 auto 2rem; }
+
+    footer { padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    footer a { color: var(--amber); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="coming-soon-banner">Coming soon — the macOS app is in final testing, not yet available for download</div>
+
+  <nav>
+    <a href="index.html" class="nav-brand">🐱 Curiosity Cat</a>
+    <a href="index.html#mechanism" class="nav-back">← Back to the site</a>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <h1>Curiosity Cat for <span>macOS</span></h1>
+      <p>Fleet discovery, one-click profile assignment with backup and undo, and a live guard board for every agent on your machine.</p>
+      <span class="status-pill">In final testing — not yet shipped</span>
+    </div>
+  </header>
+
+  <!-- REQUIREMENTS -->
+  <section class="block" id="requirements">
+    <div class="container">
+      <p class="block-label">Requirements</p>
+      <h2>What it'll need</h2>
+      <p class="lead">Planned system requirements for the first release. Subject to change before launch.</p>
+      <ul class="reqs">
+        <li><strong>OS</strong> macOS 14 Sonoma or later</li>
+        <li><strong>Chip</strong> Apple Silicon (M1 or later) — no Intel build planned for v1</li>
+        <li><strong>Disk</strong> ~150 MB free space</li>
+        <li><strong>CLI</strong> <code>curiosity-cat</code> installed separately via pip or npm, for compile and prove</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- INSTALL STEPS -->
+  <section class="block" id="install-steps">
+    <div class="container">
+      <p class="block-label">Install</p>
+      <h2>How it'll work</h2>
+      <p class="lead">Planned install flow — described honestly, ahead of the app existing anywhere but here. Nothing below is available to run yet.</p>
+      <ol class="steps">
+        <li><strong>Download the .dmg</strong> once it's published on this page, with a SHA-256 checksum alongside it.</li>
+        <li><strong>Open the .dmg and drag Curiosity Cat to Applications.</strong> Standard macOS install, no separate installer.</li>
+        <li><strong>Launch the app.</strong> Gatekeeper will ask you to confirm — the app is planned to be notarised by Apple before release.</li>
+        <li><strong>Grant discovery permission.</strong> The app scans for agent workspaces and existing <code>curiosity-cat</code> profiles on your Mac; nothing leaves the machine.</li>
+        <li><strong>Assign a profile to each agent</strong> from the guard board, with one-click backup and undo before anything is applied.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="block" id="screenshots">
+    <div class="container">
+      <p class="block-label">Preview</p>
+      <h2>Screenshots</h2>
+      <p class="lead">Real screenshots go here once the app ships. Placeholders below show what each view will cover.</p>
+      <div class="screenshots">
+        <div class="screenshot-placeholder">
+          <span class="icon">🗺️</span>
+          <span class="caption">Fleet discovery</span>
+          <span class="sub">Every agent workspace found on this Mac, one list</span>
+        </div>
+        <div class="screenshot-placeholder">
+          <span class="icon">🐈</span>
+          <span class="caption">Guard board</span>
+          <span class="sub">What's protected, from what, since when</span>
+        </div>
+        <div class="screenshot-placeholder">
+          <span class="icon">📋</span>
+          <span class="caption">Profile assignment</span>
+          <span class="sub">One-click apply, with backup and undo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKSUMS -->
+  <section class="block" id="checksums">
+    <div class="container">
+      <p class="block-label">Verify</p>
+      <h2>Checksums</h2>
+      <p class="lead">SHA-256 checksums for each release build will be published here the day the app ships, so you can verify the .dmg you downloaded matches what we built.</p>
+      <div class="checksum-block">
+        <div class="checksum-row">
+          <span class="file">Curiosity-Cat-{version}-arm64.dmg</span>
+          <span class="hash"><span class="pending">not yet published — will appear here on release</span></span>
+        </div>
+      </div>
+      <div class="note"><strong>No build exists yet.</strong> This block is a scaffold for the release-day checksum, not a live download link. Anything claiming to be a Curiosity Cat macOS build today is not from us.</div>
+    </div>
+  </section>
+
+  <div class="breathe">
+    <p>Want to be notified when it ships? For now, the CLI is the whole product — compile a profile, prove it holds, read the Clean Bill.</p>
+    <div class="cta-row">
+      <a href="index.html#mechanism" class="btn btn-primary">Try the CLI instead</a>
+      <a href="index.html#roadmap" class="btn btn-secondary">What this cat can't do yet</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>Curiosity Cat for macOS is not yet released. Everything on this page describes a plan, not a shipped feature — see <a href="index.html#roadmap">Roadmap Honesty</a>.</p>
+  </footer>
+
+</body>
+</html>

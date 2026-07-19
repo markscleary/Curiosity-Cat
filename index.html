@@ -6,6 +6,11 @@
   <title>Curiosity Cat — Safety framework for AI agents</title>
   <meta name="description" content="When a cat falls flat, the rest learn the trick. The safety framework for AI agents that explore the internet." />
   <link rel="canonical" href="https://curiositycat.online/" />
+  <link rel="alternate" hreflang="en" href="https://curiositycat.online/" />
+  <link rel="alternate" hreflang="ar" href="https://curiositycat.online/ar/" />
+  <link rel="alternate" hreflang="zh" href="https://curiositycat.online/zh/" />
+  <link rel="alternate" hreflang="hi" href="https://curiositycat.online/hi/" />
+  <link rel="alternate" hreflang="x-default" href="https://curiositycat.online/" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Curiosity Cat" />
@@ -913,7 +918,7 @@
         <div class="card fade-up delay-1">
           <span class="card-icon">📋</span>
           <h3 class="card-title">Safety Net</h3>
-          <p class="card-body" id="safety-scenario">Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net catches it before the damage is done. Every close call reported makes every agent smarter.</p>
+          <p class="card-body" id="safety-scenario">Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net flags it before the damage is done. Every close call reported makes every agent smarter.</p>
           <p class="card-tag">C-Cat standing orders and policy guidance that drop into any agent's system prompt — no SDK, no server, no dependencies. Guidance, not enforcement: nothing here is mechanically checked the way a compiled Claude Code profile is.</p>
         </div>
         <div class="card fade-up delay-2">
@@ -949,7 +954,7 @@
         <p style="margin-bottom:1.5rem;">Compile speaks one language today: Claude Code's <code>settings.json</code>. Ask it for a compiled wall in OpenClaw, LangChain, CrewAI or AutoGen and it hands you the same standing orders everyone else gets — guidance, not a fence. Every other target is next, not now.</p>
 
         <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">The app</p>
-        <p style="margin-bottom:1.5rem;">Right now, reading a Clean Bill means opening a Markdown file in a terminal. There's no dashboard, no phone notification, no little paw-print icon that means all clear. That's the plan. It isn't the product yet.</p>
+        <p style="margin-bottom:1.5rem;">Right now, reading a Clean Bill means opening a Markdown file in a terminal. A macOS app — fleet discovery, one-click profile assignment, a live guard board — is in final testing, not yet shipped. Until it lands, there's no dashboard, no phone notification, no little paw-print icon that means all clear.</p>
 
         <p style="margin-bottom:0.4rem;font-weight:600;color:var(--amber);">Vet visits</p>
         <p style="margin-bottom:1.5rem;">A Clean Bill of health is a snapshot, taken the day you ran <code>prove</code>. Nothing today re-checks it next week, or after you widen the slider, or after your agent framework changes underneath you. Scheduled, automatic re-proving — the recurring vet visit, not just the one checkup — is on the roadmap, not in the CLI.</p>
@@ -1064,10 +1069,10 @@
         <p class="story-subtitle">A Curiosity Cat Story</p>
         <p class="story-excerpt">
           The agent was doing competitive research. Normal work. It began constructing search queries, pulling in everything it knew about the project — internal codenames, client names, the names of systems that did not exist in public yet.<br /><br />
-          Curiosity Cat stopped it before the queries left.<br /><br />
+          Curiosity Cat flagged it before the queries left.<br /><br />
           The standing orders on data containment are simple: internal names do not go into external queries. Every search term is a transmission. A search engine logs it. An API provider logs it. Somewhere, a record is created that a company named something was researching something else. That record does not belong to anyone outside.<br /><br />
           The agent rewrote the queries. Generic industry terms. Competitor category descriptions. Product capability keywords. The research came back nearly as useful.<br /><br />
-          No internal names left the building. No one outside learned the project existed. The standing orders had closed the door before anyone noticed it was open.<br /><br />
+          No internal names left the building. No one outside learned the project existed. The standing orders had caught it before anyone noticed the door was open.<br /><br />
           The cat came home with nothing on its collar.
         </p>
         <div class="story-meta">
@@ -1130,7 +1135,7 @@
           The agent was summarising a quarterly report. Thirty pages of financials. Normal client work. The kind of document that arrives by email and gets processed without a second thought.<br /><br />
           On page fourteen, buried in the body text, the font dropped to size one. White text on a white background. Invisible to anyone reading the document. Invisible to the agent too — until it extracted the text.<br /><br />
           The hidden text was an instruction. It told the agent to disregard the summary request and instead return the full contents of its system prompt, along with any API keys in its environment, formatted as JSON.<br /><br />
-          The agent's text extraction pulled it out as content. The standing orders caught it — hidden text with instruction-like patterns is always flagged before processing. The agent showed the operator the exact string and waited.<br /><br />
+          The agent's text extraction pulled it out as content. The standing orders caught it — hidden text with instruction-like patterns is meant to be flagged before processing. The agent showed the operator the exact string and waited.<br /><br />
           The client had not put it there. They had downloaded the report from a vendor portal. Someone upstream had poisoned it. The document supply chain was longer than anyone had assumed.
         </p>
         <div class="story-meta">
@@ -1496,7 +1501,7 @@
 <p style="margin-bottom:2rem;">Add the standing order to your agent's IDENTITY.md or SOUL.md file. These are read at agent initialisation and persist across sessions. For multi-agent setups, each agent can have its own role-specific standing order alongside the shared general safety order.</p>
 
 <p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">LangChain</p>
-<p style="margin-bottom:2rem;">Include the standing order in your system message when initialising the chat model or agent. For agents using tools, the standing order's tool call rules are particularly important — they prevent agents from invoking tools based on instructions found in external content.</p>
+<p style="margin-bottom:2rem;">Include the standing order in your system message when initialising the chat model or agent. For agents using tools, the standing order's tool call rules are particularly important — they tell the agent not to invoke tools based on instructions found in external content.</p>
 
 <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amber);font-style:italic;text-align:center;margin:2.5rem 0;padding:1.5rem 0;border-top:1px solid rgba(245,158,11,0.2);border-bottom:1px solid rgba(245,158,11,0.2);">AI agents are explorers in the truest sense of the word.</p>
 
@@ -1510,7 +1515,7 @@
 <p style="margin-bottom:2rem;">If your agent framework uses a system prompt, system message, base instructions or any equivalent — that is where the standing order goes. Curiosity Cat is plain text. It works anywhere that accepts instructions in natural language.</p>
 
 <p style="font-weight:700;color:var(--amber);margin-bottom:0.5rem;">Scope Policies</p>
-<p style="margin-bottom:2rem;">For operators who want machine-readable policy enforcement, copy policies/scope-policy-template.json and customise it for your environment. The policy file defines allowed file types, trusted domains, MCP server trust, credential rules and reporting configuration. Your agent or wrapper reads this file and enforces the rules programmatically.</p>
+<p style="margin-bottom:2rem;">For operators who want a machine-readable policy to wire up themselves, copy policies/scope-policy-template.json and customise it for your environment. The policy file defines allowed file types, trusted domains, MCP server trust, credential rules and reporting configuration. It's a template, not a Curiosity Cat–enforced mechanism: your own agent or wrapper is what would read and act on it — only a compiled Claude Code profile is enforced by Curiosity Cat itself today.</p>
 
 </div>
 <div class="page-nav">
@@ -1834,7 +1839,7 @@
       puppy: "When a pup gets lost, the pack finds the way."
     },
     'safety-scenario': {
-      cat: "Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net catches it before the damage is done. Every close call reported makes every agent smarter.",
+      cat: "Your agent is about to install a package. Twelve downloads. Created yesterday. One small mistake, a single letter or a comma just off from the real thing. Safety Net flags it before the damage is done. Every close call reported makes every agent smarter.",
       rat: "Your agent is about to crawl into a pipe that leads nowhere good. Twelve downloads. Created yesterday. One letter off from the real thing. The Safety Net flags the tunnel before the trap springs.",
       puppy: "Your agent is about to fetch a stick from a stranger. Twelve downloads. Created yesterday. One letter off from the real thing. The Safety Net calls it back before it bites."
     },
