@@ -163,7 +163,8 @@ xcrun notarytool log <submission-id> \
 
 `sidecar.rs` spawns `ccat-engine` as a plain child process (no XPC, no
 network entitlement needed beyond what a regular process gets) and
-`watcher.rs` does the same for `curiosity-cat listen`. Tauri's default
+`watcher.rs` spawns that same bundled binary a second time, in `listen`
+mode (APP-BUILD-3). Tauri's default
 `entitlements.plist` (hardened runtime, no extra entitlements) should
 cover this, but unsigned/ad-hoc dev builds never exercise hardened-runtime
 restrictions — verify once step 4 produces a real signed build:

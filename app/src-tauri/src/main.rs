@@ -44,7 +44,7 @@ fn main() {
             .build();
 
             if let Ok(Some(profile_dir)) = commands::get_last_profile_dir(handle.clone()) {
-                watcher::restart(&handle.state::<WatcherState>(), &profile_dir);
+                watcher::restart(&handle, &handle.state::<WatcherState>(), &profile_dir);
             }
 
             if commands::is_first_run(handle.clone()).unwrap_or(true) {

@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
-"""ccat-engine serve — line-delimited JSON-RPC-ish stdio server over core.
+"""ccat-engine — the PyInstaller-bundled sidecar binary's two argv modes.
 
-One request per line on stdin: {"id": ..., "method": ..., "params": {...}}.
-One response per line on stdout: {"id": ..., "result": ...} or
-{"id": ..., "error": "..."}. Never raises out of serve_forever() for a
-malformed line or a core-level failure — those become an error response for
-that request's id (or a null-id error response if the line couldn't be
-parsed at all) so one bad request never kills the connection.
+`serve`: line-delimited JSON-RPC-ish stdio server over core. One request per
+line on stdin: {"id": ..., "method": ..., "params": {...}}. One response per
+line on stdout: {"id": ..., "result": ...} or {"id": ..., "error": "..."}.
+Never raises out of serve_forever() for a malformed line or a core-level
+failure — those become an error response for that request's id (or a
+null-id error response if the line couldn't be parsed at all) so one bad
+request never kills the connection.
+
+`listen`: dispatches straight to curiosity_cat.listen.serve_forever — the
+reference Watcher listener, identical to the `curiosity-cat listen` CLI
+command. Bundled here (rather than as a separate sidecar binary) so
+watcher.rs can spawn it through the same externalBin/resolve-by-name
+mechanism `sidecar.rs` uses for `serve`, with zero dependence on a PATH
+install of the curiosity-cat package in release builds.
 """
 
 import argparse
@@ -14,7 +22,8 @@ import dataclasses
 import json
 import sys
 
-from curiosity_cat import __version__, card, core, discover, purr
+from curiosity_cat import __version__, card, core, discover, listen, purr
+from curiosity_cat.events import WATCHER_HOST, WATCHER_PORT
 
 METHODS = ("compile", "prove", "apply", "unapply", "fleet", "fleet_undo", "estate", "check",
            "report_close_call", "queue_close_call", "list_tray", "submit_approved", "vet", "status",
@@ -228,14 +237,23 @@ def serve_forever(stdin=None, stdout=None):
 
 def main():
     parser = argparse.ArgumentParser(prog="ccat-engine", description="curiosity-cat engine")
-    parser.add_argument("command", nargs="?", choices=["serve"])
+    subparsers = parser.add_subparsers(dest="command")
+    subparsers.add_parser("serve", help="Line-delimited JSON-RPC-ish stdio server (APP-1)")
+    listen_parser = subparsers.add_parser(
+        "listen", help="Reference Watcher listener (curiosity_cat.listen), same as `curiosity-cat listen`"
+    )
+    listen_parser.add_argument("--profile", required=True, help="A directory produced by curiosity-cat compile")
+    listen_parser.add_argument("--host", default=WATCHER_HOST)
+    listen_parser.add_argument("--port", type=int, default=WATCHER_PORT)
     args = parser.parse_args()
 
-    if args.command is None:
+    if args.command == "serve":
+        serve_forever()
+    elif args.command == "listen":
+        listen.serve_forever(args.profile, host=args.host, port=args.port)
+    else:
         parser.print_help()
         sys.exit(1)
-
-    serve_forever()
 
 
 if __name__ == "__main__":

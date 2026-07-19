@@ -9,7 +9,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from curiosity_cat import core, discover, serve
+from curiosity_cat import core, discover, listen, serve
+from curiosity_cat.events import WATCHER_HOST, WATCHER_PORT
 
 
 def test_status_round_trip():
@@ -373,6 +374,63 @@ def test_serve_forever_handles_bad_json_line_without_crashing():
     response = json.loads(line)
     assert response["id"] is None
     assert "invalid JSON" in response["error"]
+
+
+def test_main_with_no_command_prints_help_and_exits(monkeypatch, capsys):
+    monkeypatch.setattr(sys, "argv", ["ccat-engine"])
+    with pytest.raises(SystemExit) as exc_info:
+        serve.main()
+    assert exc_info.value.code == 1
+    assert "usage" in capsys.readouterr().out.lower()
+
+
+def test_main_dispatches_serve(monkeypatch):
+    """This is the argv `ccat-engine serve` Tauri's sidecar mechanism spawns
+    (sidecar.rs) — must still work once `listen` is added alongside it.
+    """
+    called = []
+    monkeypatch.setattr(serve, "serve_forever", lambda: called.append(True))
+    monkeypatch.setattr(sys, "argv", ["ccat-engine", "serve"])
+    serve.main()
+    assert called == [True]
+
+
+def test_main_dispatches_listen_to_the_reference_watcher_listener(monkeypatch, tmp_path):
+    """The APP-BUILD-3 fix: watcher.rs now spawns this same bundled
+    ccat-engine sidecar with `listen --profile <dir>` instead of shelling
+    out to a PATH-installed `curiosity-cat` CLI — so ccat-engine's own argv
+    parsing has to route `listen` to curiosity_cat.listen.serve_forever
+    with the right profile dir and Watcher host/port defaults.
+    """
+    captured = {}
+    monkeypatch.setattr(
+        listen, "serve_forever",
+        lambda profile_dir, host=None, port=None: captured.update(profile_dir=profile_dir, host=host, port=port),
+    )
+    monkeypatch.setattr(sys, "argv", ["ccat-engine", "listen", "--profile", str(tmp_path)])
+    serve.main()
+    assert captured == {"profile_dir": str(tmp_path), "host": WATCHER_HOST, "port": WATCHER_PORT}
+
+
+def test_main_listen_requires_profile(monkeypatch, capsys):
+    monkeypatch.setattr(sys, "argv", ["ccat-engine", "listen"])
+    with pytest.raises(SystemExit):
+        serve.main()
+    assert "--profile" in capsys.readouterr().err
+
+
+def test_main_listen_honors_explicit_host_and_port(monkeypatch, tmp_path):
+    captured = {}
+    monkeypatch.setattr(
+        listen, "serve_forever",
+        lambda profile_dir, host=None, port=None: captured.update(profile_dir=profile_dir, host=host, port=port),
+    )
+    monkeypatch.setattr(
+        sys, "argv",
+        ["ccat-engine", "listen", "--profile", str(tmp_path), "--host", "0.0.0.0", "--port", "9000"],
+    )
+    serve.main()
+    assert captured == {"profile_dir": str(tmp_path), "host": "0.0.0.0", "port": 9000}
 
 
 def test_serve_forever_processes_multiple_lines():

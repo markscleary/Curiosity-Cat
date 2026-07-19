@@ -168,7 +168,7 @@ pub fn set_last_profile_dir(app: AppHandle, profile_dir: String) -> Result<(), S
     let path = last_profile_path(&app)?;
     let contents = serde_json::json!({ "profile_dir": profile_dir }).to_string();
     fs::write(path, contents).map_err(|e| e.to_string())?;
-    crate::watcher::restart(&app.state::<WatcherState>(), &profile_dir);
+    crate::watcher::restart(&app, &app.state::<WatcherState>(), &profile_dir);
     Ok(())
 }
 

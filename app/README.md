@@ -14,7 +14,38 @@ the tray icon a real state machine. APP-D1/APP-D2 added the Assignment
 Model and the apply verb. APP-F1 added Fleet mode. APP-G1 made the Guard
 Board the landing view. APP-S1 added the Settings window. APP-T1 added the
 explanation layer — territory diagrams, explain blocks, and the What-can-do
-panel (see below).
+panel. APP-BUILD-3 closed the last PATH dependency: a bundle copied out of
+the dev tree now brings up a live Watcher with zero reliance on pip or the
+source checkout (see below).
+
+## What APP-BUILD-3 added
+
+A release build copied outside the dev tree used to print
+"could not start watcher listener ... is the curiosity-cat package
+installed (`pip install -e .`)?" and never bring up a live Watcher:
+`watcher.rs` shelled out to a `curiosity-cat` CLI resolved on `PATH`, which
+only existed inside the dev checkout — every test passed because every
+test ran inside it too.
+
+- **`ccat-engine` gained a `listen` argv mode** (`curiosity_cat/serve.py`'s
+  `main()`), dispatching straight to `curiosity_cat/listen.py`'s
+  `serve_forever` — identical code path to the `curiosity-cat listen` CLI
+  command, just reached through the already-bundled sidecar binary instead
+  of a second one.
+- **`watcher.rs` now spawns that same sidecar** via
+  `tauri_plugin_shell`'s `ShellExt::sidecar()` (the mechanism `sidecar.rs`
+  already used for `serve`) with `listen --profile <dir>`, instead of
+  `std::process::Command::new("curiosity-cat")` resolved on `PATH`. No dev-mode
+  PATH fallback was kept — `sidecar.rs`'s own APP-6 switch already proved
+  this mechanism resolves the bundled binary identically in `cargo tauri
+  dev` and in a signed/notarised build, so there was nothing left for a
+  fallback to cover.
+- **`tests/test_app_bundle.py`**, the release gate this bug demanded: ditto
+  a built `.app` to a temp dir outside the repo, launch the copy with the
+  repo stripped from `PATH`/`PYTHONPATH` and a throwaway `$HOME` (isolating
+  Tauri's `app_data_dir()` too, since that's also `$HOME`-derived), and
+  assert within 15s that no watcher error resurfaces, the `ccat-engine
+  listen` child spawns, and the app process is still alive.
 
 ## What APP-T1 added
 
@@ -179,7 +210,8 @@ app/
       main.rs          app bootstrap: tray, sidecar, watcher, first-run routing
       tray.rs           tray icon state machine (asleep/ears-up/hackles/mouse)
       sidecar.rs         spawns + talks to `ccat-engine serve`
-      watcher.rs          spawns/restarts `curiosity-cat listen` (APP-4)
+      watcher.rs          spawns/restarts the bundled ccat-engine sidecar's
+                          `listen` mode (APP-4, bundled sidecar APP-BUILD-3)
       commands.rs         Tauri commands the frontend calls via invoke()
     tray-icons/         placeholder monochrome SVG + runtime PNG per tray state
     icons/              app icon set (32/128/128@2x + icon.icns)
@@ -219,11 +251,9 @@ app/
 - Rust + Cargo (`brew install rust`, or rustup)
 - Node (for the `@tauri-apps/cli`, run via `npx` — no project-local
   `package.json`/`node_modules` needed for v1)
-- The `curiosity-cat` Python package installed somewhere on `PATH` as the
-  `curiosity-cat` CLI (`watcher.rs` spawns
-  `curiosity-cat listen --profile <dir>` — this is not yet bundled, see
-  "Known gap" below). `ccat-engine`, the sidecar, no longer needs a PATH
-  install — see below.
+- Nothing needs to be on `PATH` for a built app to run — see "Sidecar:
+  ccat-engine" below. For local `cargo tauri dev` you still need the
+  sidecar binary built once (same section).
 
 ## Sidecar: ccat-engine
 
@@ -255,12 +285,19 @@ sidecar binary is missing, `sidecar::init` logs to stderr and every
 sidecar-backed command (compile/prove/etc.) returns a clear error rather
 than crashing the app.
 
-**Known gap:** only `ccat-engine` is packaged this way. The Watcher
-listener (`curiosity-cat listen`, `watcher.rs`) still shells out to
-`curiosity-cat` on `PATH` — a signed/notarised build handed to someone
-without a local Python install would have a working Slider/Feed but no
-live watcher. Packaging that as a second sidecar is follow-up work, not
-part of this brief.
+**The Watcher listener is the same binary, a second argv mode.** `watcher.rs`
+spawns this identical bundled `ccat-engine` sidecar with `listen --profile
+<dir>` instead of `serve` — `ccat-engine`'s own argv parsing
+(`curiosity_cat/serve.py`'s `main()`) dispatches that straight to
+`curiosity_cat/listen.py`, the reference Watcher listener, the same code
+`curiosity-cat listen` runs as a CLI command. Resolved by name via the same
+`ShellExt::sidecar()` call `sidecar.rs` uses, so a signed/notarised build
+handed to someone with no local Python install still gets a live Watcher —
+APP-BUILD-3 fixed the previous gap here (this used to shell out to
+`curiosity-cat` on `PATH`, which only worked inside the dev checkout).
+`tests/test_app_bundle.py` is the regression test and release gate: it
+ditto's a built `.app` to a temp dir outside the repo and launches it with
+the repo stripped from `PATH`/`PYTHONPATH`.
 
 ## Dev launch
 
@@ -279,9 +316,10 @@ against `src/` directly. There's no `devUrl`/bundler step; `build.frontendDist`
 `src/**/*.html`/`*.js`, then reopen the window (tray menu, or quit/relaunch)
 to see the change. Rust changes under `src-tauri/` are picked up
 automatically: `tauri dev` recompiles and relaunches the app on save.
-`curiosity-cat` itself (the Watcher listener `watcher.rs` spawns) still
-needs to be on `PATH` for the Feed to go live — `pip install -e .` from the
-repo root, same as any other local run of the CLI.
+Nothing needs to be on `PATH` for the Feed to go live — both the sidecar
+and the Watcher listener resolve through the same bundled `ccat-engine`
+binary — just re-run `build-sidecar.sh` after changing anything under
+`curiosity_cat/`.
 
 ## Building
 
