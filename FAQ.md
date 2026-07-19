@@ -2,64 +2,61 @@
 
 ## What is Curiosity Cat?
 
-A safety framework for AI agents that explore the internet. It helps your agents inspect, filter, quarantine and report risky external inputs before those inputs are trusted, stored or acted on. The minimum install is copying a text file into your agent's system prompt. That takes sixty seconds.
+An open-source safety tool for people who run AI agents without a security team. It compiles a plain-language risk choice — Housecat, Alley Cat or Tiger — into a real, hardened permission profile for the agent, then proves the profile with escape trials instead of just asserting it's safe.
 
-## How does it work?
+## How do I install it?
 
-Three layers. The Safety Net is a set of standing orders — plain text rules your agent follows. The Danger Map is shared threat intelligence — when one agent has a close call, every other agent learns from it. Nine Lives are the stories — real close calls told plainly so people remember the lessons.
+```
+pip install curiosity-cat
+npm install curiosity-cat
+```
 
-## What frameworks does it support?
+The minimum useful install is smaller: copy `standing-orders/general-safety.md` into your agent's system prompt. No account, no API key, sixty seconds. For real enforced permissions on Claude Code, install the CLI and run `compile` and `prove`.
 
-Anything that accepts a system prompt. Claude Code, Nanobot, OpenClaw, LangChain, CrewAI, AutoGen, or anything custom. The standing orders are plain text. If your agent can read instructions, it can use Curiosity Cat.
+## What do the risk levels mean?
+
+Housecat, Alley Cat and Tiger — the adventure slider. Housecat confines the agent to reads and writes within the project and fetches from an explicit domain allowlist. Tiger widens that range. Credential paths — SSH keys, `.env` files, cloud config — are denied at every level; the slider changes how far the agent explores, not that floor.
+
+## What does `prove` actually prove?
+
+Two different things, and the report never blurs them. Self-consistency checks replay the compiled rules against themselves in a throwaway sandbox — they confirm the settings file says what the compiler intended. The observed-deny trial is different: where it's safe, `prove` spawns a real, non-interactive Claude Code session inside the compiled profile, asks it to attempt exactly one denied action, and records whether it was actually stopped. Only the observed trial proves a running agent was stopped. Every line of every Clean Bill says which kind it is.
+
+## What happens if a Clean Bill fails?
+
+`prove` exits nonzero and names the wall that failed — no safe claim gets written. A Clean Bill is a dated report of trials that ran against your profile, and it can fail. That's deliberate: the first time we ran a genuine observed trial against our own compiler, it found a bug — a malformed sandbox setting quietly bypassed the deny rules while every self-consistency check still passed. We fixed it before release and kept the lesson as law: proven, not asserted.
+
+## Does it back up my settings, and can I undo a change?
+
+The macOS app, in final testing, assigns a compiled profile to an agent with backup and undo — your prior settings are saved before a profile is applied, and you can revert. That app hasn't shipped yet; the CLI's `compile` writes each profile to its own dated, versioned directory rather than overwriting anything in place.
+
+## What about agents other than Claude Code?
+
+One compile target ships today: Claude Code, with a real settings file — allow, deny and ask rules a framework actually enforces. Everything else — OpenClaw, Nanobot, LangChain, CrewAI, AutoGen, or any framework that accepts a system prompt — runs on Curiosity Cat's standing orders: plain-text briefing language, clearly labelled as guidance, not enforcement. Targets earn a compiler one at a time, and we won't claim otherwise until one does.
+
+## Does Curiosity Cat collect any telemetry?
+
+No, not today. Nothing is collected or sent off your machine by default. Any future telemetry will be off by default and gated behind explicit consent controls as those features ship — this document will say so plainly when that changes, not before.
+
+## Is the Danger Map the same as telemetry?
+
+No. The Danger Map is an opt-in shared close-call register — reports you choose to submit, structured and anonymised, with identity, credentials, IPs and free text excluded by design. It's separate from telemetry and off unless you turn it on.
+
+## Is this a certification?
+
+No. A Clean Bill is a dated record of trials that ran on your machine against your profile, and it can fail. A certification is a promise. This is a report of what held and what didn't, labelled honestly line by line.
 
 ## What does it cost?
 
-The core framework is free and open source. Personal use, open-source projects and agent framework providers pay nothing. Team and enterprise tiers with private Danger Map instances, custom policy packs and auditable decision trails are planned.
-
-## What does it actually protect against?
-
-Prompt injections hidden in web pages, HTML comments, CSS-hidden text and document metadata. Malicious downloads disguised as legitimate packages. Credential phishing through fake authentication pages. Data exfiltration through search queries that leak internal information. Permission escalation where agents use tools beyond their defined scope. Deceptive redirect chains. Memory poisoning through corrupted external content.
-
-## Is this just a system prompt?
-
-The minimum install is a system prompt addition — and that alone provides meaningful protection. The full framework includes scope policies, file quarantine, domain trust controls, policy packs for different agent types and the shared Danger Map intelligence layer.
-
-## Does it slow my agent down?
-
-No. The standing orders are read once when the agent starts. They add no latency to operations. The quarantine and reporting happen only when something suspicious is detected — which is exactly when you want your agent to slow down.
-
-## How is this different from guardrails or content filters?
-
-Guardrails filter what an agent says. Curiosity Cat protects what an agent does — where it goes, what it downloads, what it trusts, what it reports. It is an operational safety layer, not a content moderation tool.
-
-## Who built this?
-
-Short+Sweet International — a performing arts organisation that has spent 25 years creating safe spaces for creative risk-taking across 15 countries. The same philosophy applies: give people boundaries, then let them explore.
-
-## Why is a theatre company building agent security?
-
-Because the problem is the same. For 25 years S+S has helped first-time artists take risks on stage and survive the experience. The people deploying agents right now are in the same position — excited, exposed and learning as they go. They need a system that helps them survive the exploration, not one that stops them from exploring.
-
-## What is The Quine?
-
-A non-financial creative credential. Not a token, not a coin, not a payment. A verified record of contribution — a number in a ledger that proves you showed up and did something worth recognising. Operators earn Quines by reporting verified close calls, submitting stories, contributing framework adapters and translating documentation.
-
-## What are Stray Cats?
-
-Automated exploration agents deployed by S+S that deliberately wander dangerous parts of the web, interact with unknown MCP servers, click suspicious links and trigger traps. They carry fake credentials and dummy API keys. They are designed to get scratched so that real agents do not have to. Their findings feed the Danger Map.
-
-## What languages does it support?
-
-English, Arabic and Mandarin Chinese from launch. No agent security product currently exists in Arabic. Additional languages are added as the community contributes translations.
+Nothing. MIT licence, source on GitHub. Install it, fork it, ship it inside your own products.
 
 ## Can I contribute?
 
-Yes. Framework adapters, policy packs, translations, stories and threat reports are all welcome. See CONTRIBUTING.md for details. Contributions earn Quines.
+Yes. Framework adapters, policy packs, translations, stories and threat reports are all welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Active contributors earn Quines, a non-financial credential that becomes trust reputation in the Danger Map.
 
-## Is my data safe?
+## What languages does it support?
 
-The Danger Map never collects user identity, personal information, agent configurations, API keys, credentials, IP addresses or the content of the work being done. Reports are structured, sanitised and anonymous by design. Operators can choose full reporting, domain-only reporting or local-only mode where no data leaves their system.
+English, Arabic, Mandarin and Hindi at launch. Additional languages are added as the community contributes translations.
 
-## What if I just want to try it without signing up for anything?
+## Is there a graphical app, or is this CLI-only?
 
-Copy the contents of standing-orders/general-safety.md into your agent's system prompt. That is the whole install. No account, no registration, no API key. Your agent is protected.
+Today it's CLI-only: `compile`, `prove`, and the standing orders you paste by hand. A macOS app — fleet discovery, one-click profile assignment with backup and undo, a live guard board — is in final testing and not yet released.
