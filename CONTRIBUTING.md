@@ -18,7 +18,7 @@ The best close calls become Stories — published weekly in English, Arabic and 
 
 ### Build Framework Adapters
 
-Curiosity Cat works with any agent framework but works better with dedicated adapters. If you build an adapter for a framework not yet supported, submit it.
+`curiosity-cat compile` supports one target today: Claude Code. It's built so a new target is an added mapping from the existing adventure-level definitions, not a rewrite of them — if you want to add a compile target for another framework, that's the shape to follow. Frameworks without a compile target still work via standing orders; adapters that make those easier to wire in are welcome too.
 
 ### Translate
 
