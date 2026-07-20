@@ -26,17 +26,27 @@ pub async fn sidecar_call(
 
 /// Show a window for `label`/`url`, creating it on first use and just
 /// focusing it on subsequent calls (tray menu clicks, first-run
-/// navigation) rather than stacking duplicate windows.
+/// navigation, the initial launch window) rather than stacking duplicate
+/// windows. Logs `WINDOW_SHOWN` on stdout every time a window actually
+/// becomes visible — the foreign-directory release gate
+/// (tests/test_app_bundle.py) greps a launched bundle's output for this
+/// line, since a healthy engine/watcher chain with no window ever shown
+/// (APP-BUILD-4) is otherwise invisible to that test.
 pub fn show_window(app: &AppHandle, label: &str, url: &str) {
     if let Some(window) = app.get_webview_window(label) {
         let _ = window.show();
         let _ = window.set_focus();
+        println!("[curiosity-cat] WINDOW_SHOWN label={label}");
         return;
     }
-    let _ = WebviewWindowBuilder::new(app, label, WebviewUrl::App(url.into()))
+    match WebviewWindowBuilder::new(app, label, WebviewUrl::App(url.into()))
         .title("Curiosity Cat")
         .inner_size(720.0, 560.0)
-        .build();
+        .build()
+    {
+        Ok(_) => println!("[curiosity-cat] WINDOW_SHOWN label={label}"),
+        Err(e) => eprintln!("[curiosity-cat] could not create window {label}: {e}"),
+    }
 }
 
 #[tauri::command]

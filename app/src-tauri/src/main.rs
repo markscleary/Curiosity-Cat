@@ -47,12 +47,23 @@ fn main() {
                 watcher::restart(&handle, &handle.state::<WatcherState>(), &profile_dir);
             }
 
+            // APP-BUILD-4: every launch shows a window immediately — never
+            // wait on the sidecar/watcher to be ready first, since a
+            // healthy backend with no window on screen just reads as "the
+            // app didn't open" (APP_SPEC: protection state always visible
+            // beats invisible). First-run gets the first-run journey;
+            // every later launch lands straight on the Guard Board
+            // (APP-G1's landing view), which renders its own "Loading
+            // estate…" placeholder and fills in once the estate scan
+            // returns rather than the shell holding the window back.
             if commands::is_first_run(handle.clone()).unwrap_or(true) {
                 commands::open_window(
                     handle,
                     "firstrun".to_string(),
                     "firstrun/choose.html".to_string(),
                 );
+            } else {
+                commands::open_window(handle, "board".to_string(), "board.html".to_string());
             }
 
             Ok(())

@@ -1,5 +1,6 @@
 """Release gate: the built .app must run with zero dependence on pip, the
-source checkout, or the repo cwd (APP-BUILD-3).
+source checkout, or the repo cwd (APP-BUILD-3), and must actually show a
+window on launch (APP-BUILD-4).
 
 Regression covered: a bundle copied out of the dev tree and launched with
 the repo entirely off PATH/PYTHONPATH used to print
@@ -9,6 +10,13 @@ watcher.rs shelled out to a PATH-resolved `curiosity-cat` CLI instead of
 the bundled `ccat-engine` sidecar. This test ditto's the built bundle to a
 temp dir outside the repo and launches the copy with a stripped
 environment to prove that's no longer true.
+
+Second regression covered (APP-BUILD-4): the engine/watcher chain coming
+up healthy said nothing about whether a window was ever created — main.rs
+only opened a window for the first-run journey, so every later launch was
+silently windowless. commands::show_window now prints `WINDOW_SHOWN` on
+stdout whenever a window is created or re-shown; this test asserts that
+line appears, not just that the watcher started.
 
 Every path here — the copied bundle, its fake $HOME (which redirects both
 Tauri's app_data_dir and any Python-side home resolution), the seeded
@@ -32,6 +40,7 @@ LAUNCH_TIMEOUT_SECONDS = 15
 POLL_INTERVAL_SECONDS = 0.2
 
 WATCHER_ERROR_MARKERS = ("could not start watcher listener", "pip install -e .")
+WINDOW_SHOWN_MARKER = "WINDOW_SHOWN"
 
 
 def _requires_bundle():
@@ -107,7 +116,8 @@ def test_foreign_directory_launch_starts_the_watcher_with_no_pip_dependence(copi
         try:
             deadline = time.monotonic() + LAUNCH_TIMEOUT_SECONDS
             engine_listen_pid = None
-            while time.monotonic() < deadline and engine_listen_pid is None:
+            window_shown = False
+            while time.monotonic() < deadline and (engine_listen_pid is None or not window_shown):
                 assert proc.poll() is None, (
                     f"app process exited early with code {proc.returncode} — "
                     f"stderr:\n{stderr_path.read_text(errors='replace')}"
@@ -121,7 +131,9 @@ def test_foreign_directory_launch_starts_the_watcher_with_no_pip_dependence(copi
                         if int(ppid) == proc.pid:
                             engine_listen_pid = int(pid)
                             break
-                if engine_listen_pid is None:
+                if not window_shown and WINDOW_SHOWN_MARKER in stdout_path.read_text(errors="replace"):
+                    window_shown = True
+                if engine_listen_pid is None or not window_shown:
                     time.sleep(POLL_INTERVAL_SECONDS)
 
             captured_stdout = stdout_path.read_text(errors="replace")
@@ -133,6 +145,11 @@ def test_foreign_directory_launch_starts_the_watcher_with_no_pip_dependence(copi
                 assert marker not in combined, f"watcher error resurfaced: {marker!r} in output:\n{combined}"
             assert engine_listen_pid is not None, (
                 f"no `ccat-engine listen` child of pid {proc.pid} within {LAUNCH_TIMEOUT_SECONDS}s — "
+                f"stdout:\n{captured_stdout}\nstderr:\n{captured_stderr}"
+            )
+            assert WINDOW_SHOWN_MARKER in captured_stdout, (
+                f"no {WINDOW_SHOWN_MARKER!r} within {LAUNCH_TIMEOUT_SECONDS}s — the app came up with a healthy "
+                f"engine/watcher chain but never showed a window (APP-BUILD-4) — "
                 f"stdout:\n{captured_stdout}\nstderr:\n{captured_stderr}"
             )
 
