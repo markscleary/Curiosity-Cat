@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hardened-runtime entitlements for the notarised Developer ID build.
+
+  Curiosity Cat embeds a PyInstaller-built `ccat-engine` sidecar (a Mach-O
+  the shell spawns as a child, twice: once for `serve`, once for `listen`
+  per APP-BUILD-3). PyInstaller's onefile bootloader unpacks and executes
+  code at runtime, which the hardened runtime blocks by default. These three
+  entitlements are the standard set an embedded-CPython/PyInstaller binary
+  needs so it still spawns under notarisation:
+
+    - allow-jit                         : JIT pages (Python + WKWebView)
+    - allow-unsigned-executable-memory  : PyInstaller bootloader exec
+    - disable-library-validation        : load the sidecar's bundled dylibs
+                                          (not signed by this Team)
+
+  Referenced by tools/sign_and_notarize.sh's codesign step. Kept minimal:
+  no Photos/Camera/Mic/Contacts/network-server entitlements — none are used
+  (see docs/app/APP_SPEC.md Permissions Doctrine).
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+  <true/>
+  <key>com.apple.security.cs.disable-library-validation</key>
+  <true/>
+</dict>
+</plist>
