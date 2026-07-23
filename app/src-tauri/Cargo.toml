@@ -1,6 +1,6 @@
 [package]
 name = "curiosity-cat"
-version = "0.1.0"
+version = "0.2.0"
 description = "Curiosity Cat — menu bar shell for the AI agent safety framework"
 authors = ["Mark Cleary"]
 edition = "2021"
