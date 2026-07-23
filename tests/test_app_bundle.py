@@ -18,6 +18,18 @@ silently windowless. commands::show_window now prints `WINDOW_SHOWN` on
 stdout whenever a window is created or re-shown; this test asserts that
 line appears, not just that the watcher started.
 
+Third regression covered (APP-BUILD-6): a real-user report of the Guard
+Board rendering greyed behind a dead confirm/cancel modal traced to
+sidecar.rs's `call()` having no bound at all on how long it would wait for
+ccat-engine's stdout — a hung or unresponsive engine left "Protect/Undo
+whole fleet" permanently disabled with no error, indistinguishable from a
+dead button. `test_confirm_transport_round_trip_within_timeout` below drives
+the exact stdio transport board.js's Confirm action uses (line-delimited
+JSON to the built `ccat-engine` binary, the same one Tauri's sidecar spawns)
+and asserts a response lands well inside the 5s bound sidecar.rs now
+enforces — proving the wiring the Confirm button depends on actually
+answers rather than dead-ending silently.
+
 Every path here — the copied bundle, its fake $HOME (which redirects both
 Tauri's app_data_dir and any Python-side home resolution), the seeded
 profile dir — lives under `tmp_path`. Nothing in this file ever reads or
@@ -26,6 +38,7 @@ writes the real ~/.hermes or ~/Library/Application Support.
 
 import json
 import os
+import selectors
 import signal
 import subprocess
 import sys
@@ -162,3 +175,101 @@ def test_foreign_directory_launch_starts_the_watcher_with_no_pip_dependence(copi
             except ProcessLookupError:
                 pass
             proc.wait(timeout=5)
+
+
+CONFIRM_TRANSPORT_TIMEOUT_SECONDS = 5
+
+
+def _read_line_with_timeout(stream, timeout_seconds):
+    """Reads one newline-terminated line from `stream` (a raw byte pipe),
+    or returns None if nothing arrives within `timeout_seconds`. Reads the
+    underlying fd directly via `selectors` rather than a buffered file
+    read, so this can't itself block past the deadline it's enforcing.
+    """
+    sel = selectors.DefaultSelector()
+    sel.register(stream, selectors.EVENT_READ)
+    try:
+        deadline = time.monotonic() + timeout_seconds
+        buf = b""
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0 or not sel.select(timeout=remaining):
+                return None
+            chunk = os.read(stream.fileno(), 4096)
+            if not chunk:
+                return None
+            buf += chunk
+            if b"\n" in buf:
+                return buf.split(b"\n", 1)[0]
+    finally:
+        sel.close()
+
+
+def test_confirm_transport_round_trip_within_timeout(copied_bundle, tmp_path):
+    """Drives the exact stdio transport the Guard Board's "Protect whole
+    fleet" Confirm action uses — a line-delimited JSON `fleet` request to
+    the built `ccat-engine` binary (sidecar.rs spawns this same binary with
+    argv `serve`) — and asserts a response lands well inside the 5s bound
+    now enforced in sidecar.rs. This is the transport a hung/unresponsive
+    engine used to leave the Confirm button silently dead against.
+    """
+    engine_exe = copied_bundle / "Contents" / "MacOS" / "ccat-engine"
+    assert engine_exe.exists()
+
+    fake_home = tmp_path / "fake-home"
+    fake_home.mkdir()
+    project = tmp_path / "estate" / "myproject"
+    project.mkdir(parents=True)
+
+    env = {
+        "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+        "HOME": str(fake_home),
+        "USER": os.environ.get("USER", "tester"),
+        "CURIOSITY_CAT_HOME": str(tmp_path / "cc-home"),
+    }
+
+    proc = subprocess.Popen(
+        [str(engine_exe), "serve"],
+        cwd="/",
+        env=env,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        bufsize=0,
+    )
+    try:
+        # sidecar.rs spawns ccat-engine once, eagerly, at app startup
+        # (main.rs's setup()) — long before any window is even up for a
+        # user to click Confirm on — and keeps that one process alive for
+        # the rest of the session. A onefile PyInstaller binary's one-time
+        # self-extraction happens during that startup spawn, not on every
+        # call, so it's warmed up here with a generously-timed request
+        # before the actually-timed one below, matching that real shape
+        # rather than conflating cold-start unpack time with per-call
+        # latency (what board.js's Confirm button is actually exposed to).
+        proc.stdin.write((json.dumps({"id": 0, "method": "status", "params": {}}) + "\n").encode())
+        proc.stdin.flush()
+        warmup_line = _read_line_with_timeout(proc.stdout, LAUNCH_TIMEOUT_SECONDS)
+        assert warmup_line is not None, f"ccat-engine never came up within {LAUNCH_TIMEOUT_SECONDS}s"
+
+        request = {
+            "id": 1,
+            "method": "fleet",
+            "params": {"level": "housecat", "observed": False, "targets": [str(project)]},
+        }
+        proc.stdin.write((json.dumps(request) + "\n").encode())
+        proc.stdin.flush()
+
+        line = _read_line_with_timeout(proc.stdout, CONFIRM_TRANSPORT_TIMEOUT_SECONDS)
+        assert line is not None, (
+            f"ccat-engine gave no response within {CONFIRM_TRANSPORT_TIMEOUT_SECONDS}s of an already-warm "
+            "process — the exact silent dead-end APP-BUILD-6 traced the stuck Confirm modal to"
+        )
+
+        response = json.loads(line)
+        assert response["id"] == 1
+        assert "error" not in response, response.get("error")
+        assert (project / ".claude" / "settings.json").exists()
+    finally:
+        proc.kill()
+        proc.wait(timeout=5)

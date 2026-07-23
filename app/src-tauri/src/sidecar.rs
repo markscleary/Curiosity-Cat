@@ -15,10 +15,18 @@
 //! an `.await`.
 
 use serde_json::{json, Value};
+use std::time::Duration;
 use tauri::AppHandle;
 use tauri::async_runtime::Mutex;
 use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 use tauri_plugin_shell::ShellExt;
+
+/// A hung or unresponsive ccat-engine used to have no bound at all: `call()`
+/// awaited its stdout receiver forever, which meant a confirm action (Guard
+/// Board's Protect/Undo whole fleet) could look "stuck" indefinitely with no
+/// error and no button ever re-enabling (APP-BUILD-6). Every request now
+/// gives up after this long and reports a clear timeout error instead.
+const CALL_TIMEOUT: Duration = Duration::from_secs(5);
 
 pub struct Sidecar {
     child: CommandChild,
@@ -43,7 +51,8 @@ impl Sidecar {
 
     async fn call(&mut self, method: &str, params: Value) -> Result<Value, String> {
         self.next_id += 1;
-        let request = json!({ "id": self.next_id, "method": method, "params": params });
+        let id = self.next_id;
+        let request = json!({ "id": id, "method": method, "params": params });
         let mut line = serde_json::to_string(&request).map_err(|e| e.to_string())?;
         line.push('\n');
 
@@ -51,33 +60,116 @@ impl Sidecar {
             .write(line.as_bytes())
             .map_err(|e| format!("failed writing to ccat-engine stdin: {e}"))?;
 
-        // ccat-engine writes exactly one response line per request, in
-        // order (serve.py's serve_forever loop), so the first Stdout event
-        // after our write is always this call's response — stderr lines
-        // (Python tracebacks, warnings) are logged and skipped rather than
-        // treated as the answer.
-        while let Some(event) = self.rx.recv().await {
-            match event {
-                CommandEvent::Stdout(bytes) => {
-                    let text = String::from_utf8_lossy(&bytes);
-                    let response: Value = serde_json::from_str(text.trim())
-                        .map_err(|e| format!("malformed response from ccat-engine: {e}"))?;
-                    if let Some(error) = response.get("error") {
-                        return Err(error.as_str().unwrap_or("unknown ccat-engine error").to_string());
-                    }
-                    return Ok(response.get("result").cloned().unwrap_or(Value::Null));
-                }
-                CommandEvent::Stderr(bytes) => {
-                    eprintln!("[ccat-engine] {}", String::from_utf8_lossy(&bytes).trim_end());
-                }
-                CommandEvent::Error(e) => return Err(format!("ccat-engine sidecar error: {e}")),
-                CommandEvent::Terminated(payload) => {
-                    return Err(format!("ccat-engine exited (code {:?})", payload.code));
-                }
-                _ => {}
-            }
+        match tokio::time::timeout(CALL_TIMEOUT, read_response(&mut self.rx, id)).await {
+            Ok(result) => result,
+            Err(_) => Err(format!(
+                "ccat-engine did not respond to \"{method}\" within {}s",
+                CALL_TIMEOUT.as_secs()
+            )),
         }
-        Err("ccat-engine closed its stdout (process exited)".to_string())
+    }
+}
+
+/// Reads Stdout events until one parses as the response to `expected_id`,
+/// logging Stderr (Python tracebacks, warnings) rather than treating it as
+/// the answer. A response left over from a call that already timed out
+/// carries a stale id and is skipped here rather than handed to whichever
+/// later call happens to be waiting next — see `parse_response`.
+async fn read_response(
+    rx: &mut tauri::async_runtime::Receiver<CommandEvent>,
+    expected_id: u64,
+) -> Result<Value, String> {
+    while let Some(event) = rx.recv().await {
+        match event {
+            CommandEvent::Stdout(bytes) => match parse_response(&bytes, expected_id) {
+                Some(result) => return result,
+                None => continue,
+            },
+            CommandEvent::Stderr(bytes) => {
+                eprintln!("[ccat-engine] {}", String::from_utf8_lossy(&bytes).trim_end());
+            }
+            CommandEvent::Error(e) => return Err(format!("ccat-engine sidecar error: {e}")),
+            CommandEvent::Terminated(payload) => {
+                return Err(format!("ccat-engine exited (code {:?})", payload.code));
+            }
+            _ => {}
+        }
+    }
+    Err("ccat-engine closed its stdout (process exited)".to_string())
+}
+
+/// Parses one stdout line as a `{"id": ..., "result"|"error": ...}` response
+/// (serve.py's wire format). Returns `None` when the line's id doesn't match
+/// `expected_id` — a stale response for an already-timed-out call — so the
+/// caller keeps waiting instead of returning the wrong request's answer.
+fn parse_response(bytes: &[u8], expected_id: u64) -> Option<Result<Value, String>> {
+    let text = String::from_utf8_lossy(bytes);
+    let response: Value = match serde_json::from_str(text.trim()) {
+        Ok(v) => v,
+        Err(e) => return Some(Err(format!("malformed response from ccat-engine: {e}"))),
+    };
+    if response.get("id").and_then(Value::as_u64) != Some(expected_id) {
+        return None;
+    }
+    if let Some(error) = response.get("error") {
+        return Some(Err(error.as_str().unwrap_or("unknown ccat-engine error").to_string()));
+    }
+    Some(Ok(response.get("result").cloned().unwrap_or(Value::Null)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_response_matching_id_returns_the_result() {
+        let result = parse_response(br#"{"id":1,"result":{"ok":true}}"#, 1).expect("should match");
+        assert_eq!(result.unwrap(), json!({"ok": true}));
+    }
+
+    #[test]
+    fn parse_response_matching_id_returns_the_error() {
+        let result = parse_response(br#"{"id":2,"error":"boom"}"#, 2).expect("should match");
+        assert_eq!(result.unwrap_err(), "boom");
+    }
+
+    #[test]
+    fn parse_response_missing_result_defaults_to_null() {
+        let result = parse_response(br#"{"id":3}"#, 3).expect("should match");
+        assert_eq!(result.unwrap(), Value::Null);
+    }
+
+    #[test]
+    fn parse_response_stale_id_is_skipped_not_misdelivered() {
+        // A response for a call that already timed out (APP-BUILD-6) must
+        // never be handed to a later call waiting on a different id.
+        assert!(parse_response(br#"{"id":1,"result":{"ok":true}}"#, 2).is_none());
+    }
+
+    #[test]
+    fn parse_response_malformed_json_is_an_error_regardless_of_id() {
+        let result = parse_response(b"not json", 1).expect("malformed is always Some");
+        assert!(result.unwrap_err().contains("malformed response"));
+    }
+
+    #[tokio::test]
+    async fn read_response_times_out_when_nothing_ever_arrives() {
+        let (_tx, mut rx) = tokio::sync::mpsc::channel::<CommandEvent>(1);
+        let outcome = tokio::time::timeout(Duration::from_millis(50), read_response(&mut rx, 1)).await;
+        assert!(outcome.is_err(), "expected the outer timeout to fire, got {outcome:?}");
+    }
+
+    #[tokio::test]
+    async fn read_response_skips_a_stale_response_and_returns_the_matching_one() {
+        let (tx, mut rx) = tokio::sync::mpsc::channel::<CommandEvent>(4);
+        tx.send(CommandEvent::Stdout(br#"{"id":1,"result":"stale"}"#.to_vec()))
+            .await
+            .unwrap();
+        tx.send(CommandEvent::Stdout(br#"{"id":2,"result":"fresh"}"#.to_vec()))
+            .await
+            .unwrap();
+        let result = read_response(&mut rx, 2).await.unwrap();
+        assert_eq!(result, json!("fresh"));
     }
 }
 
