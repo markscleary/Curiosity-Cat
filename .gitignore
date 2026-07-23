@@ -21,3 +21,6 @@ site/*.jpeg
 site/*.png
 site/*.gif
 site/*.webp
+
+# scripted Guard Board captures (tools/screenshot_guard_board.py)
+screenshots/
